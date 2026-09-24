@@ -1,0 +1,16073 @@
+/* § 0 — حرس الأخطاء: أول سكريبت يشغّل، بيصطاد أي خطأ ويعرضه بالعربي على الشاشة */
+(function(){
+  "use strict";
+  window.__MH_ERRS__ = [];
+  window.__MH_BOOT__ = false;
+  window.__MH_VER__ = "v٢٠٢٦-٠٩-٢٢-ج"; /* شارة النسخة — نفس رقم <title> و mhVerBadge و verTag بالظبط */
+  document.addEventListener("DOMContentLoaded", function(){
+    var vb = document.getElementById("mhVerBadge");
+    if (vb) vb.textContent = window.__MH_VER__;
+    var vt = document.getElementById("verTag");
+    if (vt) vt.textContent = window.__MH_VER__;
+  });
+  /* ختم السلامة: assemble.py بيحقن حجم الملف الحقيقي مكان العنصر النائب — بيكشف أي نسخة متبظّرة فورًا */
+  window.__MH_STAMP__ = { scripts: 8, bytes: 0, tail: "<!--مِحْبَر:الملف-مكتمل-->" };
+  function mhShow(msg, where){
+    try{
+      var b = document.getElementById("mh-errbar");
+      if(!b){
+        b = document.createElement("div");
+        b.id = "mh-errbar";
+        b.setAttribute("dir","rtl");
+        b.style.cssText = "position:fixed;z-index:2147483647;left:12px;right:12px;bottom:12px;max-width:560px;margin:0 auto;background:#0B0906;color:#EAD3A2;border:1px solid #41382A;border-radius:12px;padding:12px 14px;font:13px/1.7 system-ui,Tahoma,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.45)";
+        b.innerHTML = '<b style="color:#EAD3A2">مِحْبَر — حصل خطأ غير متوقع <span style="color:#6E5325">(' + (window.__MH_VER__ || "?") + ')</span></b>'
+          + '<div id="mh-errtxt" style="margin-top:6px;word-break:break-word;direction:ltr;text-align:left;font-family:monospace;font-size:11.5px;color:#F3EDE1;white-space:pre-wrap"></div>'
+          + '<button onclick="this.parentNode.remove()" style="margin-top:8px;border:1px solid #41382A;background:#13100B;color:#EAD3A2;border-radius:8px;padding:5px 12px;cursor:pointer">حسّن، اقفل</button>';
+        (document.body || document.documentElement).appendChild(b);
+      }
+      var t = document.getElementById("mh-errtxt");
+      var line = String(msg).slice(0, 300) + (where ? "\n@ " + where : "");
+      if(t) t.textContent = line;
+      window.__MH_ERRS__.push(line);
+    }catch(e){}
+  }
+  window.__MH_SHOW__ = mhShow;
+  window.addEventListener("error", function(e){
+    if(e && e.target !== window && e.target !== document) return; /* أخطاء الموارد تتجاهل */
+    mhShow(e && e.message ? e.message : "خطأ غير معروف",
+      ((e && e.filename) ? String(e.filename).split("/").pop() : "") + ":" + ((e && e.lineno) || "?"));
+  }, true);
+  window.addEventListener("unhandledrejection", function(e){
+    var r = e && e.reason;
+    mhShow(r && (r.message || r.stack) ? String(r.message || r) : String(r), "promise");
+  });
+  /* ═══ كاشف النسخ البايظة: بيكشف الملف المقطوع/المعدّل ويعرض بطاقة إرشادية عربية ═══ */
+  function mhBroken(findings){
+    try{
+      if(document.getElementById("mh-broken")) return;
+      var ov = document.createElement("div");
+      ov.id = "mh-broken";
+      ov.setAttribute("dir","rtl");
+      ov.style.cssText = "position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:rgba(10,7,2,.93);display:flex;align-items:center;justify-content:center;padding:18px";
+      var card = document.createElement("div");
+      card.style.cssText = "background:linear-gradient(160deg,#13100B,#0B0906);color:#F3EDE1;border:1px solid #6E5325;border-radius:16px;max-width:520px;width:100%;padding:20px 18px;font:14px/1.9 system-ui,Tahoma,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.6)";
+      card.innerHTML = '<div style="font-size:17px;font-weight:700;color:#EAD3A2">النسخة اللي فاتحها بايظة أو مش كاملة</div>'
+        + '<div style="margin-top:4px;font-size:12px;color:#A89D89">' + (window.__MH_VER__ || "") + '</div>'
+        + '<div style="margin-top:10px;background:#13100B;border:1px solid #41382A;border-radius:10px;padding:10px 12px;font-size:12.5px">' + findings + '</div>'
+        + '<div style="margin-top:12px;font-weight:700;color:#EAD3A2">اعمل الآتي:</div>'
+        + '<div style="margin-top:10px;font-size:12.5px;color:#EAD3A2">السبب المعروف: نسخة نزّلتها كملف HTML خام من الشات، أو فاتحها من «معاينة» جوه التطبيق — الاتنين بيكسّروا السكريبت. الحل الوحيد المضمون تحت.</div>'
+        + '<ol style="margin:6px 18px 0 0;padding:0;font-size:13px;line-height:2">'
+        + '<li>امسح أي نسخة قديمة من الملف من جهازك (زي 11VIP.html أو index.html).</li>'
+        + '<li>نزّل ملف <b style="color:#EAD3A2">مِحْبَر-الخط-الاستوديو.zip</b> — الضغط بيحمي الملف من التلف أثناء النقل.</li>'
+        + '<li>فك الضغط وافتح الملف اللي جوّاه مباشرة — متفتحش نسخ قديمة محفوظة.</li>'
+        + '<li>اتأكد إن شارة النسخة ' + (window.__MH_VER__ || "") + ' ظاهرة فوق جنب اسم مِحْبَر.</li>'
+        + '</ol>'
+        + '<button onclick="var o=document.getElementById(&quot;mh-broken&quot;); if(o) o.remove()" style="margin-top:14px;width:100%;border:1px solid #41382A;background:#0B0906;color:#EAD3A2;border-radius:10px;padding:10px;cursor:pointer;font-size:13px">خفّي التحذير وكمّل</button>';
+      (document.body || document.documentElement).appendChild(ov);
+      ov.appendChild(card);
+      window.__MH_ERRS__.push("نسخة بايظة: " + findings.replace(/<[^>]+>/g, " "));
+    }catch(e){}
+  }
+  function mhIntegrity(){
+    try{
+      var st = window.__MH_STAMP__;
+      if(!st) return;
+      var f = [];
+      /* ⚠ إصلاح «9 سكريبتات بدل 8»: querySelectorAll("script") بيرجع كل
+         السكريبتات بما فيها الديناميكية اللي بتضيفها loadScript (fontkit CDN).
+         بنعّد بس السكريبتات الثابتة (inline من غير src) — الديناميكية
+         اللي ليها src خارجي مش جزء من الملف الأصلي فما تتحسبش. */
+      var allScripts = document.querySelectorAll("script");
+      var staticCount = 0;
+      for (var i = 0; i < allScripts.length; i++) {
+        var sc = allScripts[i];
+        if (sc.src) continue; /* سكريبتات خارجية (CDN) مش جزء من الملف */
+        /* سكريبتات بتضيفها إضافات المتصفح أو أدوات المطوّر عادةً بتبقى
+           من غير أي محتوى مرتبط بمِحْبَر — نتجاهلها بدل ما نعتبرها كسر */
+        var txt = sc.textContent || "";
+        if (txt.indexOf("مِحْبَر") === -1 && txt.indexOf("MH_") === -1 && txt.trim().length < 40) continue;
+        staticCount++;
+      }
+      if(staticCount < st.scripts) f.push("عدد بلوكات الكود " + staticCount + " والمفروض " + st.scripts + " — الملف اتقطع أو اتعدل جوّه");
+      var leaked = ((document.body && document.body.innerText) || "").match(/function\s*\w*\s*\(|document\.write|addEventListener\(/g) || [];
+      if(leaked.length >= 3) f.push("كود برمجي ظاهر كنص في الصفحة (" + leaked.length + " مقطع) — السكريبت اتشقق والنسخة مش سليمة");
+      if(document.documentElement.outerHTML.indexOf(st.tail) === -1) f.push("علامة نهاية الملف مش موجودة — الملف مقطوع من الآخر أو ناقص");
+      if(f.length) mhBroken("<ul style='margin:0;padding-right:16px'>" + f.map(function(x){ return "<li>" + x + "</li>"; }).join("") + "</ul>");
+      /* فحص الحجم: برضه بيتعمل بس للسكريبتات الثابتة عشان التغييرات المشروعة
+         (زي إصلاحات الكود) ما تطلّشش تحذير كاذب. بنقارن نسبة الانحراف بدل
+         المطابقة التامة — 5% تغيير مقبول للإصلاحات. */
+      if(st.bytes && String(location.protocol).indexOf("http") === 0){
+        try{
+          fetch(location.href, { cache: "no-store" }).then(function(r){ return r.arrayBuffer(); }).then(function(buf){
+            var ratio = Math.abs(buf.byteLength - st.bytes) / st.bytes;
+            if(ratio > 0.05)  /* أكتر من 5% فرق = نسخة مختلفة فعلاً */
+              mhBroken("حجم الملف المفتوح " + buf.byteLength + " بايت والمفروض " + st.bytes + " بايت — النسخة اللي عندك مش النسخة الأصلية. نزّل ملف ZIP وافتح الملف اللي جوّاه.");
+          }).catch(function(){});
+        }catch(e){}
+      }
+    }catch(e){}
+  }
+  window.addEventListener("load", function(){
+    mhIntegrity();
+    setTimeout(function(){
+      if(!window.__MH_BOOT__ && !window.__MH_ERRS__.length){
+        mhShow("الملف اتحمّل ناقص — النسخة المفتوحة عندك مش كاملة (قناة النقل بوظتها). افتح النسخة الصح من ملف ZIP — المفروض تشوف شارة "
+          + (window.__MH_VER__ || "?") + " جنب اسم مِحْبَر.",
+          "تحميل ناقص");
+      }
+    }, 3000);
+  });
+})();
+
+window.__mihabarGroupedViewEnabled=window.__mihabarGroupedViewEnabled||function(){try{return localStorage.getItem("mihabarGroupedView")==="1"}catch(e){return false}};
+
+/*
+        imagetracer.js version 1.2.6
+        Simple raster image tracer and vectorizer written in JavaScript.
+        andras@jankovics.net
+*/
+
+/*
+
+The Unlicense / PUBLIC DOMAIN
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to http://unlicense.org/
+
+*/
+
+(function(){ 'use strict';
+
+function ImageTracer(){
+        var _this = this;
+
+        this.versionnumber = '1.2.6',
+        
+        ////////////////////////////////////////////////////////////
+        //
+        //  API
+        //
+        ////////////////////////////////////////////////////////////
+        
+        // Loading an image from a URL, tracing when loaded,
+        // then executing callback with the scaled svg string as argument
+        this.imageToSVG = function( url, callback, options ){
+                options = _this.checkoptions(options);
+                // loading image, tracing and callback
+                _this.loadImage(
+                        url,
+                        function(canvas){
+                                callback(
+                                        _this.imagedataToSVG( _this.getImgdata(canvas), options )
+                                );
+                        },
+                        options
+                );
+        },// End of imageToSVG()
+        
+        // Tracing imagedata, then returning the scaled svg string
+        this.imagedataToSVG = function( imgd, options ){
+                options = _this.checkoptions(options);
+                // tracing imagedata
+                var td = _this.imagedataToTracedata( imgd, options );
+                // returning SVG string
+                return _this.getsvgstring(td, options);
+        },// End of imagedataToSVG()
+        
+        // Loading an image from a URL, tracing when loaded,
+        // then executing callback with tracedata as argument
+        this.imageToTracedata = function( url, callback, options ){
+                options = _this.checkoptions(options);
+                // loading image, tracing and callback
+                _this.loadImage(
+                                url,
+                                function(canvas){
+                                        callback(
+                                                _this.imagedataToTracedata( _this.getImgdata(canvas), options )
+                                        );
+                                },
+                                options
+                );
+        },// End of imageToTracedata()
+        
+        // Tracing imagedata, then returning tracedata (layers with paths, palette, image size)
+        this.imagedataToTracedata = function( imgd, options ){
+                options = _this.checkoptions(options);
+                
+                // 1. Color quantization
+                var ii = _this.colorquantization( imgd, options );
+                
+                if(options.layering === 0){// Sequential layering
+                        
+                        // create tracedata object
+                        var tracedata = {
+                                layers : [],
+                                palette : ii.palette,
+                                width : ii.array[0].length-2,
+                                height : ii.array.length-2
+                        };
+                        
+                        // Loop to trace each color layer
+                        for(var colornum=0; colornum<ii.palette.length; colornum++){
+                                
+                                // layeringstep -> pathscan -> internodes -> batchtracepaths
+                                var tracedlayer =
+                                        _this.batchtracepaths(
+                                                        
+                                                _this.internodes(
+                                                                
+                                                        _this.pathscan(
+                                                                _this.layeringstep( ii, colornum ),
+                                                                options.pathomit
+                                                        ),
+                                                        
+                                                        options
+                                                        
+                                                ),
+                                                
+                                                options.ltres,
+                                                options.qtres
+                                                
+                                        );
+                                
+                                // adding traced layer
+                                tracedata.layers.push(tracedlayer);
+                                
+                        }// End of color loop
+                        
+                }else{// Parallel layering
+                        // 2. Layer separation and edge detection
+                        var ls = _this.layering( ii );
+                        
+                        // Optional edge node visualization
+                        if(options.layercontainerid){ _this.drawLayers( ls, _this.specpalette, options.scale, options.layercontainerid ); }
+                        
+                        // 3. Batch pathscan
+                        var bps = _this.batchpathscan( ls, options.pathomit );
+                        
+                        // 4. Batch interpollation
+                        var bis = _this.batchinternodes( bps, options );
+                        
+                        // 5. Batch tracing and creating tracedata object
+                        var tracedata = {
+                                layers : _this.batchtracelayers( bis, options.ltres, options.qtres ),
+                                palette : ii.palette,
+                                width : imgd.width,
+                                height : imgd.height
+                        };
+                        
+                }// End of parallel layering
+                
+                // return tracedata
+                return tracedata;
+                
+        },// End of imagedataToTracedata()
+        
+        this.optionpresets = {
+                'default': {
+                        
+                        // Tracing
+                        corsenabled : false,
+                        ltres : 1,
+                        qtres : 1,
+                        pathomit : 8,
+                        rightangleenhance : true,
+                        
+                        // Color quantization
+                        colorsampling : 2,
+                        numberofcolors : 16,
+                        mincolorratio : 0,
+                        colorquantcycles : 3,
+                        
+                        // Layering method
+                        layering : 0,
+                        
+                        // SVG rendering
+                        strokewidth : 1,
+                        linefilter : false,
+                        scale : 1,
+                        roundcoords : 1,
+                        viewbox : false,
+                        desc : false,
+                        lcpr : 0,
+                        qcpr : 0,
+                        
+                        // Blur
+                        blurradius : 0,
+                        blurdelta : 20
+                        
+                },
+                'posterized1': { colorsampling:0, numberofcolors:2 },
+                'posterized2': { numberofcolors:4, blurradius:5 },
+                'curvy': { ltres:0.01, linefilter:true, rightangleenhance:false },
+                'sharp': { qtres:0.01, linefilter:false },
+                'detailed': { pathomit:0, roundcoords:2, ltres:0.5, qtres:0.5, numberofcolors:64 },
+                'smoothed': { blurradius:5, blurdelta: 64 },
+                'grayscale': { colorsampling:0, colorquantcycles:1, numberofcolors:7 },
+                'fixedpalette': { colorsampling:0, colorquantcycles:1, numberofcolors:27 },
+                'randomsampling1': { colorsampling:1, numberofcolors:8 },
+                'randomsampling2': { colorsampling:1, numberofcolors:64 },
+                'artistic1': { colorsampling:0, colorquantcycles:1, pathomit:0, blurradius:5, blurdelta: 64, ltres:0.01, linefilter:true, numberofcolors:16, strokewidth:2 },
+                'artistic2': { qtres:0.01, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 },
+                'artistic3': { qtres:10, ltres:10, numberofcolors:8 },
+                'artistic4': { qtres:10, ltres:10, numberofcolors:64, blurradius:5, blurdelta: 256, strokewidth:2 },
+                'posterized3': { ltres: 1, qtres: 1, pathomit: 20, rightangleenhance: true, colorsampling: 0, numberofcolors: 3,
+                        mincolorratio: 0, colorquantcycles: 3, blurradius: 3, blurdelta: 20, strokewidth: 0, linefilter: false,
+                        roundcoords: 1, pal: [ { r: 0, g: 0, b: 100, a: 255 }, { r: 255, g: 255, b: 255, a: 255 } ] }
+        },// End of optionpresets
+        
+        // creating options object, setting defaults for missing values
+        this.checkoptions = function(options){
+                options = options || {};
+                // Option preset
+                if(typeof options === 'string'){
+                        options = options.toLowerCase();
+                        if( _this.optionpresets[options] ){ options = _this.optionpresets[options]; }else{ options = {}; }
+                }
+                // Defaults
+                var ok = Object.keys(_this.optionpresets['default']);
+                for(var k=0; k<ok.length; k++){
+                        if(!options.hasOwnProperty(ok[k])){ options[ok[k]] = _this.optionpresets['default'][ok[k]]; }
+                }
+                // options.pal is not defined here, the custom palette should be added externally: options.pal = [ { 'r':0, 'g':0, 'b':0, 'a':255 }, {...}, ... ];
+                // options.layercontainerid is not defined here, can be added externally: options.layercontainerid = 'mydiv'; ... <div id="mydiv"></div>
+                return options;
+        },// End of checkoptions()
+        
+        ////////////////////////////////////////////////////////////
+        //
+        //  Vectorizing functions
+        //
+        ////////////////////////////////////////////////////////////
+        
+        // 1. Color quantization
+        // Using a form of k-means clustering repeatead options.colorquantcycles times. http://en.wikipedia.org/wiki/Color_quantization
+        this.colorquantization = function( imgd, options ){
+                var arr = [], idx=0, cd,cdl,ci, paletteacc = [], pixelnum = imgd.width * imgd.height, i, j, k, cnt, palette;
+                
+                // imgd.data must be RGBA, not just RGB
+                if( imgd.data.length < pixelnum * 4 ){
+                        var newimgddata = new Uint8ClampedArray(pixelnum * 4);
+                        for(var pxcnt = 0; pxcnt < pixelnum ; pxcnt++){
+                                newimgddata[pxcnt*4  ] = imgd.data[pxcnt*3  ];
+                                newimgddata[pxcnt*4+1] = imgd.data[pxcnt*3+1];
+                                newimgddata[pxcnt*4+2] = imgd.data[pxcnt*3+2];
+                                newimgddata[pxcnt*4+3] = 255;
+                        }
+                        imgd.data = newimgddata;
+                }// End of RGBA imgd.data check
+                
+                // Filling arr (color index array) with -1
+                for( j=0; j<imgd.height+2; j++ ){ arr[j]=[]; for(i=0; i<imgd.width+2 ; i++){ arr[j][i] = -1; } }
+                
+                // Use custom palette if pal is defined or sample / generate custom length palette
+                if(options.pal){
+                        palette = options.pal;
+                }else if(options.colorsampling === 0){
+                        palette = _this.generatepalette(options.numberofcolors);
+                }else if(options.colorsampling === 1){
+                        palette = _this.samplepalette( options.numberofcolors, imgd );
+                }else{
+                        palette = _this.samplepalette2( options.numberofcolors, imgd );
+                }
+                
+                // Selective Gaussian blur preprocessing
+                if( options.blurradius > 0 ){ imgd = _this.blur( imgd, options.blurradius, options.blurdelta ); }
+                
+                // Repeat clustering step options.colorquantcycles times
+                for( cnt=0; cnt < options.colorquantcycles; cnt++ ){
+                        
+                        // Average colors from the second iteration
+                        if(cnt>0){
+                                // averaging paletteacc for palette
+                                for( k=0; k < palette.length; k++ ){
+                                        
+                                        // averaging
+                                        if( paletteacc[k].n > 0 ){
+                                                palette[k] = {  r: Math.floor( paletteacc[k].r / paletteacc[k].n ),
+                                                                                g: Math.floor( paletteacc[k].g / paletteacc[k].n ),
+                                                                                b: Math.floor( paletteacc[k].b / paletteacc[k].n ),
+                                                                                a:  Math.floor( paletteacc[k].a / paletteacc[k].n ) };
+                                        }
+                                        
+                                        // Randomizing a color, if there are too few pixels and there will be a new cycle
+                                        if( ( paletteacc[k].n/pixelnum < options.mincolorratio ) && ( cnt < options.colorquantcycles-1 ) ){
+                                                palette[k] = {  r: Math.floor(Math.random()*255),
+                                                                                g: Math.floor(Math.random()*255),
+                                                                                b: Math.floor(Math.random()*255),
+                                                                                a: Math.floor(Math.random()*255) };
+                                        }
+                                        
+                                }// End of palette loop
+                        }// End of Average colors from the second iteration
+                        
+                        // Reseting palette accumulator for averaging
+                        for( i=0; i < palette.length; i++ ){ paletteacc[i] = { r:0, g:0, b:0, a:0, n:0 }; }
+                        
+                        // loop through all pixels
+                        for( j=0; j < imgd.height; j++ ){
+                                for( i=0; i < imgd.width; i++ ){
+                                        
+                                        // pixel index
+                                        idx = (j*imgd.width+i)*4;
+                                        
+                                        // find closest color from palette by measuring (rectilinear) color distance between this pixel and all palette colors
+                                        ci=0; cdl = 1024; // 4 * 256 is the maximum RGBA distance
+                                        for( k=0; k<palette.length; k++ ){
+                                                
+                                                // In my experience, https://en.wikipedia.org/wiki/Rectilinear_distance works better than https://en.wikipedia.org/wiki/Euclidean_distance
+                                                cd = Math.abs(palette[k].r-imgd.data[idx]) + Math.abs(palette[k].g-imgd.data[idx+1]) + Math.abs(palette[k].b-imgd.data[idx+2]) + Math.abs(palette[k].a-imgd.data[idx+3]);
+                                                
+                                                // Remember this color if this is the closest yet
+                                                if(cd<cdl){ cdl = cd; ci = k; }
+                                                
+                                        }// End of palette loop
+                                        
+                                        // add to palettacc
+                                        paletteacc[ci].r += imgd.data[idx  ];
+                                        paletteacc[ci].g += imgd.data[idx+1];
+                                        paletteacc[ci].b += imgd.data[idx+2];
+                                        paletteacc[ci].a += imgd.data[idx+3];
+                                        paletteacc[ci].n++;
+                                        
+                                        // update the indexed color array
+                                        arr[j+1][i+1] = ci;
+                                        
+                                }// End of i loop
+                        }// End of j loop
+                        
+                }// End of Repeat clustering step options.colorquantcycles times
+                
+                return { array:arr, palette:palette };
+                
+        },// End of colorquantization()
+        
+        // Sampling a palette from imagedata
+        this.samplepalette = function( numberofcolors, imgd ){
+                var idx, palette=[];
+                for(var i=0; i<numberofcolors; i++){
+                        idx = Math.floor( Math.random() * imgd.data.length / 4 ) * 4;
+                        palette.push({ r:imgd.data[idx  ], g:imgd.data[idx+1], b:imgd.data[idx+2], a:imgd.data[idx+3] });
+                }
+                return palette;
+        },// End of samplepalette()
+        
+        // Deterministic sampling a palette from imagedata: rectangular grid
+        this.samplepalette2 = function( numberofcolors, imgd ){
+                var idx, palette=[], ni = Math.ceil(Math.sqrt(numberofcolors)), nj = Math.ceil(numberofcolors/ni),
+                        vx = imgd.width / (ni+1), vy = imgd.height / (nj+1);
+                for(var j=0; j<nj; j++){
+                        for(var i=0; i<ni; i++){
+                                if(palette.length === numberofcolors){
+                                        break;
+                                }else{
+                                        idx = Math.floor( ((j+1)*vy) * imgd.width + ((i+1)*vx) ) * 4;
+                                        palette.push( { r:imgd.data[idx], g:imgd.data[idx+1], b:imgd.data[idx+2], a:imgd.data[idx+3] } );
+                                }
+                        }
+                }
+                return palette;
+        },// End of samplepalette2()
+        
+        // Generating a palette with numberofcolors
+        this.generatepalette = function(numberofcolors){
+                var palette = [], rcnt, gcnt, bcnt;
+                if(numberofcolors<8){
+                        
+                        // Grayscale
+                        var graystep = Math.floor(255/(numberofcolors-1));
+                        for(var i=0; i<numberofcolors; i++){ palette.push({ r:i*graystep, g:i*graystep, b:i*graystep, a:255 }); }
+                        
+                }else{
+                        
+                        // RGB color cube
+                        var colorqnum = Math.floor(Math.pow(numberofcolors, 1/3)), // Number of points on each edge on the RGB color cube
+                                colorstep = Math.floor(255/(colorqnum-1)), // distance between points
+                                rndnum = numberofcolors - colorqnum*colorqnum*colorqnum; // number of random colors
+                        
+                        for(rcnt=0; rcnt<colorqnum; rcnt++){
+                                for(gcnt=0; gcnt<colorqnum; gcnt++){
+                                        for(bcnt=0; bcnt<colorqnum; bcnt++){
+                                                palette.push( { r:rcnt*colorstep, g:gcnt*colorstep, b:bcnt*colorstep, a:255 } );
+                                        }// End of blue loop
+                                }// End of green loop
+                        }// End of red loop
+                        
+                        // Rest is random
+                        for(rcnt=0; rcnt<rndnum; rcnt++){ palette.push({ r:Math.floor(Math.random()*255), g:Math.floor(Math.random()*255), b:Math.floor(Math.random()*255), a:Math.floor(Math.random()*255) }); }
+
+                }// End of numberofcolors check
+                
+                return palette;
+        },// End of generatepalette()
+                
+        // 2. Layer separation and edge detection
+        // Edge node types ( ▓: this layer or 1; ░: not this layer or 0 )
+        // 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
+        // 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
+        //     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        this.layering = function(ii){
+                // Creating layers for each indexed color in arr
+                var layers = [], val=0, ah = ii.array.length, aw = ii.array[0].length, n1,n2,n3,n4,n5,n6,n7,n8, i, j, k;
+                
+                // Create layers
+                for(k=0; k<ii.palette.length; k++){
+                        layers[k] = [];
+                        for(j=0; j<ah; j++){
+                                layers[k][j] = [];
+                                for(i=0; i<aw; i++){
+                                        layers[k][j][i]=0;
+                                }
+                        }
+                }
+                
+                // Looping through all pixels and calculating edge node type
+                for(j=1; j<ah-1; j++){
+                        for(i=1; i<aw-1; i++){
+                                
+                                // This pixel's indexed color
+                                val = ii.array[j][i];
+                                
+                                // Are neighbor pixel colors the same?
+                                n1 = ii.array[j-1][i-1]===val ? 1 : 0;
+                                n2 = ii.array[j-1][i  ]===val ? 1 : 0;
+                                n3 = ii.array[j-1][i+1]===val ? 1 : 0;
+                                n4 = ii.array[j  ][i-1]===val ? 1 : 0;
+                                n5 = ii.array[j  ][i+1]===val ? 1 : 0;
+                                n6 = ii.array[j+1][i-1]===val ? 1 : 0;
+                                n7 = ii.array[j+1][i  ]===val ? 1 : 0;
+                                n8 = ii.array[j+1][i+1]===val ? 1 : 0;
+                                
+                                // this pixel's type and looking back on previous pixels
+                                layers[val][j+1][i+1] = 1 + n5 * 2 + n8 * 4 + n7 * 8 ;
+                                if(!n4){ layers[val][j+1][i  ] = 0 + 2 + n7 * 4 + n6 * 8 ; }
+                                if(!n2){ layers[val][j  ][i+1] = 0 + n3*2 + n5 * 4 + 8 ; }
+                                if(!n1){ layers[val][j  ][i  ] = 0 + n2*2 + 4 + n4 * 8 ; }
+                                
+                        }// End of i loop
+                }// End of j loop
+                
+                return layers;
+        },// End of layering()
+        
+        // 2. Layer separation and edge detection
+        // Edge node types ( ▓: this layer or 1; ░: not this layer or 0 )
+        // 12  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓  ░░  ▓░  ░▓  ▓▓
+        // 48  ░░  ░░  ░░  ░░  ░▓  ░▓  ░▓  ░▓  ▓░  ▓░  ▓░  ▓░  ▓▓  ▓▓  ▓▓  ▓▓
+        //     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        this.layeringstep = function(ii,cnum){
+                // Creating layers for each indexed color in arr
+                var layer = [], val=0, ah = ii.array.length, aw = ii.array[0].length, n1,n2,n3,n4,n5,n6,n7,n8, i, j, k;
+                
+                // Create layer
+                for(j=0; j<ah; j++){
+                        layer[j] = [];
+                        for(i=0; i<aw; i++){
+                                layer[j][i]=0;
+                        }
+                }
+                
+                // Looping through all pixels and calculating edge node type
+                for(j=1; j<ah; j++){
+                        for(i=1; i<aw; i++){
+                                layer[j][i] =
+                                        ( ii.array[j-1][i-1]===cnum ? 1 : 0 ) +
+                                        ( ii.array[j-1][i]===cnum ? 2 : 0 ) +
+                                        ( ii.array[j][i-1]===cnum ? 8 : 0 ) +
+                                        ( ii.array[j][i]===cnum ? 4 : 0 )
+                                ;
+                        }// End of i loop
+                }// End of j loop
+                        
+                return layer;
+        },// End of layeringstep()
+        
+        // Point in polygon test
+        this.pointinpoly = function( p, pa ){
+                var isin=false;
+
+                for(var i=0,j=pa.length-1; i<pa.length; j=i++){
+                        isin =
+                                ( ((pa[i].y > p.y) !== (pa[j].y > p.y)) && (p.x < (pa[j].x - pa[i].x) * (p.y - pa[i].y) / (pa[j].y - pa[i].y) + pa[i].x) )
+                                ? !isin : isin;
+                }
+
+                return isin;
+        },
+        
+        // Lookup tables for pathscan
+        // pathscan_combined_lookup[ arr[py][px] ][ dir ] = [nextarrpypx, nextdir, deltapx, deltapy];
+        this.pathscan_combined_lookup = [
+                [[-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1]],// arr[py][px]===0 is invalid
+                [[ 0, 1, 0,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 2,-1, 0]],
+                [[-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 1, 0,-1], [ 0, 0, 1, 0]],
+                [[ 0, 0, 1, 0], [-1,-1,-1,-1], [ 0, 2,-1, 0], [-1,-1,-1,-1]],
+                
+                [[-1,-1,-1,-1], [ 0, 0, 1, 0], [ 0, 3, 0, 1], [-1,-1,-1,-1]],
+                [[13, 3, 0, 1], [13, 2,-1, 0], [ 7, 1, 0,-1], [ 7, 0, 1, 0]],
+                [[-1,-1,-1,-1], [ 0, 1, 0,-1], [-1,-1,-1,-1], [ 0, 3, 0, 1]],
+                [[ 0, 3, 0, 1], [ 0, 2,-1, 0], [-1,-1,-1,-1], [-1,-1,-1,-1]],
+                
+                [[ 0, 3, 0, 1], [ 0, 2,-1, 0], [-1,-1,-1,-1], [-1,-1,-1,-1]],
+                [[-1,-1,-1,-1], [ 0, 1, 0,-1], [-1,-1,-1,-1], [ 0, 3, 0, 1]],
+                [[11, 1, 0,-1], [14, 0, 1, 0], [14, 3, 0, 1], [11, 2,-1, 0]],
+                [[-1,-1,-1,-1], [ 0, 0, 1, 0], [ 0, 3, 0, 1], [-1,-1,-1,-1]],
+                
+                [[ 0, 0, 1, 0], [-1,-1,-1,-1], [ 0, 2,-1, 0], [-1,-1,-1,-1]],
+                [[-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 1, 0,-1], [ 0, 0, 1, 0]],
+                [[ 0, 1, 0,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [ 0, 2,-1, 0]],
+                [[-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1], [-1,-1,-1,-1]]// arr[py][px]===15 is invalid
+        ],
+
+        // 3. Walking through an edge node array, discarding edge node types 0 and 15 and creating paths from the rest.
+        // Walk directions (dir): 0 > ; 1 ^ ; 2 < ; 3 v 
+        this.pathscan = function( arr, pathomit ){
+                var paths=[], pacnt=0, pcnt=0, px=0, py=0, w = arr[0].length, h = arr.length,
+                        dir=0, pathfinished=true, holepath=false, lookuprow;
+                
+                for(var j=0; j<h; j++){
+                        for(var i=0; i<w; i++){
+                                if( (arr[j][i] == 4) || ( arr[j][i] == 11) ){ // Other values are not valid
+                                        
+                                        // Init
+                                        px = i; py = j;
+                                        paths[pacnt] = {};
+                                        paths[pacnt].points = [];
+                                        paths[pacnt].boundingbox = [px,py,px,py];
+                                        paths[pacnt].holechildren = [];
+                                        pathfinished = false;
+                                        pcnt=0;
+                                        holepath = (arr[j][i]==11);
+                                        dir = 1;
+
+                                        // Path points loop
+                                        while(!pathfinished){
+                                                
+                                                // New path point
+                                                paths[pacnt].points[pcnt] = {};
+                                                paths[pacnt].points[pcnt].x = px-1;
+                                                paths[pacnt].points[pcnt].y = py-1;
+                                                paths[pacnt].points[pcnt].t = arr[py][px];
+                                                
+                                                // Bounding box
+                                                if( (px-1) < paths[pacnt].boundingbox[0] ){ paths[pacnt].boundingbox[0] = px-1; }
+                                                if( (px-1) > paths[pacnt].boundingbox[2] ){ paths[pacnt].boundingbox[2] = px-1; }
+                                                if( (py-1) < paths[pacnt].boundingbox[1] ){ paths[pacnt].boundingbox[1] = py-1; }
+                                                if( (py-1) > paths[pacnt].boundingbox[3] ){ paths[pacnt].boundingbox[3] = py-1; }
+                                                
+                                                // Next: look up the replacement, direction and coordinate changes = clear this cell, turn if required, walk forward
+                                                lookuprow = _this.pathscan_combined_lookup[ arr[py][px] ][ dir ];
+                                                arr[py][px] = lookuprow[0]; dir = lookuprow[1]; px += lookuprow[2]; py += lookuprow[3];
+
+                                                // Close path
+                                                if( (px-1 === paths[pacnt].points[0].x ) && ( py-1 === paths[pacnt].points[0].y ) ){
+                                                        pathfinished = true;
+                                                        
+                                                        // Discarding paths shorter than pathomit
+                                                        if( paths[pacnt].points.length < pathomit ){
+                                                                paths.pop();
+                                                        }else{
+                                                        
+                                                                paths[pacnt].isholepath = holepath ? true : false;
+                                                                
+                                                                // Finding the parent shape for this hole
+                                                                if(holepath){
+                                                                        
+                                                                        var parentidx = 0, parentbbox = [-1,-1,w+1,h+1];
+                                                                        for(var parentcnt=0; parentcnt < pacnt; parentcnt++){
+                                                                                if( (!paths[parentcnt].isholepath) &&
+                                                                                        _this.boundingboxincludes( paths[parentcnt].boundingbox , paths[pacnt].boundingbox ) &&
+                                                                                        _this.boundingboxincludes( parentbbox , paths[parentcnt].boundingbox ) &&
+                                                                                        _this.pointinpoly( paths[pacnt].points[0], paths[parentcnt].points )
+                                                                                ){
+                                                                                        parentidx = parentcnt;
+                                                                                        parentbbox = paths[parentcnt].boundingbox;
+                                                                                }
+                                                                        }
+                                                                        
+                                                                        paths[parentidx].holechildren.push( pacnt );
+                                                                        
+                                                                }// End of holepath parent finding
+                                                                
+                                                                pacnt++;
+                                                        
+                                                        }
+                                                        
+                                                }// End of Close path
+                                                
+                                                pcnt++;
+                                                
+                                        }// End of Path points loop
+                                        
+                                }// End of Follow path
+                                
+                        }// End of i loop
+                }// End of j loop
+                
+                return paths;
+        },// End of pathscan()
+        
+        this.boundingboxincludes = function( parentbbox, childbbox ){
+                return ( ( parentbbox[0] < childbbox[0] ) && ( parentbbox[1] < childbbox[1] ) && ( parentbbox[2] > childbbox[2] ) && ( parentbbox[3] > childbbox[3] ) );
+        },// End of boundingboxincludes()
+        
+        // 3. Batch pathscan
+        this.batchpathscan = function( layers, pathomit ){
+                var bpaths = [];
+                for(var k in layers){
+                        if(!layers.hasOwnProperty(k)){ continue; }
+                        bpaths[k] = _this.pathscan( layers[k], pathomit );
+                }
+                return bpaths;
+        },
+        
+        // 4. interpollating between path points for nodes with 8 directions ( East, SouthEast, S, SW, W, NW, N, NE )
+        this.internodes = function( paths, options ){
+                var ins = [], palen=0, nextidx=0, nextidx2=0, previdx=0, previdx2=0, pacnt, pcnt;
+                
+                // paths loop
+                for(pacnt=0; pacnt<paths.length; pacnt++){
+                        
+                        ins[pacnt] = {};
+                        ins[pacnt].points = [];
+                        ins[pacnt].boundingbox = paths[pacnt].boundingbox;
+                        ins[pacnt].holechildren = paths[pacnt].holechildren;
+                        ins[pacnt].isholepath = paths[pacnt].isholepath;
+                        palen = paths[pacnt].points.length;
+                        
+                        // pathpoints loop
+                        for(pcnt=0; pcnt<palen; pcnt++){
+                        
+                                // next and previous point indexes
+                                nextidx = (pcnt+1)%palen; nextidx2 = (pcnt+2)%palen; previdx = (pcnt-1+palen)%palen; previdx2 = (pcnt-2+palen)%palen;
+                                
+                                // right angle enhance
+                                if( options.rightangleenhance && _this.testrightangle( paths[pacnt], previdx2, previdx, pcnt, nextidx, nextidx2 ) ){
+                                        
+                                        // Fix previous direction
+                                        if(ins[pacnt].points.length > 0){
+                                                ins[pacnt].points[ ins[pacnt].points.length-1 ].linesegment = _this.getdirection(
+                                                                ins[pacnt].points[ ins[pacnt].points.length-1 ].x,
+                                                                ins[pacnt].points[ ins[pacnt].points.length-1 ].y,
+                                                                paths[pacnt].points[pcnt].x,
+                                                                paths[pacnt].points[pcnt].y
+                                                        );
+                                        }
+                                        
+                                        // This corner point
+                                        ins[pacnt].points.push({
+                                                x : paths[pacnt].points[pcnt].x,
+                                                y : paths[pacnt].points[pcnt].y,
+                                                linesegment : _this.getdirection(
+                                                                paths[pacnt].points[pcnt].x,
+                                                                paths[pacnt].points[pcnt].y,
+                                                                (( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+                                                                (( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2)
+                                                        )
+                                        });
+                                        
+                                }// End of right angle enhance
+                                
+                                // interpolate between two path points
+                                ins[pacnt].points.push({
+                                        x : (( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+                                        y : (( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2),
+                                        linesegment : _this.getdirection(
+                                                        (( paths[pacnt].points[pcnt].x + paths[pacnt].points[nextidx].x ) /2),
+                                                        (( paths[pacnt].points[pcnt].y + paths[pacnt].points[nextidx].y ) /2),
+                                                        (( paths[pacnt].points[nextidx].x + paths[pacnt].points[nextidx2].x ) /2),
+                                                        (( paths[pacnt].points[nextidx].y + paths[pacnt].points[nextidx2].y ) /2)
+                                                )
+                                });
+                                
+                        }// End of pathpoints loop
+                                                
+                }// End of paths loop
+                
+                return ins;
+        },// End of internodes()
+        
+        this.testrightangle = function( path, idx1, idx2, idx3, idx4, idx5 ){
+                return ( (( path.points[idx3].x === path.points[idx1].x) &&
+                                  ( path.points[idx3].x === path.points[idx2].x) &&
+                                  ( path.points[idx3].y === path.points[idx4].y) &&
+                                  ( path.points[idx3].y === path.points[idx5].y)
+                                 ) ||
+                                 (( path.points[idx3].y === path.points[idx1].y) &&
+                                  ( path.points[idx3].y === path.points[idx2].y) &&
+                                  ( path.points[idx3].x === path.points[idx4].x) &&
+                                  ( path.points[idx3].x === path.points[idx5].x)
+                                 )
+                );
+        },// End of testrightangle()
+        
+        this.getdirection = function( x1, y1, x2, y2 ){
+                var val = 8;
+                if(x1 < x2){
+                        if     (y1 < y2){ val = 1; }// SouthEast
+                        else if(y1 > y2){ val = 7; }// NE
+                        else            { val = 0; }// E
+                }else if(x1 > x2){
+                        if     (y1 < y2){ val = 3; }// SW
+                        else if(y1 > y2){ val = 5; }// NW
+                        else            { val = 4; }// W
+                }else{
+                        if     (y1 < y2){ val = 2; }// S
+                        else if(y1 > y2){ val = 6; }// N
+                        else            { val = 8; }// center, this should not happen
+                }
+                return val;
+        },// End of getdirection()
+        
+        // 4. Batch interpollation
+        this.batchinternodes = function( bpaths, options ){
+                var binternodes = [];
+                for (var k in bpaths) {
+                        if(!bpaths.hasOwnProperty(k)){ continue; }
+                        binternodes[k] = _this.internodes(bpaths[k], options);
+                }
+                return binternodes;
+        },
+        
+        // 5. tracepath() : recursively trying to fit straight and quadratic spline segments on the 8 direction internode path
+        
+        // 5.1. Find sequences of points with only 2 segment types
+        // 5.2. Fit a straight line on the sequence
+        // 5.3. If the straight line fails (distance error > ltres), find the point with the biggest error
+        // 5.4. Fit a quadratic spline through errorpoint (project this to get controlpoint), then measure errors on every point in the sequence
+        // 5.5. If the spline fails (distance error > qtres), find the point with the biggest error, set splitpoint = fitting point
+        // 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+        
+        this.tracepath = function( path, ltres, qtres ){
+                var pcnt=0, segtype1, segtype2, seqend, smp = {};
+                smp.segments = [];
+                smp.boundingbox = path.boundingbox;
+                smp.holechildren = path.holechildren;
+                smp.isholepath = path.isholepath;
+                
+                while(pcnt < path.points.length){
+                        // 5.1. Find sequences of points with only 2 segment types
+                        segtype1 = path.points[pcnt].linesegment; segtype2 = -1; seqend=pcnt+1;
+                        while(
+                                ((path.points[seqend].linesegment === segtype1) || (path.points[seqend].linesegment === segtype2) || (segtype2 === -1))
+                                && (seqend < path.points.length-1) ){
+                                
+                                if((path.points[seqend].linesegment!==segtype1) && (segtype2===-1)){ segtype2 = path.points[seqend].linesegment; }
+                                seqend++;
+                                
+                        }
+                        if(seqend === path.points.length-1){ seqend = 0; }
+
+                        // 5.2. - 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+                        smp.segments = smp.segments.concat( _this.fitseq(path, ltres, qtres, pcnt, seqend) );
+                        
+                        // forward pcnt;
+                        if(seqend>0){ pcnt = seqend; }else{ pcnt = path.points.length; }
+                        
+                }// End of pcnt loop
+                
+                return smp;
+        },// End of tracepath()
+                
+        // 5.2. - 5.6. recursively fitting a straight or quadratic line segment on this sequence of path nodes,
+        // called from tracepath()
+        this.fitseq = function( path, ltres, qtres, seqstart, seqend ){
+                // return if invalid seqend
+                if( (seqend>path.points.length) || (seqend<0) ){ return []; }
+                // variables
+                var errorpoint=seqstart, errorval=0, curvepass=true, px, py, dist2;
+                var tl = (seqend-seqstart); if(tl<0){ tl += path.points.length; }
+                var vx = (path.points[seqend].x-path.points[seqstart].x) / tl,
+                        vy = (path.points[seqend].y-path.points[seqstart].y) / tl;
+                
+                // 5.2. Fit a straight line on the sequence
+                var pcnt = (seqstart+1) % path.points.length, pl;
+                while(pcnt != seqend){
+                        pl = pcnt-seqstart; if(pl<0){ pl += path.points.length; }
+                        px = path.points[seqstart].x + vx * pl; py = path.points[seqstart].y + vy * pl;
+                        dist2 = (path.points[pcnt].x-px)*(path.points[pcnt].x-px) + (path.points[pcnt].y-py)*(path.points[pcnt].y-py);
+                        if(dist2>ltres){curvepass=false;}
+                        if(dist2>errorval){ errorpoint=pcnt; errorval=dist2; }
+                        pcnt = (pcnt+1)%path.points.length;
+                }
+                // return straight line if fits
+                if(curvepass){ return [{ type:'L', x1:path.points[seqstart].x, y1:path.points[seqstart].y, x2:path.points[seqend].x, y2:path.points[seqend].y }]; }
+                
+                // 5.3. If the straight line fails (distance error>ltres), find the point with the biggest error
+                var fitpoint = errorpoint; curvepass = true; errorval = 0;
+                
+                // 5.4. Fit a quadratic spline through this point, measure errors on every point in the sequence
+                // helpers and projecting to get control point
+                var t=(fitpoint-seqstart)/tl, t1=(1-t)*(1-t), t2=2*(1-t)*t, t3=t*t;
+                var cpx = (t1*path.points[seqstart].x + t3*path.points[seqend].x - path.points[fitpoint].x)/-t2 ,
+                        cpy = (t1*path.points[seqstart].y + t3*path.points[seqend].y - path.points[fitpoint].y)/-t2 ;
+                
+                // Check every point
+                pcnt = seqstart+1;
+                while(pcnt != seqend){
+                        t=(pcnt-seqstart)/tl; t1=(1-t)*(1-t); t2=2*(1-t)*t; t3=t*t;
+                        px = t1 * path.points[seqstart].x + t2 * cpx + t3 * path.points[seqend].x;
+                        py = t1 * path.points[seqstart].y + t2 * cpy + t3 * path.points[seqend].y;
+                        
+                        dist2 = (path.points[pcnt].x-px)*(path.points[pcnt].x-px) + (path.points[pcnt].y-py)*(path.points[pcnt].y-py);
+                        
+                        if(dist2>qtres){curvepass=false;}
+                        if(dist2>errorval){ errorpoint=pcnt; errorval=dist2; }
+                        pcnt = (pcnt+1)%path.points.length;
+                }
+                // return spline if fits
+                if(curvepass){ return [{ type:'Q', x1:path.points[seqstart].x, y1:path.points[seqstart].y, x2:cpx, y2:cpy, x3:path.points[seqend].x, y3:path.points[seqend].y }]; }
+                // 5.5. If the spline fails (distance error>qtres), find the point with the biggest error
+                var splitpoint = fitpoint; // Earlier: Math.floor((fitpoint + errorpoint)/2);
+                
+                // 5.6. Split sequence and recursively apply 5.2. - 5.6. to startpoint-splitpoint and splitpoint-endpoint sequences
+                return _this.fitseq( path, ltres, qtres, seqstart, splitpoint ).concat(
+                                _this.fitseq( path, ltres, qtres, splitpoint, seqend ) );
+                
+        },// End of fitseq()
+        
+        // 5. Batch tracing paths
+        this.batchtracepaths = function(internodepaths,ltres,qtres){
+                var btracedpaths = [];
+                for(var k in internodepaths){
+                        if(!internodepaths.hasOwnProperty(k)){ continue; }
+                        btracedpaths.push( _this.tracepath(internodepaths[k],ltres,qtres) );
+                }
+                return btracedpaths;
+        },
+        
+        // 5. Batch tracing layers
+        this.batchtracelayers = function(binternodes, ltres, qtres){
+                var btbis = [];
+                for(var k in binternodes){
+                        if(!binternodes.hasOwnProperty(k)){ continue; }
+                        btbis[k] = _this.batchtracepaths(binternodes[k], ltres, qtres);
+                }
+                return btbis;
+        },
+        
+        ////////////////////////////////////////////////////////////
+        //
+        //  SVG Drawing functions
+        //
+        ////////////////////////////////////////////////////////////
+        
+        // Rounding to given decimals https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-in-javascript
+        this.roundtodec = function(val,places){ return +val.toFixed(places); },
+        
+        // Getting SVG path element string from a traced path
+        this.svgpathstring = function( tracedata, lnum, pathnum, options ){
+                
+                var layer = tracedata.layers[lnum], smp = layer[pathnum], str='', pcnt;
+                
+                // Line filter
+                if(options.linefilter && (smp.segments.length < 3)){ return str; }
+                
+                // Starting path element, desc contains layer and path number
+                str = '<path '+
+                        ( options.desc ? ('desc="l '+lnum+' p '+pathnum+'" ') : '' ) +
+                        _this.tosvgcolorstr(tracedata.palette[lnum], options) +
+                        'd="';
+                
+                // Creating non-hole path string
+                if( options.roundcoords === -1 ){
+                        str += 'M '+ smp.segments[0].x1 * options.scale +' '+ smp.segments[0].y1 * options.scale +' ';
+                        for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+                                str += smp.segments[pcnt].type +' '+ smp.segments[pcnt].x2 * options.scale +' '+ smp.segments[pcnt].y2 * options.scale +' ';
+                                if(smp.segments[pcnt].hasOwnProperty('x3')){
+                                        str += smp.segments[pcnt].x3 * options.scale +' '+ smp.segments[pcnt].y3 * options.scale +' ';
+                                }
+                        }
+                        str += 'Z ';
+                }else{
+                        str += 'M '+ _this.roundtodec( smp.segments[0].x1 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[0].y1 * options.scale, options.roundcoords ) +' ';
+                        for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+                                str += smp.segments[pcnt].type +' '+ _this.roundtodec( smp.segments[pcnt].x2 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[pcnt].y2 * options.scale, options.roundcoords ) +' ';
+                                if(smp.segments[pcnt].hasOwnProperty('x3')){
+                                        str += _this.roundtodec( smp.segments[pcnt].x3 * options.scale, options.roundcoords ) +' '+ _this.roundtodec( smp.segments[pcnt].y3 * options.scale, options.roundcoords ) +' ';
+                                }
+                        }
+                        str += 'Z ';
+                }// End of creating non-hole path string
+                
+                // Hole children
+                for( var hcnt=0; hcnt < smp.holechildren.length; hcnt++){
+                        var hsmp = layer[ smp.holechildren[hcnt] ];
+                        // Creating hole path string
+                        if( options.roundcoords === -1 ){
+                                
+                                if(hsmp.segments[ hsmp.segments.length-1 ].hasOwnProperty('x3')){
+                                        str += 'M '+ hsmp.segments[ hsmp.segments.length-1 ].x3 * options.scale +' '+ hsmp.segments[ hsmp.segments.length-1 ].y3 * options.scale +' ';
+                                }else{
+                                        str += 'M '+ hsmp.segments[ hsmp.segments.length-1 ].x2 * options.scale +' '+ hsmp.segments[ hsmp.segments.length-1 ].y2 * options.scale +' ';
+                                }
+                                
+                                for(pcnt = hsmp.segments.length-1; pcnt >= 0; pcnt--){
+                                        str += hsmp.segments[pcnt].type +' ';
+                                        if(hsmp.segments[pcnt].hasOwnProperty('x3')){
+                                                str += hsmp.segments[pcnt].x2 * options.scale +' '+ hsmp.segments[pcnt].y2 * options.scale +' ';
+                                        }
+                                        
+                                        str += hsmp.segments[pcnt].x1 * options.scale +' '+ hsmp.segments[pcnt].y1 * options.scale +' ';
+                                }
+                                
+                        }else{
+                                
+                                if(hsmp.segments[ hsmp.segments.length-1 ].hasOwnProperty('x3')){
+                                        str += 'M '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].x3 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].y3 * options.scale ) +' ';
+                                }else{
+                                        str += 'M '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].x2 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[ hsmp.segments.length-1 ].y2 * options.scale ) +' ';
+                                }
+                                
+                                for(pcnt = hsmp.segments.length-1; pcnt >= 0; pcnt--){
+                                        str += hsmp.segments[pcnt].type +' ';
+                                        if(hsmp.segments[pcnt].hasOwnProperty('x3')){
+                                                str += _this.roundtodec( hsmp.segments[pcnt].x2 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[pcnt].y2 * options.scale ) +' ';
+                                        }
+                                        str += _this.roundtodec( hsmp.segments[pcnt].x1 * options.scale ) +' '+ _this.roundtodec( hsmp.segments[pcnt].y1 * options.scale ) +' ';
+                                }
+                                
+                                
+                        }// End of creating hole path string
+                        
+                        str += 'Z '; // Close path
+                        
+                }// End of holepath check
+                
+                // Closing path element
+                str += '" />';
+                
+                // Rendering control points
+                if(options.lcpr || options.qcpr){
+                        for(pcnt=0; pcnt<smp.segments.length; pcnt++){
+                                if( smp.segments[pcnt].hasOwnProperty('x3') && options.qcpr ){
+                                        str += '<circle cx="'+ smp.segments[pcnt].x2 * options.scale +'" cy="'+ smp.segments[pcnt].y2 * options.scale +'" r="'+ options.qcpr +'" fill="cyan" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+                                        str += '<circle cx="'+ smp.segments[pcnt].x3 * options.scale +'" cy="'+ smp.segments[pcnt].y3 * options.scale +'" r="'+ options.qcpr +'" fill="white" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+                                        str += '<line x1="'+ smp.segments[pcnt].x1 * options.scale +'" y1="'+ smp.segments[pcnt].y1 * options.scale +'" x2="'+ smp.segments[pcnt].x2 * options.scale +'" y2="'+ smp.segments[pcnt].y2 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+                                        str += '<line x1="'+ smp.segments[pcnt].x2 * options.scale +'" y1="'+ smp.segments[pcnt].y2 * options.scale +'" x2="'+ smp.segments[pcnt].x3 * options.scale +'" y2="'+ smp.segments[pcnt].y3 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+                                }
+                                if( (!smp.segments[pcnt].hasOwnProperty('x3')) && options.lcpr){
+                                        str += '<circle cx="'+ smp.segments[pcnt].x2 * options.scale +'" cy="'+ smp.segments[pcnt].y2 * options.scale +'" r="'+ options.lcpr +'" fill="white" stroke-width="'+ options.lcpr * 0.2 +'" stroke="black" />';
+                                }
+                        }
+                        
+                        // Hole children control points
+                        for( var hcnt=0; hcnt < smp.holechildren.length; hcnt++){
+                                var hsmp = layer[ smp.holechildren[hcnt] ];
+                                for(pcnt=0; pcnt<hsmp.segments.length; pcnt++){
+                                        if( hsmp.segments[pcnt].hasOwnProperty('x3') && options.qcpr ){
+                                                str += '<circle cx="'+ hsmp.segments[pcnt].x2 * options.scale +'" cy="'+ hsmp.segments[pcnt].y2 * options.scale +'" r="'+ options.qcpr +'" fill="cyan" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+                                                str += '<circle cx="'+ hsmp.segments[pcnt].x3 * options.scale +'" cy="'+ hsmp.segments[pcnt].y3 * options.scale +'" r="'+ options.qcpr +'" fill="white" stroke-width="'+ options.qcpr * 0.2 +'" stroke="black" />';
+                                                str += '<line x1="'+ hsmp.segments[pcnt].x1 * options.scale +'" y1="'+ hsmp.segments[pcnt].y1 * options.scale +'" x2="'+ hsmp.segments[pcnt].x2 * options.scale +'" y2="'+ hsmp.segments[pcnt].y2 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+                                                str += '<line x1="'+ hsmp.segments[pcnt].x2 * options.scale +'" y1="'+ hsmp.segments[pcnt].y2 * options.scale +'" x2="'+ hsmp.segments[pcnt].x3 * options.scale +'" y2="'+ hsmp.segments[pcnt].y3 * options.scale +'" stroke-width="'+ options.qcpr * 0.2 +'" stroke="cyan" />';
+                                        }
+                                        if( (!hsmp.segments[pcnt].hasOwnProperty('x3')) && options.lcpr){
+                                                str += '<circle cx="'+ hsmp.segments[pcnt].x2 * options.scale +'" cy="'+ hsmp.segments[pcnt].y2 * options.scale +'" r="'+ options.lcpr +'" fill="white" stroke-width="'+ options.lcpr * 0.2 +'" stroke="black" />';
+                                        }
+                                }
+                        }
+                }// End of Rendering control points
+                        
+                return str;
+                
+        },// End of svgpathstring()
+        
+        // Converting tracedata to an SVG string
+        this.getsvgstring = function( tracedata, options ){
+                
+                options = _this.checkoptions(options);
+                
+                var w = tracedata.width * options.scale, h = tracedata.height * options.scale;
+                
+                // SVG start
+                var svgstr = '<svg ' + (options.viewbox ? ('viewBox="0 0 '+w+' '+h+'" ') : ('width="'+w+'" height="'+h+'" ')) +
+                        'version="1.1" xmlns="http://www.w3.org/2000/svg" desc="Created with imagetracer.js version '+_this.versionnumber+'" >';
+
+                // Drawing: Layers and Paths loops
+                for(var lcnt=0; lcnt < tracedata.layers.length; lcnt++){
+                        for(var pcnt=0; pcnt < tracedata.layers[lcnt].length; pcnt++){
+                                
+                                // Adding SVG <path> string
+                                if( !tracedata.layers[lcnt][pcnt].isholepath ){
+                                        svgstr += _this.svgpathstring( tracedata, lcnt, pcnt, options );
+                                }
+                                        
+                        }// End of paths loop
+                }// End of layers loop
+                
+                // SVG End
+                svgstr+='</svg>';
+                
+                return svgstr;
+                
+        },// End of getsvgstring()
+        
+        // Comparator for numeric Array.sort
+        this.compareNumbers = function(a,b){ return a - b; },
+        
+        // Convert color object to rgba string
+        this.torgbastr = function(c){ return 'rgba('+c.r+','+c.g+','+c.b+','+c.a+')'; },
+        
+        // Convert color object to SVG color string
+        this.tosvgcolorstr = function(c, options){
+                return 'fill="rgb('+c.r+','+c.g+','+c.b+')" stroke="rgb('+c.r+','+c.g+','+c.b+')" stroke-width="'+options.strokewidth+'" opacity="'+c.a/255.0+'" ';
+        },
+        
+        // Helper function: Appending an <svg> element to a container from an svgstring
+        this.appendSVGString = function(svgstr,parentid){
+                var div;
+                if(parentid){
+                        div = document.getElementById(parentid);
+                        if(!div){
+                                div = document.createElement('div');
+                                div.id = parentid;
+                                document.body.appendChild(div);
+                        }
+                }else{
+                        div = document.createElement('div');
+                        document.body.appendChild(div);
+                }
+                div.innerHTML += svgstr;
+        },
+        
+        ////////////////////////////////////////////////////////////
+        //
+        //  Canvas functions
+        //
+        ////////////////////////////////////////////////////////////
+        
+        // Gaussian kernels for blur
+        this.gks = [ [0.27901,0.44198,0.27901], [0.135336,0.228569,0.272192,0.228569,0.135336], [0.086776,0.136394,0.178908,0.195843,0.178908,0.136394,0.086776],
+                     [0.063327,0.093095,0.122589,0.144599,0.152781,0.144599,0.122589,0.093095,0.063327], [0.049692,0.069304,0.089767,0.107988,0.120651,0.125194,0.120651,0.107988,0.089767,0.069304,0.049692] ],
+        
+        // Selective Gaussian blur for preprocessing
+        this.blur = function(imgd,radius,delta){
+                var i,j,k,d,idx,racc,gacc,bacc,aacc,wacc;
+                
+                // new ImageData
+                var imgd2 = { width:imgd.width, height:imgd.height, data:[] };
+                
+                // radius and delta limits, this kernel
+                radius = Math.floor(radius); if(radius<1){ return imgd; } if(radius>5){ radius = 5; } delta = Math.abs( delta ); if(delta>1024){ delta = 1024; }
+                var thisgk = _this.gks[radius-1];
+                
+                // loop through all pixels, horizontal blur
+                for( j=0; j < imgd.height; j++ ){
+                        for( i=0; i < imgd.width; i++ ){
+
+                                racc = 0; gacc = 0; bacc = 0; aacc = 0; wacc = 0;
+                                // gauss kernel loop
+                                for( k = -radius; k < radius+1; k++){
+                                        // add weighted color values
+                                        if( (i+k > 0) && (i+k < imgd.width) ){
+                                                idx = (j*imgd.width+i+k)*4;
+                                                racc += imgd.data[idx  ] * thisgk[k+radius];
+                                                gacc += imgd.data[idx+1] * thisgk[k+radius];
+                                                bacc += imgd.data[idx+2] * thisgk[k+radius];
+                                                aacc += imgd.data[idx+3] * thisgk[k+radius];
+                                                wacc += thisgk[k+radius];
+                                        }
+                                }
+                                // The new pixel
+                                idx = (j*imgd.width+i)*4;
+                                imgd2.data[idx  ] = Math.floor(racc / wacc);
+                                imgd2.data[idx+1] = Math.floor(gacc / wacc);
+                                imgd2.data[idx+2] = Math.floor(bacc / wacc);
+                                imgd2.data[idx+3] = Math.floor(aacc / wacc);
+                                
+                        }// End of width loop
+                }// End of horizontal blur
+                
+                // copying the half blurred imgd2
+                var himgd = new Uint8ClampedArray(imgd2.data);
+                
+                // loop through all pixels, vertical blur
+                for( j=0; j < imgd.height; j++ ){
+                        for( i=0; i < imgd.width; i++ ){
+
+                                racc = 0; gacc = 0; bacc = 0; aacc = 0; wacc = 0;
+                                // gauss kernel loop
+                                for( k = -radius; k < radius+1; k++){
+                                        // add weighted color values
+                                        if( (j+k > 0) && (j+k < imgd.height) ){
+                                                idx = ((j+k)*imgd.width+i)*4;
+                                                racc += himgd[idx  ] * thisgk[k+radius];
+                                                gacc += himgd[idx+1] * thisgk[k+radius];
+                                                bacc += himgd[idx+2] * thisgk[k+radius];
+                                                aacc += himgd[idx+3] * thisgk[k+radius];
+                                                wacc += thisgk[k+radius];
+                                        }
+                                }
+                                // The new pixel
+                                idx = (j*imgd.width+i)*4;
+                                imgd2.data[idx  ] = Math.floor(racc / wacc);
+                                imgd2.data[idx+1] = Math.floor(gacc / wacc);
+                                imgd2.data[idx+2] = Math.floor(bacc / wacc);
+                                imgd2.data[idx+3] = Math.floor(aacc / wacc);
+                                
+                        }// End of width loop
+                }// End of vertical blur
+                
+                // Selective blur: loop through all pixels
+                for( j=0; j < imgd.height; j++ ){
+                        for( i=0; i < imgd.width; i++ ){
+                                
+                                idx = (j*imgd.width+i)*4;
+                                // d is the difference between the blurred and the original pixel
+                                d = Math.abs(imgd2.data[idx  ] - imgd.data[idx  ]) + Math.abs(imgd2.data[idx+1] - imgd.data[idx+1]) +
+                                        Math.abs(imgd2.data[idx+2] - imgd.data[idx+2]) + Math.abs(imgd2.data[idx+3] - imgd.data[idx+3]);
+                                // selective blur: if d>delta, put the original pixel back
+                                if(d>delta){
+                                        imgd2.data[idx  ] = imgd.data[idx  ];
+                                        imgd2.data[idx+1] = imgd.data[idx+1];
+                                        imgd2.data[idx+2] = imgd.data[idx+2];
+                                        imgd2.data[idx+3] = imgd.data[idx+3];
+                                }
+                        }
+                }// End of Selective blur
+                
+                return imgd2;
+                
+        },// End of blur()
+        
+        // Helper function: loading an image from a URL, then executing callback with canvas as argument
+        this.loadImage = function(url,callback,options){
+                var img = new Image();
+                if(options && options.corsenabled){ img.crossOrigin = 'Anonymous'; }
+                img.onload = function(){
+                        var canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        var context = canvas.getContext('2d');
+                        context.drawImage(img,0,0);
+                        callback(canvas);
+                };
+                img.src = url;
+        },
+        
+        // Helper function: getting ImageData from a canvas
+        this.getImgdata = function(canvas){
+                var context = canvas.getContext('2d');
+                return context.getImageData(0,0,canvas.width,canvas.height);
+        },
+        
+        // Special palette to use with drawlayers()
+        this.specpalette = [
+                {r:0,g:0,b:0,a:255}, {r:128,g:128,b:128,a:255}, {r:0,g:0,b:128,a:255}, {r:64,g:64,b:128,a:255},
+                {r:192,g:192,b:192,a:255}, {r:255,g:255,b:255,a:255}, {r:128,g:128,b:192,a:255}, {r:0,g:0,b:192,a:255},
+                {r:128,g:0,b:0,a:255}, {r:128,g:64,b:64,a:255}, {r:128,g:0,b:128,a:255}, {r:168,g:168,b:168,a:255},
+                {r:192,g:128,b:128,a:255}, {r:192,g:0,b:0,a:255}, {r:255,g:255,b:255,a:255}, {r:0,g:128,b:0,a:255}
+        ],
+        
+        // Helper function: Drawing all edge node layers into a container
+        this.drawLayers = function(layers,palette,scale,parentid){
+                scale = scale||1;
+                var w,h,i,j,k;
+                
+                // Preparing container
+                var div;
+                if(parentid){
+                        div = document.getElementById(parentid);
+                        if(!div){
+                                div = document.createElement('div');
+                                div.id = parentid;
+                                document.body.appendChild(div);
+                        }
+                }else{
+                        div = document.createElement('div');
+                        document.body.appendChild(div);
+                }
+                
+                // Layers loop
+                for (k in layers) {
+                        if(!layers.hasOwnProperty(k)){ continue; }
+                        
+                        // width, height
+                        w=layers[k][0].length; h=layers[k].length;
+                        
+                        // Creating new canvas for every layer
+                        var canvas = document.createElement('canvas'); canvas.width=w*scale; canvas.height=h*scale;
+                        var context = canvas.getContext('2d');
+                        
+                        // Drawing
+                        for(j=0; j<h; j++){
+                                for(i=0; i<w; i++){
+                                        context.fillStyle = _this.torgbastr(palette[ layers[k][j][i]%palette.length ]);
+                                        context.fillRect(i*scale,j*scale,scale,scale);
+                                }
+                        }
+                        
+                        // Appending canvas to container
+                        div.appendChild(canvas);
+                }// End of Layers loop
+        }// End of drawlayers
+        
+        ;// End of function list
+        
+}// End of ImageTracer object
+
+// export as AMD module / Node module / browser or worker variable
+if(typeof define === 'function' && define.amd){
+        define(function() { return new ImageTracer(); });
+}else if(typeof module !== 'undefined'){
+        module.exports = new ImageTracer();
+}else if(typeof self !== 'undefined'){
+        self.ImageTracer = new ImageTracer();
+}else window.ImageTracer = new ImageTracer();
+
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   مكتبة مدمجة #2 — opentype.js 1.3.4 (رخصة MIT)
+   كانت بتتحمّل من CDN — دلوقتي جوّه الملف: محرر الخطوط كامل
+   بيشتغل بلا نت — فك الخطوط، موديل الحروف، والتصدير كلها محلية.
+   ═══════════════════════════════════════════════════════════════ */
+!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e=e||self).opentype={})}(this,function(O){"use strict";function e(e){if(null==this)throw TypeError();var t=String(this),r=t.length,n=e?Number(e):0;if(n!=n&&(n=0),!(n<0||r<=n)){var a,o=t.charCodeAt(n);return 55296<=o&&o<=56319&&n+1<r&&56320<=(a=t.charCodeAt(n+1))&&a<=57343?1024*(o-55296)+a-56320+65536:o}}var t;String.prototype.codePointAt||((t=function(){try{var e={},t=Object.defineProperty,r=t(e,e,e)&&t}catch(e){}return r}())?t(String.prototype,"codePointAt",{value:e,configurable:!0,writable:!0}):String.prototype.codePointAt=e);var u=0,o=-3;function r(){this.table=new Uint16Array(16),this.trans=new Uint16Array(288)}function s(e,t){this.source=e,this.sourceIndex=0,this.tag=0,this.bitcount=0,this.dest=t,this.destLen=0,this.ltree=new r,this.dtree=new r}var i=new r,l=new r,p=new Uint8Array(30),c=new Uint16Array(30),h=new Uint8Array(30),f=new Uint16Array(30),d=new Uint8Array([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]),g=new r,v=new Uint8Array(320);function n(e,t,r,n){var a,o;for(a=0;a<r;++a)e[a]=0;for(a=0;a<30-r;++a)e[a+r]=a/r|0;for(o=n,a=0;a<30;++a)t[a]=o,o+=1<<e[a]}var m=new Uint16Array(16);function y(e,t,r,n){var a,o;for(a=0;a<16;++a)e.table[a]=0;for(a=0;a<n;++a)e.table[t[r+a]]++;for(a=o=e.table[0]=0;a<16;++a)m[a]=o,o+=e.table[a];for(a=0;a<n;++a)t[r+a]&&(e.trans[m[t[r+a]]++]=a)}function b(e){e.bitcount--||(e.tag=e.source[e.sourceIndex++],e.bitcount=7);var t=1&e.tag;return e.tag>>>=1,t}function S(e,t,r){if(!t)return r;for(;e.bitcount<24;)e.tag|=e.source[e.sourceIndex++]<<e.bitcount,e.bitcount+=8;var n=e.tag&65535>>>16-t;return e.tag>>>=t,e.bitcount-=t,n+r}function x(e,t){for(;e.bitcount<24;)e.tag|=e.source[e.sourceIndex++]<<e.bitcount,e.bitcount+=8;for(var r=0,n=0,a=0,o=e.tag;n=2*n+(1&o),o>>>=1,++a,r+=t.table[a],0<=(n-=t.table[a]););return e.tag=o,e.bitcount-=a,t.trans[r+n]}function T(e,t,r){var n,a,o,s,i,u;for(n=S(e,5,257),a=S(e,5,1),o=S(e,4,4),s=0;s<19;++s)v[s]=0;for(s=0;s<o;++s){var l=S(e,3,0);v[d[s]]=l}for(y(g,v,0,19),i=0;i<n+a;){var p=x(e,g);switch(p){case 16:var c=v[i-1];for(u=S(e,2,3);u;--u)v[i++]=c;break;case 17:for(u=S(e,3,3);u;--u)v[i++]=0;break;case 18:for(u=S(e,7,11);u;--u)v[i++]=0;break;default:v[i++]=p}}y(t,v,0,n),y(r,v,n,a)}function k(e,t,r){for(;;){var n,a,o,s,i=x(e,t);if(256===i)return u;if(i<256)e.dest[e.destLen++]=i;else for(n=S(e,p[i-=257],c[i]),a=x(e,r),s=o=e.destLen-S(e,h[a],f[a]);s<o+n;++s)e.dest[e.destLen++]=e.dest[s]}}function U(e){for(var t,r;8<e.bitcount;)e.sourceIndex--,e.bitcount-=8;if((t=256*(t=e.source[e.sourceIndex+1])+e.source[e.sourceIndex])!==(65535&~(256*e.source[e.sourceIndex+3]+e.source[e.sourceIndex+2])))return o;for(e.sourceIndex+=4,r=t;r;--r)e.dest[e.destLen++]=e.source[e.sourceIndex++];return e.bitcount=0,u}!function(e,t){var r;for(r=0;r<7;++r)e.table[r]=0;for(e.table[7]=24,e.table[8]=152,e.table[9]=112,r=0;r<24;++r)e.trans[r]=256+r;for(r=0;r<144;++r)e.trans[24+r]=r;for(r=0;r<8;++r)e.trans[168+r]=280+r;for(r=0;r<112;++r)e.trans[176+r]=144+r;for(r=0;r<5;++r)t.table[r]=0;for(t.table[5]=32,r=0;r<32;++r)t.trans[r]=r}(i,l),n(p,c,4,3),n(h,f,2,1),p[28]=0,c[28]=258;var a=function(e,t){var r,n,a=new s(e,t);do{switch(r=b(a),S(a,2,0)){case 0:n=U(a);break;case 1:n=k(a,i,l);break;case 2:T(a,a.ltree,a.dtree),n=k(a,a.ltree,a.dtree);break;default:n=o}if(n!==u)throw new Error("Data error")}while(!r);return a.destLen<a.dest.length?"function"==typeof a.dest.slice?a.dest.slice(0,a.destLen):a.dest.subarray(0,a.destLen):a.dest};function E(e,t,r,n,a){return Math.pow(1-a,3)*e+3*Math.pow(1-a,2)*a*t+3*(1-a)*Math.pow(a,2)*r+Math.pow(a,3)*n}function R(){this.x1=Number.NaN,this.y1=Number.NaN,this.x2=Number.NaN,this.y2=Number.NaN}function B(){this.commands=[],this.fill="black",this.stroke=null,this.strokeWidth=1}function L(e){throw new Error(e)}function C(e,t){e||L(t)}R.prototype.isEmpty=function(){return isNaN(this.x1)||isNaN(this.y1)||isNaN(this.x2)||isNaN(this.y2)},R.prototype.addPoint=function(e,t){"number"==typeof e&&((isNaN(this.x1)||isNaN(this.x2))&&(this.x1=e,this.x2=e),e<this.x1&&(this.x1=e),e>this.x2&&(this.x2=e)),"number"==typeof t&&((isNaN(this.y1)||isNaN(this.y2))&&(this.y1=t,this.y2=t),t<this.y1&&(this.y1=t),t>this.y2&&(this.y2=t))},R.prototype.addX=function(e){this.addPoint(e,null)},R.prototype.addY=function(e){this.addPoint(null,e)},R.prototype.addBezier=function(e,t,r,n,a,o,s,i){var u=[e,t],l=[r,n],p=[a,o],c=[s,i];this.addPoint(e,t),this.addPoint(s,i);for(var h=0;h<=1;h++){var f=6*u[h]-12*l[h]+6*p[h],d=-3*u[h]+9*l[h]-9*p[h]+3*c[h],g=3*l[h]-3*u[h];if(0!=d){var v=Math.pow(f,2)-4*g*d;if(!(v<0)){var m=(-f+Math.sqrt(v))/(2*d);0<m&&m<1&&(0===h&&this.addX(E(u[h],l[h],p[h],c[h],m)),1===h&&this.addY(E(u[h],l[h],p[h],c[h],m)));var y=(-f-Math.sqrt(v))/(2*d);0<y&&y<1&&(0===h&&this.addX(E(u[h],l[h],p[h],c[h],y)),1===h&&this.addY(E(u[h],l[h],p[h],c[h],y)))}}else{if(0==f)continue;var b=-g/f;0<b&&b<1&&(0===h&&this.addX(E(u[h],l[h],p[h],c[h],b)),1===h&&this.addY(E(u[h],l[h],p[h],c[h],b)))}}},R.prototype.addQuad=function(e,t,r,n,a,o){var s=e+2/3*(r-e),i=t+2/3*(n-t),u=s+1/3*(a-e),l=i+1/3*(o-t);this.addBezier(e,t,s,i,u,l,a,o)},B.prototype.moveTo=function(e,t){this.commands.push({type:"M",x:e,y:t})},B.prototype.lineTo=function(e,t){this.commands.push({type:"L",x:e,y:t})},B.prototype.curveTo=B.prototype.bezierCurveTo=function(e,t,r,n,a,o){this.commands.push({type:"C",x1:e,y1:t,x2:r,y2:n,x:a,y:o})},B.prototype.quadTo=B.prototype.quadraticCurveTo=function(e,t,r,n){this.commands.push({type:"Q",x1:e,y1:t,x:r,y:n})},B.prototype.close=B.prototype.closePath=function(){this.commands.push({type:"Z"})},B.prototype.extend=function(e){if(e.commands)e=e.commands;else if(e instanceof R){var t=e;return this.moveTo(t.x1,t.y1),this.lineTo(t.x2,t.y1),this.lineTo(t.x2,t.y2),this.lineTo(t.x1,t.y2),void this.close()}Array.prototype.push.apply(this.commands,e)},B.prototype.getBoundingBox=function(){for(var e=new R,t=0,r=0,n=0,a=0,o=0;o<this.commands.length;o++){var s=this.commands[o];switch(s.type){case"M":e.addPoint(s.x,s.y),t=n=s.x,r=a=s.y;break;case"L":e.addPoint(s.x,s.y),n=s.x,a=s.y;break;case"Q":e.addQuad(n,a,s.x1,s.y1,s.x,s.y),n=s.x,a=s.y;break;case"C":e.addBezier(n,a,s.x1,s.y1,s.x2,s.y2,s.x,s.y),n=s.x,a=s.y;break;case"Z":n=t,a=r;break;default:throw new Error("Unexpected path command "+s.type)}}return e.isEmpty()&&e.addPoint(0,0),e},B.prototype.draw=function(e){e.beginPath();for(var t=0;t<this.commands.length;t+=1){var r=this.commands[t];"M"===r.type?e.moveTo(r.x,r.y):"L"===r.type?e.lineTo(r.x,r.y):"C"===r.type?e.bezierCurveTo(r.x1,r.y1,r.x2,r.y2,r.x,r.y):"Q"===r.type?e.quadraticCurveTo(r.x1,r.y1,r.x,r.y):"Z"===r.type&&e.closePath()}this.fill&&(e.fillStyle=this.fill,e.fill()),this.stroke&&(e.strokeStyle=this.stroke,e.lineWidth=this.strokeWidth,e.stroke())},B.prototype.toPathData=function(o){function e(){for(var e,t=arguments,r="",n=0;n<arguments.length;n+=1){var a=t[n];0<=a&&0<n&&(r+=" "),r+=(e=a,Math.round(e)===e?""+Math.round(e):e.toFixed(o))}return r}o=void 0!==o?o:2;for(var t="",r=0;r<this.commands.length;r+=1){var n=this.commands[r];"M"===n.type?t+="M"+e(n.x,n.y):"L"===n.type?t+="L"+e(n.x,n.y):"C"===n.type?t+="C"+e(n.x1,n.y1,n.x2,n.y2,n.x,n.y):"Q"===n.type?t+="Q"+e(n.x1,n.y1,n.x,n.y):"Z"===n.type&&(t+="Z")}return t},B.prototype.toSVG=function(e){var t='<path d="';return t+=this.toPathData(e),t+='"',this.fill&&"black"!==this.fill&&(null===this.fill?t+=' fill="none"':t+=' fill="'+this.fill+'"'),this.stroke&&(t+=' stroke="'+this.stroke+'" stroke-width="'+this.strokeWidth+'"'),t+="/>"},B.prototype.toDOMElement=function(e){var t=this.toPathData(e),r=document.createElementNS("http://www.w3.org/2000/svg","path");return r.setAttribute("d",t),r};var w={fail:L,argument:C,assert:C},D=2147483648,I={},M={},G={};function F(e){return function(){return e}}M.BYTE=function(e){return w.argument(0<=e&&e<=255,"Byte value should be between 0 and 255."),[e]},G.BYTE=F(1),M.CHAR=function(e){return[e.charCodeAt(0)]},G.CHAR=F(1),M.CHARARRAY=function(e){void 0===e&&(e="",console.warn("Undefined CHARARRAY encountered and treated as an empty string. This is probably caused by a missing glyph name."));for(var t=[],r=0;r<e.length;r+=1)t[r]=e.charCodeAt(r);return t},G.CHARARRAY=function(e){return void 0===e?0:e.length},M.USHORT=function(e){return[e>>8&255,255&e]},G.USHORT=F(2),M.SHORT=function(e){return 32768<=e&&(e=-(65536-e)),[e>>8&255,255&e]},G.SHORT=F(2),M.UINT24=function(e){return[e>>16&255,e>>8&255,255&e]},G.UINT24=F(3),M.ULONG=function(e){return[e>>24&255,e>>16&255,e>>8&255,255&e]},G.ULONG=F(4),M.LONG=function(e){return D<=e&&(e=-(2*D-e)),[e>>24&255,e>>16&255,e>>8&255,255&e]},G.LONG=F(4),M.FIXED=M.ULONG,G.FIXED=G.ULONG,M.FWORD=M.SHORT,G.FWORD=G.SHORT,M.UFWORD=M.USHORT,G.UFWORD=G.USHORT,M.LONGDATETIME=function(e){return[0,0,0,0,e>>24&255,e>>16&255,e>>8&255,255&e]},G.LONGDATETIME=F(8),M.TAG=function(e){return w.argument(4===e.length,"Tag should be exactly 4 ASCII characters."),[e.charCodeAt(0),e.charCodeAt(1),e.charCodeAt(2),e.charCodeAt(3)]},G.TAG=F(4),M.Card8=M.BYTE,G.Card8=G.BYTE,M.Card16=M.USHORT,G.Card16=G.USHORT,M.OffSize=M.BYTE,G.OffSize=G.BYTE,M.SID=M.USHORT,G.SID=G.USHORT,M.NUMBER=function(e){return-107<=e&&e<=107?[e+139]:108<=e&&e<=1131?[247+((e-=108)>>8),255&e]:-1131<=e&&e<=-108?[251+((e=-e-108)>>8),255&e]:-32768<=e&&e<=32767?M.NUMBER16(e):M.NUMBER32(e)},G.NUMBER=function(e){return M.NUMBER(e).length},M.NUMBER16=function(e){return[28,e>>8&255,255&e]},G.NUMBER16=F(3),M.NUMBER32=function(e){return[29,e>>24&255,e>>16&255,e>>8&255,255&e]},G.NUMBER32=F(5),M.REAL=function(e){var t=e.toString(),r=/\.(\d*?)(?:9{5,20}|0{5,20})\d{0,2}(?:e(.+)|$)/.exec(t);if(r){var n=parseFloat("1e"+((r[2]?+r[2]:0)+r[1].length));t=(Math.round(e*n)/n).toString()}for(var a="",o=0,s=t.length;o<s;o+=1){var i=t[o];a+="e"===i?"-"===t[++o]?"c":"b":"."===i?"a":"-"===i?"e":i}for(var u=[30],l=0,p=(a+=1&a.length?"f":"ff").length;l<p;l+=2)u.push(parseInt(a.substr(l,2),16));return u},G.REAL=function(e){return M.REAL(e).length},M.NAME=M.CHARARRAY,G.NAME=G.CHARARRAY,M.STRING=M.CHARARRAY,G.STRING=G.CHARARRAY,I.UTF8=function(e,t,r){for(var n=[],a=r,o=0;o<a;o++,t+=1)n[o]=e.getUint8(t);return String.fromCharCode.apply(null,n)},I.UTF16=function(e,t,r){for(var n=[],a=r/2,o=0;o<a;o++,t+=2)n[o]=e.getUint16(t);return String.fromCharCode.apply(null,n)},M.UTF16=function(e){for(var t=[],r=0;r<e.length;r+=1){var n=e.charCodeAt(r);t[t.length]=n>>8&255,t[t.length]=255&n}return t},G.UTF16=function(e){return 2*e.length};var A={"x-mac-croatian":"ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®Š™´¨≠ŽØ∞±≤≥∆µ∂∑∏š∫ªºΩžø¿¡¬√ƒ≈Ć«Č… ÀÃÕŒœĐ—“”‘’÷◊©⁄€‹›Æ»–·‚„‰ÂćÁčÈÍÎÏÌÓÔđÒÚÛÙıˆ˜¯πË˚¸Êæˇ","x-mac-cyrillic":"АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ†°Ґ£§•¶І®©™Ђђ≠Ѓѓ∞±≤≥іµґЈЄєЇїЉљЊњјЅ¬√ƒ≈∆«»… ЋћЌќѕ–—“”‘’÷„ЎўЏџ№Ёёяабвгдежзийклмнопрстуфхцчшщъыьэю","x-mac-gaelic":"ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØḂ±≤≥ḃĊċḊḋḞḟĠġṀæøṁṖṗɼƒſṠ«»… ÀÃÕŒœ–—“”‘’ṡẛÿŸṪ€‹›Ŷŷṫ·Ỳỳ⁊ÂÊÁËÈÍÎÏÌÓÔ♣ÒÚÛÙıÝýŴŵẄẅẀẁẂẃ","x-mac-greek":"Ä¹²É³ÖÜ΅àâä΄¨çéèêë£™îï•½‰ôö¦€ùûü†ΓΔΘΛΞΠß®©ΣΪ§≠°·Α±≤≥¥ΒΕΖΗΙΚΜΦΫΨΩάΝ¬ΟΡ≈Τ«»… ΥΧΆΈœ–―“”‘’÷ΉΊΌΎέήίόΏύαβψδεφγηιξκλμνοπώρστθωςχυζϊϋΐΰ­","x-mac-icelandic":"ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûüÝ°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€ÐðÞþý·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ","x-mac-inuit":"ᐃᐄᐅᐆᐊᐋᐱᐲᐳᐴᐸᐹᑉᑎᑏᑐᑑᑕᑖᑦᑭᑮᑯᑰᑲᑳᒃᒋᒌᒍᒎᒐᒑ°ᒡᒥᒦ•¶ᒧ®©™ᒨᒪᒫᒻᓂᓃᓄᓅᓇᓈᓐᓯᓰᓱᓲᓴᓵᔅᓕᓖᓗᓘᓚᓛᓪᔨᔩᔪᔫᔭ… ᔮᔾᕕᕖᕗ–—“”‘’ᕘᕙᕚᕝᕆᕇᕈᕉᕋᕌᕐᕿᖀᖁᖂᖃᖄᖅᖏᖐᖑᖒᖓᖔᖕᙱᙲᙳᙴᙵᙶᖖᖠᖡᖢᖣᖤᖥᖦᕼŁł","x-mac-ce":"ÄĀāÉĄÖÜáąČäčĆćéŹźĎíďĒēĖóėôöõúĚěü†°Ę£§•¶ß®©™ę¨≠ģĮįĪ≤≥īĶ∂∑łĻļĽľĹĺŅņŃ¬√ńŇ∆«»… ňŐÕőŌ–—“”‘’÷◊ōŔŕŘ‹›řŖŗŠ‚„šŚśÁŤťÍŽžŪÓÔūŮÚůŰűŲųÝýķŻŁżĢˇ",macintosh:"ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›ﬁﬂ‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ","x-mac-romanian":"ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ĂȘ∞±≤≥¥µ∂∑∏π∫ªºΩăș¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›Țț‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ","x-mac-turkish":"ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸĞğİıŞş‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙˆ˜¯˘˙˚¸˝˛ˇ"};I.MACSTRING=function(e,t,r,n){var a=A[n];if(void 0!==a){for(var o="",s=0;s<r;s++){var i=e.getUint8(t+s);o+=i<=127?String.fromCharCode(i):a[127&i]}return o}};var P,N="function"==typeof WeakMap&&new WeakMap;function H(e){return-128<=e&&e<=127}function z(e,t,r){for(var n=0,a=e.length;t<a&&n<64&&0===e[t];)++t,++n;return r.push(128|n-1),t}function W(e,t,r){for(var n=0,a=e.length,o=t;o<a&&n<64;){var s=e[o];if(!H(s))break;if(0===s&&o+1<a&&0===e[o+1])break;++o,++n}r.push(n-1);for(var i=t;i<o;++i)r.push(e[i]+256&255);return o}function q(e,t,r){for(var n=0,a=e.length,o=t;o<a&&n<64;){var s=e[o];if(0===s)break;if(H(s)&&o+1<a&&H(e[o+1]))break;++o,++n}r.push(64|n-1);for(var i=t;i<o;++i){var u=e[i];r.push(u+65536>>8&255,u+256&255)}return o}M.MACSTRING=function(e,t){var r=function(e){if(!P)for(var t in P={},A)P[t]=new String(t);var r=P[e];if(void 0!==r){if(N){var n=N.get(r);if(void 0!==n)return n}var a=A[e];if(void 0!==a){for(var o={},s=0;s<a.length;s++)o[a.charCodeAt(s)]=s+128;return N&&N.set(r,o),o}}}(t);if(void 0!==r){for(var n=[],a=0;a<e.length;a++){var o=e.charCodeAt(a);if(128<=o&&void 0===(o=r[o]))return;n[a]=o}return n}},G.MACSTRING=function(e,t){var r=M.MACSTRING(e,t);return void 0!==r?r.length:0},M.VARDELTAS=function(e){for(var t=0,r=[];t<e.length;){var n=e[t];t=(0===n?z:-128<=n&&n<=127?W:q)(e,t,r)}return r},M.INDEX=function(e){for(var t=1,r=[t],n=[],a=0;a<e.length;a+=1){var o=M.OBJECT(e[a]);Array.prototype.push.apply(n,o),t+=o.length,r.push(t)}if(0===n.length)return[0,0];for(var s=[],i=1+Math.floor(Math.log(t)/Math.log(2))/8|0,u=[void 0,M.BYTE,M.USHORT,M.UINT24,M.ULONG][i],l=0;l<r.length;l+=1){var p=u(r[l]);Array.prototype.push.apply(s,p)}return Array.prototype.concat(M.Card16(e.length),M.OffSize(i),s,n)},G.INDEX=function(e){return M.INDEX(e).length},M.DICT=function(e){for(var t=[],r=Object.keys(e),n=r.length,a=0;a<n;a+=1){var o=parseInt(r[a],0),s=e[o];t=(t=t.concat(M.OPERAND(s.value,s.type))).concat(M.OPERATOR(o))}return t},G.DICT=function(e){return M.DICT(e).length},M.OPERATOR=function(e){return e<1200?[e]:[12,e-1200]},M.OPERAND=function(e,t){var r=[];if(Array.isArray(t))for(var n=0;n<t.length;n+=1)w.argument(e.length===t.length,"Not enough arguments given for type"+t),r=r.concat(M.OPERAND(e[n],t[n]));else if("SID"===t)r=r.concat(M.NUMBER(e));else if("offset"===t)r=r.concat(M.NUMBER32(e));else if("number"===t)r=r.concat(M.NUMBER(e));else{if("real"!==t)throw new Error("Unknown operand type "+t);r=r.concat(M.REAL(e))}return r},M.OP=M.BYTE,G.OP=G.BYTE;var _="function"==typeof WeakMap&&new WeakMap;function X(e,t,r){if(t.length&&("coverageFormat"!==t[0].name||1===t[0].value))for(var n=0;n<t.length;n+=1){var a=t[n];this[a.name]=a.value}if(this.tableName=e,this.fields=t,r)for(var o=Object.keys(r),s=0;s<o.length;s+=1){var i=o[s],u=r[i];void 0!==this[i]&&(this[i]=u)}}function V(e,t,r){void 0===r&&(r=t.length);var n=new Array(t.length+1);n[0]={name:e+"Count",type:"USHORT",value:r};for(var a=0;a<t.length;a++)n[a+1]={name:e+a,type:"USHORT",value:t[a]};return n}function Y(e,t,r){var n=t.length,a=new Array(n+1);a[0]={name:e+"Count",type:"USHORT",value:n};for(var o=0;o<n;o++)a[o+1]={name:e+o,type:"TABLE",value:r(t[o],o)};return a}function j(e,t,r){var n=t.length,a=[];a[0]={name:e+"Count",type:"USHORT",value:n};for(var o=0;o<n;o++)a=a.concat(r(t[o],o));return a}function Z(e){1===e.format?X.call(this,"coverageTable",[{name:"coverageFormat",type:"USHORT",value:1}].concat(V("glyph",e.glyphs))):2===e.format?X.call(this,"coverageTable",[{name:"coverageFormat",type:"USHORT",value:2}].concat(j("rangeRecord",e.ranges,function(e){return[{name:"startGlyphID",type:"USHORT",value:e.start},{name:"endGlyphID",type:"USHORT",value:e.end},{name:"startCoverageIndex",type:"USHORT",value:e.index}]}))):w.assert(!1,"Coverage format must be 1 or 2.")}function Q(e){X.call(this,"scriptListTable",j("scriptRecord",e,function(e,t){var r=e.script,n=r.defaultLangSys;return w.assert(!!n,"Unable to write GSUB: script "+e.tag+" has no default language system."),[{name:"scriptTag"+t,type:"TAG",value:e.tag},{name:"script"+t,type:"TABLE",value:new X("scriptTable",[{name:"defaultLangSys",type:"TABLE",value:new X("defaultLangSys",[{name:"lookupOrder",type:"USHORT",value:0},{name:"reqFeatureIndex",type:"USHORT",value:n.reqFeatureIndex}].concat(V("featureIndex",n.featureIndexes)))}].concat(j("langSys",r.langSysRecords,function(e,t){var r=e.langSys;return[{name:"langSysTag"+t,type:"TAG",value:e.tag},{name:"langSys"+t,type:"TABLE",value:new X("langSys",[{name:"lookupOrder",type:"USHORT",value:0},{name:"reqFeatureIndex",type:"USHORT",value:r.reqFeatureIndex}].concat(V("featureIndex",r.featureIndexes)))}]})))}]}))}function K(e){X.call(this,"featureListTable",j("featureRecord",e,function(e,t){var r=e.feature;return[{name:"featureTag"+t,type:"TAG",value:e.tag},{name:"feature"+t,type:"TABLE",value:new X("featureTable",[{name:"featureParams",type:"USHORT",value:r.featureParams}].concat(V("lookupListIndex",r.lookupListIndexes)))}]}))}function J(e,r){X.call(this,"lookupListTable",Y("lookup",e,function(e){var t=r[e.lookupType];return w.assert(!!t,"Unable to write GSUB lookup type "+e.lookupType+" tables."),new X("lookupTable",[{name:"lookupType",type:"USHORT",value:e.lookupType},{name:"lookupFlag",type:"USHORT",value:e.lookupFlag}].concat(Y("subtable",e.subtables,t)))}))}M.CHARSTRING=function(e){if(_){var t=_.get(e);if(void 0!==t)return t}for(var r=[],n=e.length,a=0;a<n;a+=1){var o=e[a];r=r.concat(M[o.type](o.value))}return _&&_.set(e,r),r},G.CHARSTRING=function(e){return M.CHARSTRING(e).length},M.OBJECT=function(e){var t=M[e.type];return w.argument(void 0!==t,"No encoding function for type "+e.type),t(e.value)},G.OBJECT=function(e){var t=G[e.type];return w.argument(void 0!==t,"No sizeOf function for type "+e.type),t(e.value)},M.TABLE=function(e){for(var t=[],r=e.fields.length,n=[],a=[],o=0;o<r;o+=1){var s=e.fields[o],i=M[s.type];w.argument(void 0!==i,"No encoding function for field type "+s.type+" ("+s.name+")");var u=e[s.name];void 0===u&&(u=s.value);var l=i(u);"TABLE"===s.type?(a.push(t.length),t=t.concat([0,0]),n.push(l)):t=t.concat(l)}for(var p=0;p<n.length;p+=1){var c=a[p],h=t.length;w.argument(h<65536,"Table "+e.tableName+" too big."),t[c]=h>>8,t[c+1]=255&h,t=t.concat(n[p])}return t},G.TABLE=function(e){for(var t=0,r=e.fields.length,n=0;n<r;n+=1){var a=e.fields[n],o=G[a.type];w.argument(void 0!==o,"No sizeOf function for field type "+a.type+" ("+a.name+")");var s=e[a.name];void 0===s&&(s=a.value),t+=o(s),"TABLE"===a.type&&(t+=2)}return t},M.RECORD=M.TABLE,G.RECORD=G.TABLE,M.LITERAL=function(e){return e},G.LITERAL=function(e){return e.length},X.prototype.encode=function(){return M.TABLE(this)},X.prototype.sizeOf=function(){return G.TABLE(this)};var $={Table:X,Record:X,Coverage:(Z.prototype=Object.create(X.prototype)).constructor=Z,ScriptList:(Q.prototype=Object.create(X.prototype)).constructor=Q,FeatureList:(K.prototype=Object.create(X.prototype)).constructor=K,LookupList:(J.prototype=Object.create(X.prototype)).constructor=J,ushortList:V,tableList:Y,recordList:j};function ee(e,t){return e.getUint8(t)}function te(e,t){return e.getUint16(t,!1)}function re(e,t){return e.getUint32(t,!1)}function ne(e,t){return e.getInt16(t,!1)+e.getUint16(t+2,!1)/65535}var ae={byte:1,uShort:2,short:2,uLong:4,fixed:4,longDateTime:8,tag:4};function oe(e,t){this.data=e,this.offset=t,this.relativeOffset=0}oe.prototype.parseByte=function(){var e=this.data.getUint8(this.offset+this.relativeOffset);return this.relativeOffset+=1,e},oe.prototype.parseChar=function(){var e=this.data.getInt8(this.offset+this.relativeOffset);return this.relativeOffset+=1,e},oe.prototype.parseCard8=oe.prototype.parseByte,oe.prototype.parseCard16=oe.prototype.parseUShort=function(){var e=this.data.getUint16(this.offset+this.relativeOffset);return this.relativeOffset+=2,e},oe.prototype.parseSID=oe.prototype.parseUShort,oe.prototype.parseOffset16=oe.prototype.parseUShort,oe.prototype.parseShort=function(){var e=this.data.getInt16(this.offset+this.relativeOffset);return this.relativeOffset+=2,e},oe.prototype.parseF2Dot14=function(){var e=this.data.getInt16(this.offset+this.relativeOffset)/16384;return this.relativeOffset+=2,e},oe.prototype.parseOffset32=oe.prototype.parseULong=function(){var e=re(this.data,this.offset+this.relativeOffset);return this.relativeOffset+=4,e},oe.prototype.parseFixed=function(){var e=ne(this.data,this.offset+this.relativeOffset);return this.relativeOffset+=4,e},oe.prototype.parseString=function(e){var t=this.data,r=this.offset+this.relativeOffset,n="";this.relativeOffset+=e;for(var a=0;a<e;a++)n+=String.fromCharCode(t.getUint8(r+a));return n},oe.prototype.parseTag=function(){return this.parseString(4)},oe.prototype.parseLongDateTime=function(){var e=re(this.data,this.offset+this.relativeOffset+4);return e-=2082844800,this.relativeOffset+=8,e},oe.prototype.parseVersion=function(e){var t=te(this.data,this.offset+this.relativeOffset),r=te(this.data,this.offset+this.relativeOffset+2);return this.relativeOffset+=4,void 0===e&&(e=4096),t+r/e/10},oe.prototype.skip=function(e,t){void 0===t&&(t=1),this.relativeOffset+=ae[e]*t},oe.prototype.parseULongList=function(e){void 0===e&&(e=this.parseULong());for(var t=new Array(e),r=this.data,n=this.offset+this.relativeOffset,a=0;a<e;a++)t[a]=r.getUint32(n),n+=4;return this.relativeOffset+=4*e,t},oe.prototype.parseOffset16List=oe.prototype.parseUShortList=function(e){void 0===e&&(e=this.parseUShort());for(var t=new Array(e),r=this.data,n=this.offset+this.relativeOffset,a=0;a<e;a++)t[a]=r.getUint16(n),n+=2;return this.relativeOffset+=2*e,t},oe.prototype.parseShortList=function(e){for(var t=new Array(e),r=this.data,n=this.offset+this.relativeOffset,a=0;a<e;a++)t[a]=r.getInt16(n),n+=2;return this.relativeOffset+=2*e,t},oe.prototype.parseByteList=function(e){for(var t=new Array(e),r=this.data,n=this.offset+this.relativeOffset,a=0;a<e;a++)t[a]=r.getUint8(n++);return this.relativeOffset+=e,t},oe.prototype.parseList=function(e,t){t||(t=e,e=this.parseUShort());for(var r=new Array(e),n=0;n<e;n++)r[n]=t.call(this);return r},oe.prototype.parseList32=function(e,t){t||(t=e,e=this.parseULong());for(var r=new Array(e),n=0;n<e;n++)r[n]=t.call(this);return r},oe.prototype.parseRecordList=function(e,t){t||(t=e,e=this.parseUShort());for(var r=new Array(e),n=Object.keys(t),a=0;a<e;a++){for(var o={},s=0;s<n.length;s++){var i=n[s],u=t[i];o[i]=u.call(this)}r[a]=o}return r},oe.prototype.parseRecordList32=function(e,t){t||(t=e,e=this.parseULong());for(var r=new Array(e),n=Object.keys(t),a=0;a<e;a++){for(var o={},s=0;s<n.length;s++){var i=n[s],u=t[i];o[i]=u.call(this)}r[a]=o}return r},oe.prototype.parseStruct=function(e){if("function"==typeof e)return e.call(this);for(var t=Object.keys(e),r={},n=0;n<t.length;n++){var a=t[n],o=e[a];r[a]=o.call(this)}return r},oe.prototype.parseValueRecord=function(e){if(void 0===e&&(e=this.parseUShort()),0!==e){var t={};return 1&e&&(t.xPlacement=this.parseShort()),2&e&&(t.yPlacement=this.parseShort()),4&e&&(t.xAdvance=this.parseShort()),8&e&&(t.yAdvance=this.parseShort()),16&e&&(t.xPlaDevice=void 0,this.parseShort()),32&e&&(t.yPlaDevice=void 0,this.parseShort()),64&e&&(t.xAdvDevice=void 0,this.parseShort()),128&e&&(t.yAdvDevice=void 0,this.parseShort()),t}},oe.prototype.parseValueRecordList=function(){for(var e=this.parseUShort(),t=this.parseUShort(),r=new Array(t),n=0;n<t;n++)r[n]=this.parseValueRecord(e);return r},oe.prototype.parsePointer=function(e){var t=this.parseOffset16();if(0<t)return new oe(this.data,this.offset+t).parseStruct(e)},oe.prototype.parsePointer32=function(e){var t=this.parseOffset32();if(0<t)return new oe(this.data,this.offset+t).parseStruct(e)},oe.prototype.parseListOfLists=function(e){for(var t=this.parseOffset16List(),r=t.length,n=this.relativeOffset,a=new Array(r),o=0;o<r;o++){var s=t[o];if(0!==s)if(this.relativeOffset=s,e){for(var i=this.parseOffset16List(),u=new Array(i.length),l=0;l<i.length;l++)this.relativeOffset=s+i[l],u[l]=e.call(this);a[o]=u}else a[o]=this.parseUShortList();else a[o]=void 0}return this.relativeOffset=n,a},oe.prototype.parseCoverage=function(){var e=this.offset+this.relativeOffset,t=this.parseUShort(),r=this.parseUShort();if(1===t)return{format:1,glyphs:this.parseUShortList(r)};if(2!==t)throw new Error("0x"+e.toString(16)+": Coverage format must be 1 or 2.");for(var n=new Array(r),a=0;a<r;a++)n[a]={start:this.parseUShort(),end:this.parseUShort(),index:this.parseUShort()};return{format:2,ranges:n}},oe.prototype.parseClassDef=function(){var e=this.offset+this.relativeOffset,t=this.parseUShort();if(1===t)return{format:1,startGlyph:this.parseUShort(),classes:this.parseUShortList()};if(2===t)return{format:2,ranges:this.parseRecordList({start:oe.uShort,end:oe.uShort,classId:oe.uShort})};throw new Error("0x"+e.toString(16)+": ClassDef format must be 1 or 2.")},oe.list=function(e,t){return function(){return this.parseList(e,t)}},oe.list32=function(e,t){return function(){return this.parseList32(e,t)}},oe.recordList=function(e,t){return function(){return this.parseRecordList(e,t)}},oe.recordList32=function(e,t){return function(){return this.parseRecordList32(e,t)}},oe.pointer=function(e){return function(){return this.parsePointer(e)}},oe.pointer32=function(e){return function(){return this.parsePointer32(e)}},oe.tag=oe.prototype.parseTag,oe.byte=oe.prototype.parseByte,oe.uShort=oe.offset16=oe.prototype.parseUShort,oe.uShortList=oe.prototype.parseUShortList,oe.uLong=oe.offset32=oe.prototype.parseULong,oe.uLongList=oe.prototype.parseULongList,oe.struct=oe.prototype.parseStruct,oe.coverage=oe.prototype.parseCoverage,oe.classDef=oe.prototype.parseClassDef;var se={reserved:oe.uShort,reqFeatureIndex:oe.uShort,featureIndexes:oe.uShortList};oe.prototype.parseScriptList=function(){return this.parsePointer(oe.recordList({tag:oe.tag,script:oe.pointer({defaultLangSys:oe.pointer(se),langSysRecords:oe.recordList({tag:oe.tag,langSys:oe.pointer(se)})})}))||[]},oe.prototype.parseFeatureList=function(){return this.parsePointer(oe.recordList({tag:oe.tag,feature:oe.pointer({featureParams:oe.offset16,lookupListIndexes:oe.uShortList})}))||[]},oe.prototype.parseLookupList=function(n){return this.parsePointer(oe.list(oe.pointer(function(){var e=this.parseUShort();w.argument(1<=e&&e<=9,"GPOS/GSUB lookup type "+e+" unknown.");var t=this.parseUShort(),r=16&t;return{lookupType:e,lookupFlag:t,subtables:this.parseList(oe.pointer(n[e])),markFilteringSet:r?this.parseUShort():void 0}})))||[]},oe.prototype.parseFeatureVariationsList=function(){return this.parsePointer32(function(){var e=this.parseUShort(),t=this.parseUShort();return w.argument(1===e&&t<1,"GPOS/GSUB feature variations table unknown."),this.parseRecordList32({conditionSetOffset:oe.offset32,featureTableSubstitutionOffset:oe.offset32})})||[]};var ie={getByte:ee,getCard8:ee,getUShort:te,getCard16:te,getShort:function(e,t){return e.getInt16(t,!1)},getULong:re,getFixed:ne,getTag:function(e,t){for(var r="",n=t;n<t+4;n+=1)r+=String.fromCharCode(e.getInt8(n));return r},getOffset:function(e,t,r){for(var n=0,a=0;a<r;a+=1)n<<=8,n+=e.getUint8(t+a);return n},getBytes:function(e,t,r){for(var n=[],a=t;a<r;a+=1)n.push(e.getUint8(a));return n},bytesToString:function(e){for(var t="",r=0;r<e.length;r+=1)t+=String.fromCharCode(e[r]);return t},Parser:oe};var ue={parse:function(e,t){var r={};r.version=ie.getUShort(e,t),w.argument(0===r.version,"cmap table version should be 0."),r.numTables=ie.getUShort(e,t+2);for(var n=-1,a=r.numTables-1;0<=a;--a){var o=ie.getUShort(e,t+4+8*a),s=ie.getUShort(e,t+4+8*a+2);if(3===o&&(0===s||1===s||10===s)||0===o&&(0===s||1===s||2===s||3===s||4===s)){n=ie.getULong(e,t+4+8*a+4);break}}if(-1===n)throw new Error("No valid cmap sub-tables found.");var i=new ie.Parser(e,t+n);if(r.format=i.parseUShort(),12===r.format)!function(e,t){var r;t.parseUShort(),e.length=t.parseULong(),e.language=t.parseULong(),e.groupCount=r=t.parseULong(),e.glyphIndexMap={};for(var n=0;n<r;n+=1)for(var a=t.parseULong(),o=t.parseULong(),s=t.parseULong(),i=a;i<=o;i+=1)e.glyphIndexMap[i]=s,s++}(r,i);else{if(4!==r.format)throw new Error("Only format 4 and 12 cmap tables are supported (found format "+r.format+").");!function(e,t,r,n,a){var o;e.length=t.parseUShort(),e.language=t.parseUShort(),e.segCount=o=t.parseUShort()>>1,t.skip("uShort",3),e.glyphIndexMap={};for(var s=new ie.Parser(r,n+a+14),i=new ie.Parser(r,n+a+16+2*o),u=new ie.Parser(r,n+a+16+4*o),l=new ie.Parser(r,n+a+16+6*o),p=n+a+16+8*o,c=0;c<o-1;c+=1)for(var h=void 0,f=s.parseUShort(),d=i.parseUShort(),g=u.parseShort(),v=l.parseUShort(),m=d;m<=f;m+=1)0!==v?(p=l.offset+l.relativeOffset-2,p+=v,p+=2*(m-d),0!==(h=ie.getUShort(r,p))&&(h=h+g&65535)):h=m+g&65535,e.glyphIndexMap[m]=h}(r,i,e,t,n)}return r},make:function(e){var t,r=!0;for(t=e.length-1;0<t;--t){if(65535<e.get(t).unicode){console.log("Adding CMAP format 12 (needed!)"),r=!1;break}}var n=[{name:"version",type:"USHORT",value:0},{name:"numTables",type:"USHORT",value:r?1:2},{name:"platformID",type:"USHORT",value:3},{name:"encodingID",type:"USHORT",value:1},{name:"offset",type:"ULONG",value:r?12:20}];r||(n=n.concat([{name:"cmap12PlatformID",type:"USHORT",value:3},{name:"cmap12EncodingID",type:"USHORT",value:10},{name:"cmap12Offset",type:"ULONG",value:0}])),n=n.concat([{name:"format",type:"USHORT",value:4},{name:"cmap4Length",type:"USHORT",value:0},{name:"language",type:"USHORT",value:0},{name:"segCountX2",type:"USHORT",value:0},{name:"searchRange",type:"USHORT",value:0},{name:"entrySelector",type:"USHORT",value:0},{name:"rangeShift",type:"USHORT",value:0}]);var a,o,s,i=new $.Table("cmap",n);for(i.segments=[],t=0;t<e.length;t+=1){for(var u=e.get(t),l=0;l<u.unicodes.length;l+=1)a=i,o=u.unicodes[l],s=t,a.segments.push({end:o,start:o,delta:-(o-s),offset:0,glyphIndex:s});i.segments=i.segments.sort(function(e,t){return e.start-t.start})}i.segments.push({end:65535,start:65535,delta:1,offset:0});var p=i.segments.length,c=0,h=[],f=[],d=[],g=[],v=[],m=[];for(t=0;t<p;t+=1){var y=i.segments[t];y.end<=65535&&y.start<=65535?(h=h.concat({name:"end_"+t,type:"USHORT",value:y.end}),f=f.concat({name:"start_"+t,type:"USHORT",value:y.start}),d=d.concat({name:"idDelta_"+t,type:"SHORT",value:y.delta}),g=g.concat({name:"idRangeOffset_"+t,type:"USHORT",value:y.offset}),void 0!==y.glyphId&&(v=v.concat({name:"glyph_"+t,type:"USHORT",value:y.glyphId}))):c+=1,r||void 0===y.glyphIndex||(m=(m=(m=m.concat({name:"cmap12Start_"+t,type:"ULONG",value:y.start})).concat({name:"cmap12End_"+t,type:"ULONG",value:y.end})).concat({name:"cmap12Glyph_"+t,type:"ULONG",value:y.glyphIndex}))}if(i.segCountX2=2*(p-c),i.searchRange=2*Math.pow(2,Math.floor(Math.log(p-c)/Math.log(2))),i.entrySelector=Math.log(i.searchRange/2)/Math.log(2),i.rangeShift=i.segCountX2-i.searchRange,i.fields=i.fields.concat(h),i.fields.push({name:"reservedPad",type:"USHORT",value:0}),i.fields=i.fields.concat(f),i.fields=i.fields.concat(d),i.fields=i.fields.concat(g),i.fields=i.fields.concat(v),i.cmap4Length=14+2*h.length+2+2*f.length+2*d.length+2*g.length+2*v.length,!r){var b=16+4*m.length;i.cmap12Offset=20+i.cmap4Length,i.fields=i.fields.concat([{name:"cmap12Format",type:"USHORT",value:12},{name:"cmap12Reserved",type:"USHORT",value:0},{name:"cmap12Length",type:"ULONG",value:b},{name:"cmap12Language",type:"ULONG",value:0},{name:"cmap12nGroups",type:"ULONG",value:m.length/3}]),i.fields=i.fields.concat(m)}return i}},le=[".notdef","space","exclam","quotedbl","numbersign","dollar","percent","ampersand","quoteright","parenleft","parenright","asterisk","plus","comma","hyphen","period","slash","zero","one","two","three","four","five","six","seven","eight","nine","colon","semicolon","less","equal","greater","question","at","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","bracketleft","backslash","bracketright","asciicircum","underscore","quoteleft","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","braceleft","bar","braceright","asciitilde","exclamdown","cent","sterling","fraction","yen","florin","section","currency","quotesingle","quotedblleft","guillemotleft","guilsinglleft","guilsinglright","fi","fl","endash","dagger","daggerdbl","periodcentered","paragraph","bullet","quotesinglbase","quotedblbase","quotedblright","guillemotright","ellipsis","perthousand","questiondown","grave","acute","circumflex","tilde","macron","breve","dotaccent","dieresis","ring","cedilla","hungarumlaut","ogonek","caron","emdash","AE","ordfeminine","Lslash","Oslash","OE","ordmasculine","ae","dotlessi","lslash","oslash","oe","germandbls","onesuperior","logicalnot","mu","trademark","Eth","onehalf","plusminus","Thorn","onequarter","divide","brokenbar","degree","thorn","threequarters","twosuperior","registered","minus","eth","multiply","threesuperior","copyright","Aacute","Acircumflex","Adieresis","Agrave","Aring","Atilde","Ccedilla","Eacute","Ecircumflex","Edieresis","Egrave","Iacute","Icircumflex","Idieresis","Igrave","Ntilde","Oacute","Ocircumflex","Odieresis","Ograve","Otilde","Scaron","Uacute","Ucircumflex","Udieresis","Ugrave","Yacute","Ydieresis","Zcaron","aacute","acircumflex","adieresis","agrave","aring","atilde","ccedilla","eacute","ecircumflex","edieresis","egrave","iacute","icircumflex","idieresis","igrave","ntilde","oacute","ocircumflex","odieresis","ograve","otilde","scaron","uacute","ucircumflex","udieresis","ugrave","yacute","ydieresis","zcaron","exclamsmall","Hungarumlautsmall","dollaroldstyle","dollarsuperior","ampersandsmall","Acutesmall","parenleftsuperior","parenrightsuperior","266 ff","onedotenleader","zerooldstyle","oneoldstyle","twooldstyle","threeoldstyle","fouroldstyle","fiveoldstyle","sixoldstyle","sevenoldstyle","eightoldstyle","nineoldstyle","commasuperior","threequartersemdash","periodsuperior","questionsmall","asuperior","bsuperior","centsuperior","dsuperior","esuperior","isuperior","lsuperior","msuperior","nsuperior","osuperior","rsuperior","ssuperior","tsuperior","ff","ffi","ffl","parenleftinferior","parenrightinferior","Circumflexsmall","hyphensuperior","Gravesmall","Asmall","Bsmall","Csmall","Dsmall","Esmall","Fsmall","Gsmall","Hsmall","Ismall","Jsmall","Ksmall","Lsmall","Msmall","Nsmall","Osmall","Psmall","Qsmall","Rsmall","Ssmall","Tsmall","Usmall","Vsmall","Wsmall","Xsmall","Ysmall","Zsmall","colonmonetary","onefitted","rupiah","Tildesmall","exclamdownsmall","centoldstyle","Lslashsmall","Scaronsmall","Zcaronsmall","Dieresissmall","Brevesmall","Caronsmall","Dotaccentsmall","Macronsmall","figuredash","hypheninferior","Ogoneksmall","Ringsmall","Cedillasmall","questiondownsmall","oneeighth","threeeighths","fiveeighths","seveneighths","onethird","twothirds","zerosuperior","foursuperior","fivesuperior","sixsuperior","sevensuperior","eightsuperior","ninesuperior","zeroinferior","oneinferior","twoinferior","threeinferior","fourinferior","fiveinferior","sixinferior","seveninferior","eightinferior","nineinferior","centinferior","dollarinferior","periodinferior","commainferior","Agravesmall","Aacutesmall","Acircumflexsmall","Atildesmall","Adieresissmall","Aringsmall","AEsmall","Ccedillasmall","Egravesmall","Eacutesmall","Ecircumflexsmall","Edieresissmall","Igravesmall","Iacutesmall","Icircumflexsmall","Idieresissmall","Ethsmall","Ntildesmall","Ogravesmall","Oacutesmall","Ocircumflexsmall","Otildesmall","Odieresissmall","OEsmall","Oslashsmall","Ugravesmall","Uacutesmall","Ucircumflexsmall","Udieresissmall","Yacutesmall","Thornsmall","Ydieresissmall","001.000","001.001","001.002","001.003","Black","Bold","Book","Light","Medium","Regular","Roman","Semibold"],pe=["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","space","exclam","quotedbl","numbersign","dollar","percent","ampersand","quoteright","parenleft","parenright","asterisk","plus","comma","hyphen","period","slash","zero","one","two","three","four","five","six","seven","eight","nine","colon","semicolon","less","equal","greater","question","at","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","bracketleft","backslash","bracketright","asciicircum","underscore","quoteleft","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","braceleft","bar","braceright","asciitilde","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","exclamdown","cent","sterling","fraction","yen","florin","section","currency","quotesingle","quotedblleft","guillemotleft","guilsinglleft","guilsinglright","fi","fl","","endash","dagger","daggerdbl","periodcentered","","paragraph","bullet","quotesinglbase","quotedblbase","quotedblright","guillemotright","ellipsis","perthousand","","questiondown","","grave","acute","circumflex","tilde","macron","breve","dotaccent","dieresis","","ring","cedilla","","hungarumlaut","ogonek","caron","emdash","","","","","","","","","","","","","","","","","AE","","ordfeminine","","","","","Lslash","Oslash","OE","ordmasculine","","","","","","ae","","","","dotlessi","","","lslash","oslash","oe","germandbls"],ce=["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","space","exclamsmall","Hungarumlautsmall","","dollaroldstyle","dollarsuperior","ampersandsmall","Acutesmall","parenleftsuperior","parenrightsuperior","twodotenleader","onedotenleader","comma","hyphen","period","fraction","zerooldstyle","oneoldstyle","twooldstyle","threeoldstyle","fouroldstyle","fiveoldstyle","sixoldstyle","sevenoldstyle","eightoldstyle","nineoldstyle","colon","semicolon","commasuperior","threequartersemdash","periodsuperior","questionsmall","","asuperior","bsuperior","centsuperior","dsuperior","esuperior","","","isuperior","","","lsuperior","msuperior","nsuperior","osuperior","","","rsuperior","ssuperior","tsuperior","","ff","fi","fl","ffi","ffl","parenleftinferior","","parenrightinferior","Circumflexsmall","hyphensuperior","Gravesmall","Asmall","Bsmall","Csmall","Dsmall","Esmall","Fsmall","Gsmall","Hsmall","Ismall","Jsmall","Ksmall","Lsmall","Msmall","Nsmall","Osmall","Psmall","Qsmall","Rsmall","Ssmall","Tsmall","Usmall","Vsmall","Wsmall","Xsmall","Ysmall","Zsmall","colonmonetary","onefitted","rupiah","Tildesmall","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","exclamdownsmall","centoldstyle","Lslashsmall","","","Scaronsmall","Zcaronsmall","Dieresissmall","Brevesmall","Caronsmall","","Dotaccentsmall","","","Macronsmall","","","figuredash","hypheninferior","","","Ogoneksmall","Ringsmall","Cedillasmall","","","","onequarter","onehalf","threequarters","questiondownsmall","oneeighth","threeeighths","fiveeighths","seveneighths","onethird","twothirds","","","zerosuperior","onesuperior","twosuperior","threesuperior","foursuperior","fivesuperior","sixsuperior","sevensuperior","eightsuperior","ninesuperior","zeroinferior","oneinferior","twoinferior","threeinferior","fourinferior","fiveinferior","sixinferior","seveninferior","eightinferior","nineinferior","centinferior","dollarinferior","periodinferior","commainferior","Agravesmall","Aacutesmall","Acircumflexsmall","Atildesmall","Adieresissmall","Aringsmall","AEsmall","Ccedillasmall","Egravesmall","Eacutesmall","Ecircumflexsmall","Edieresissmall","Igravesmall","Iacutesmall","Icircumflexsmall","Idieresissmall","Ethsmall","Ntildesmall","Ogravesmall","Oacutesmall","Ocircumflexsmall","Otildesmall","Odieresissmall","OEsmall","Oslashsmall","Ugravesmall","Uacutesmall","Ucircumflexsmall","Udieresissmall","Yacutesmall","Thornsmall","Ydieresissmall"],he=[".notdef",".null","nonmarkingreturn","space","exclam","quotedbl","numbersign","dollar","percent","ampersand","quotesingle","parenleft","parenright","asterisk","plus","comma","hyphen","period","slash","zero","one","two","three","four","five","six","seven","eight","nine","colon","semicolon","less","equal","greater","question","at","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","bracketleft","backslash","bracketright","asciicircum","underscore","grave","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","braceleft","bar","braceright","asciitilde","Adieresis","Aring","Ccedilla","Eacute","Ntilde","Odieresis","Udieresis","aacute","agrave","acircumflex","adieresis","atilde","aring","ccedilla","eacute","egrave","ecircumflex","edieresis","iacute","igrave","icircumflex","idieresis","ntilde","oacute","ograve","ocircumflex","odieresis","otilde","uacute","ugrave","ucircumflex","udieresis","dagger","degree","cent","sterling","section","bullet","paragraph","germandbls","registered","copyright","trademark","acute","dieresis","notequal","AE","Oslash","infinity","plusminus","lessequal","greaterequal","yen","mu","partialdiff","summation","product","pi","integral","ordfeminine","ordmasculine","Omega","ae","oslash","questiondown","exclamdown","logicalnot","radical","florin","approxequal","Delta","guillemotleft","guillemotright","ellipsis","nonbreakingspace","Agrave","Atilde","Otilde","OE","oe","endash","emdash","quotedblleft","quotedblright","quoteleft","quoteright","divide","lozenge","ydieresis","Ydieresis","fraction","currency","guilsinglleft","guilsinglright","fi","fl","daggerdbl","periodcentered","quotesinglbase","quotedblbase","perthousand","Acircumflex","Ecircumflex","Aacute","Edieresis","Egrave","Iacute","Icircumflex","Idieresis","Igrave","Oacute","Ocircumflex","apple","Ograve","Uacute","Ucircumflex","Ugrave","dotlessi","circumflex","tilde","macron","breve","dotaccent","ring","cedilla","hungarumlaut","ogonek","caron","Lslash","lslash","Scaron","scaron","Zcaron","zcaron","brokenbar","Eth","eth","Yacute","yacute","Thorn","thorn","minus","multiply","onesuperior","twosuperior","threesuperior","onehalf","onequarter","threequarters","franc","Gbreve","gbreve","Idotaccent","Scedilla","scedilla","Cacute","cacute","Ccaron","ccaron","dcroat"];function fe(e){this.font=e}function de(e){this.cmap=e}function ge(e,t){this.encoding=e,this.charset=t}function ve(e){switch(e.version){case 1:this.names=he.slice();break;case 2:this.names=new Array(e.numberOfGlyphs);for(var t=0;t<e.numberOfGlyphs;t++)e.glyphNameIndex[t]<he.length?this.names[t]=he[e.glyphNameIndex[t]]:this.names[t]=e.names[e.glyphNameIndex[t]-he.length];break;case 2.5:this.names=new Array(e.numberOfGlyphs);for(var r=0;r<e.numberOfGlyphs;r++)this.names[r]=he[r+e.glyphNameIndex[r]];break;case 3:default:this.names=[]}}function me(e,t){(t.lowMemory?function(e){e._IndexToUnicodeMap={};for(var t=e.tables.cmap.glyphIndexMap,r=Object.keys(t),n=0;n<r.length;n+=1){var a=r[n],o=t[a];void 0===e._IndexToUnicodeMap[o]?e._IndexToUnicodeMap[o]={unicodes:[parseInt(a)]}:e._IndexToUnicodeMap[o].unicodes.push(parseInt(a))}}:function(e){for(var t,r=e.tables.cmap.glyphIndexMap,n=Object.keys(r),a=0;a<n.length;a+=1){var o=n[a],s=r[o];(t=e.glyphs.get(s)).addUnicode(parseInt(o))}for(var i=0;i<e.glyphs.length;i+=1)t=e.glyphs.get(i),e.cffEncoding?e.isCIDFont?t.name="gid"+i:t.name=e.cffEncoding.charset[i]:e.glyphNames.names&&(t.name=e.glyphNames.glyphIndexToName(i))})(e)}fe.prototype.charToGlyphIndex=function(e){var t=e.codePointAt(0),r=this.font.glyphs;if(r)for(var n=0;n<r.length;n+=1)for(var a=r.get(n),o=0;o<a.unicodes.length;o+=1)if(a.unicodes[o]===t)return n;return null},de.prototype.charToGlyphIndex=function(e){return this.cmap.glyphIndexMap[e.codePointAt(0)]||0},ge.prototype.charToGlyphIndex=function(e){var t=e.codePointAt(0),r=this.encoding[t];return this.charset.indexOf(r)},ve.prototype.nameToGlyphIndex=function(e){return this.names.indexOf(e)},ve.prototype.glyphIndexToName=function(e){return this.names[e]};var ye={line:function(e,t,r,n,a){e.beginPath(),e.moveTo(t,r),e.lineTo(n,a),e.stroke()}};function be(e){this.bindConstructorValues(e)}function Se(t,e,r){Object.defineProperty(t,e,{get:function(){return t.path,t[r]},set:function(e){t[r]=e},enumerable:!0,configurable:!0})}function xe(e,t){if(this.font=e,this.glyphs={},Array.isArray(t))for(var r=0;r<t.length;r++){var n=t[r];n.path.unitsPerEm=e.unitsPerEm,this.glyphs[r]=n}this.length=t&&t.length||0}be.prototype.bindConstructorValues=function(e){var t,r;this.index=e.index||0,this.name=e.name||null,this.unicode=e.unicode||void 0,this.unicodes=e.unicodes||void 0!==e.unicode?[e.unicode]:[],"xMin"in e&&(this.xMin=e.xMin),"yMin"in e&&(this.yMin=e.yMin),"xMax"in e&&(this.xMax=e.xMax),"yMax"in e&&(this.yMax=e.yMax),"advanceWidth"in e&&(this.advanceWidth=e.advanceWidth),Object.defineProperty(this,"path",(t=e.path,r=t||new B,{configurable:!0,get:function(){return"function"==typeof r&&(r=r()),r},set:function(e){r=e}}))},be.prototype.addUnicode=function(e){0===this.unicodes.length&&(this.unicode=e),this.unicodes.push(e)},be.prototype.getBoundingBox=function(){return this.path.getBoundingBox()},be.prototype.getPath=function(e,t,r,n,a){var o,s;e=void 0!==e?e:0,t=void 0!==t?t:0,r=void 0!==r?r:72;var i=(n=n||{}).xScale,u=n.yScale;if(n.hinting&&a&&a.hinting&&(s=this.path&&a.hinting.exec(this,r)),s)o=a.hinting.getCommands(s),e=Math.round(e),t=Math.round(t),i=u=1;else{o=this.path.commands;var l=1/(this.path.unitsPerEm||1e3)*r;void 0===i&&(i=l),void 0===u&&(u=l)}for(var p=new B,c=0;c<o.length;c+=1){var h=o[c];"M"===h.type?p.moveTo(e+h.x*i,t+-h.y*u):"L"===h.type?p.lineTo(e+h.x*i,t+-h.y*u):"Q"===h.type?p.quadraticCurveTo(e+h.x1*i,t+-h.y1*u,e+h.x*i,t+-h.y*u):"C"===h.type?p.curveTo(e+h.x1*i,t+-h.y1*u,e+h.x2*i,t+-h.y2*u,e+h.x*i,t+-h.y*u):"Z"===h.type&&p.closePath()}return p},be.prototype.getContours=function(){if(void 0===this.points)return[];for(var e=[],t=[],r=0;r<this.points.length;r+=1){var n=this.points[r];t.push(n),n.lastPointOfContour&&(e.push(t),t=[])}return w.argument(0===t.length,"There are still points left in the current contour."),e},be.prototype.getMetrics=function(){for(var e=this.path.commands,t=[],r=[],n=0;n<e.length;n+=1){var a=e[n];"Z"!==a.type&&(t.push(a.x),r.push(a.y)),"Q"!==a.type&&"C"!==a.type||(t.push(a.x1),r.push(a.y1)),"C"===a.type&&(t.push(a.x2),r.push(a.y2))}var o={xMin:Math.min.apply(null,t),yMin:Math.min.apply(null,r),xMax:Math.max.apply(null,t),yMax:Math.max.apply(null,r),leftSideBearing:this.leftSideBearing};return isFinite(o.xMin)||(o.xMin=0),isFinite(o.xMax)||(o.xMax=this.advanceWidth),isFinite(o.yMin)||(o.yMin=0),isFinite(o.yMax)||(o.yMax=0),o.rightSideBearing=this.advanceWidth-o.leftSideBearing-(o.xMax-o.xMin),o},be.prototype.draw=function(e,t,r,n,a){this.getPath(t,r,n,a).draw(e)},be.prototype.drawPoints=function(o,e,t,r){function n(e,t,r,n){o.beginPath();for(var a=0;a<e.length;a+=1)o.moveTo(t+e[a].x*n,r+e[a].y*n),o.arc(t+e[a].x*n,r+e[a].y*n,2,0,2*Math.PI,!1);o.closePath(),o.fill()}e=void 0!==e?e:0,t=void 0!==t?t:0,r=void 0!==r?r:24;for(var a=1/this.path.unitsPerEm*r,s=[],i=[],u=this.path,l=0;l<u.commands.length;l+=1){var p=u.commands[l];void 0!==p.x&&s.push({x:p.x,y:-p.y}),void 0!==p.x1&&i.push({x:p.x1,y:-p.y1}),void 0!==p.x2&&i.push({x:p.x2,y:-p.y2})}o.fillStyle="blue",n(s,e,t,a),o.fillStyle="red",n(i,e,t,a)},be.prototype.drawMetrics=function(e,t,r,n){var a;t=void 0!==t?t:0,r=void 0!==r?r:0,n=void 0!==n?n:24,a=1/this.path.unitsPerEm*n,e.lineWidth=1,e.strokeStyle="black",ye.line(e,t,-1e4,t,1e4),ye.line(e,-1e4,r,1e4,r);var o=this.xMin||0,s=this.yMin||0,i=this.xMax||0,u=this.yMax||0,l=this.advanceWidth||0;e.strokeStyle="blue",ye.line(e,t+o*a,-1e4,t+o*a,1e4),ye.line(e,t+i*a,-1e4,t+i*a,1e4),ye.line(e,-1e4,r+-s*a,1e4,r+-s*a),ye.line(e,-1e4,r+-u*a,1e4,r+-u*a),e.strokeStyle="green",ye.line(e,t+l*a,-1e4,t+l*a,1e4)},xe.prototype.get=function(e){if(void 0===this.glyphs[e]){this.font._push(e),"function"==typeof this.glyphs[e]&&(this.glyphs[e]=this.glyphs[e]());var t=this.glyphs[e],r=this.font._IndexToUnicodeMap[e];if(r)for(var n=0;n<r.unicodes.length;n++)t.addUnicode(r.unicodes[n]);this.font.cffEncoding?this.font.isCIDFont?t.name="gid"+e:t.name=this.font.cffEncoding.charset[e]:this.font.glyphNames.names&&(t.name=this.font.glyphNames.glyphIndexToName(e)),this.glyphs[e].advanceWidth=this.font._hmtxTableData[e].advanceWidth,this.glyphs[e].leftSideBearing=this.font._hmtxTableData[e].leftSideBearing}else"function"==typeof this.glyphs[e]&&(this.glyphs[e]=this.glyphs[e]());return this.glyphs[e]},xe.prototype.push=function(e,t){this.glyphs[e]=t,this.length++};var Te={GlyphSet:xe,glyphLoader:function(e,t){return new be({index:t,font:e})},ttfGlyphLoader:function(r,e,n,a,o,s){return function(){var t=new be({index:e,font:r});return t.path=function(){n(t,a,o);var e=s(r.glyphs,t);return e.unitsPerEm=r.unitsPerEm,e},Se(t,"xMin","_xMin"),Se(t,"xMax","_xMax"),Se(t,"yMin","_yMin"),Se(t,"yMax","_yMax"),t}},cffGlyphLoader:function(r,e,n,a){return function(){var t=new be({index:e,font:r});return t.path=function(){var e=n(r,t,a);return e.unitsPerEm=r.unitsPerEm,e},t}}};function ke(e,t){if(e===t)return 1;if(Array.isArray(e)&&Array.isArray(t)){if(e.length!==t.length)return;for(var r=0;r<e.length;r+=1)if(!ke(e[r],t[r]))return;return 1}}function Ue(e){return e.length<1240?107:e.length<33900?1131:32768}function Oe(e,t,r){var n,a,o=[],s=[],i=ie.getCard16(e,t);if(0!==i){var u=ie.getByte(e,t+2);n=t+(i+1)*u+2;for(var l=t+3,p=0;p<i+1;p+=1)o.push(ie.getOffset(e,l,u)),l+=u;a=n+o[i]}else a=t+2;for(var c=0;c<o.length-1;c+=1){var h=ie.getBytes(e,n+o[c],n+o[c+1]);r&&(h=r(h)),s.push(h)}return{objects:s,startOffset:t,endOffset:a}}function Ee(e,t){if(28===t)return e.parseByte()<<8|e.parseByte();if(29===t)return e.parseByte()<<24|e.parseByte()<<16|e.parseByte()<<8|e.parseByte();if(30===t)return function(e){for(var t="",r=["0","1","2","3","4","5","6","7","8","9",".","E","E-",null,"-"];;){var n=e.parseByte(),a=n>>4,o=15&n;if(15==a)break;if(t+=r[a],15==o)break;t+=r[o]}return parseFloat(t)}(e);if(32<=t&&t<=246)return t-139;if(247<=t&&t<=250)return 256*(t-247)+e.parseByte()+108;if(251<=t&&t<=254)return 256*-(t-251)-e.parseByte()-108;throw new Error("Invalid b0 "+t)}function Re(e,t,r){t=void 0!==t?t:0;var n=new ie.Parser(e,t),a=[],o=[];for(r=void 0!==r?r:e.length;n.relativeOffset<r;){var s=n.parseByte();s<=21?(12===s&&(s=1200+n.parseByte()),a.push([s,o]),o=[]):o.push(Ee(n,s))}return function(e){for(var t={},r=0;r<e.length;r+=1){var n=e[r][0],a=e[r][1],o=void 0;if(o=1===a.length?a[0]:a,t.hasOwnProperty(n)&&!isNaN(t[n]))throw new Error("Object "+t+" already has key "+n);t[n]=o}return t}(a)}function Le(e,t){return t=t<=390?le[t]:e[t-391]}function Ce(e,t,r){for(var n,a={},o=0;o<t.length;o+=1){var s=t[o];if(Array.isArray(s.type)){var i=[];i.length=s.type.length;for(var u=0;u<s.type.length;u++)void 0===(n=void 0!==e[s.op]?e[s.op][u]:void 0)&&(n=void 0!==s.value&&void 0!==s.value[u]?s.value[u]:null),"SID"===s.type[u]&&(n=Le(r,n)),i[u]=n;a[s.name]=i}else void 0===(n=e[s.op])&&(n=void 0!==s.value?s.value:null),"SID"===s.type&&(n=Le(r,n)),a[s.name]=n}return a}var we=[{name:"version",op:0,type:"SID"},{name:"notice",op:1,type:"SID"},{name:"copyright",op:1200,type:"SID"},{name:"fullName",op:2,type:"SID"},{name:"familyName",op:3,type:"SID"},{name:"weight",op:4,type:"SID"},{name:"isFixedPitch",op:1201,type:"number",value:0},{name:"italicAngle",op:1202,type:"number",value:0},{name:"underlinePosition",op:1203,type:"number",value:-100},{name:"underlineThickness",op:1204,type:"number",value:50},{name:"paintType",op:1205,type:"number",value:0},{name:"charstringType",op:1206,type:"number",value:2},{name:"fontMatrix",op:1207,type:["real","real","real","real","real","real"],value:[.001,0,0,.001,0,0]},{name:"uniqueId",op:13,type:"number"},{name:"fontBBox",op:5,type:["number","number","number","number"],value:[0,0,0,0]},{name:"strokeWidth",op:1208,type:"number",value:0},{name:"xuid",op:14,type:[],value:null},{name:"charset",op:15,type:"offset",value:0},{name:"encoding",op:16,type:"offset",value:0},{name:"charStrings",op:17,type:"offset",value:0},{name:"private",op:18,type:["number","offset"],value:[0,0]},{name:"ros",op:1230,type:["SID","SID","number"]},{name:"cidFontVersion",op:1231,type:"number",value:0},{name:"cidFontRevision",op:1232,type:"number",value:0},{name:"cidFontType",op:1233,type:"number",value:0},{name:"cidCount",op:1234,type:"number",value:8720},{name:"uidBase",op:1235,type:"number"},{name:"fdArray",op:1236,type:"offset"},{name:"fdSelect",op:1237,type:"offset"},{name:"fontName",op:1238,type:"SID"}],De=[{name:"subrs",op:19,type:"offset",value:0},{name:"defaultWidthX",op:20,type:"number",value:0},{name:"nominalWidthX",op:21,type:"number",value:0}];function Ie(e,t,r,n){return Ce(Re(e,t,r),De,n)}function Me(e,t,r,n){for(var a,o,s=[],i=0;i<r.length;i+=1){var u=new DataView(new Uint8Array(r[i]).buffer),l=(o=n,Ce(Re(a=u,0,a.byteLength),we,o));l._subrs=[],l._subrsBias=0,l._defaultWidthX=0,l._nominalWidthX=0;var p=l.private[0],c=l.private[1];if(0!==p&&0!==c){var h=Ie(e,c+t,p,n);if(l._defaultWidthX=h.defaultWidthX,l._nominalWidthX=h.nominalWidthX,0!==h.subrs){var f=Oe(e,c+h.subrs+t);l._subrs=f.objects,l._subrsBias=Ue(l._subrs)}l._privateDict=h}s.push(l)}return s}function Ge(v,m,e){var y,b,S,x,T,k,t,U,O=new B,E=[],R=0,L=!1,C=!1,w=0,D=0;if(v.isCIDFont){var r=v.tables.cff.topDict._fdSelect[m.index],n=v.tables.cff.topDict._fdArray[r];T=n._subrs,k=n._subrsBias,t=n._defaultWidthX,U=n._nominalWidthX}else T=v.tables.cff.topDict._subrs,k=v.tables.cff.topDict._subrsBias,t=v.tables.cff.topDict._defaultWidthX,U=v.tables.cff.topDict._nominalWidthX;var I=t;function M(e,t){C&&O.closePath(),O.moveTo(e,t),C=!0}function G(){E.length%2==0||L||(I=E.shift()+U),R+=E.length>>1,E.length=0,L=!0}return function e(t){for(var r,n,a,o,s,i,u,l,p,c,h,f,d=0;d<t.length;){var g=t[d];switch(d+=1,g){case 1:case 3:G();break;case 4:1<E.length&&!L&&(I=E.shift()+U,L=!0),D+=E.pop(),M(w,D);break;case 5:for(;0<E.length;)w+=E.shift(),D+=E.shift(),O.lineTo(w,D);break;case 6:for(;0<E.length&&(w+=E.shift(),O.lineTo(w,D),0!==E.length);)D+=E.shift(),O.lineTo(w,D);break;case 7:for(;0<E.length&&(D+=E.shift(),O.lineTo(w,D),0!==E.length);)w+=E.shift(),O.lineTo(w,D);break;case 8:for(;0<E.length;)y=w+E.shift(),b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),w=S+E.shift(),D=x+E.shift(),O.curveTo(y,b,S,x,w,D);break;case 10:s=E.pop()+k,(i=T[s])&&e(i);break;case 11:return;case 12:switch(g=t[d],d+=1,g){case 35:y=w+E.shift(),b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),u=S+E.shift(),l=x+E.shift(),p=u+E.shift(),c=l+E.shift(),h=p+E.shift(),f=c+E.shift(),w=h+E.shift(),D=f+E.shift(),E.shift(),O.curveTo(y,b,S,x,u,l),O.curveTo(p,c,h,f,w,D);break;case 34:y=w+E.shift(),b=D,S=y+E.shift(),x=b+E.shift(),u=S+E.shift(),l=x,p=u+E.shift(),c=x,h=p+E.shift(),f=D,w=h+E.shift(),O.curveTo(y,b,S,x,u,l),O.curveTo(p,c,h,f,w,D);break;case 36:y=w+E.shift(),b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),u=S+E.shift(),l=x,p=u+E.shift(),c=x,h=p+E.shift(),f=c+E.shift(),w=h+E.shift(),O.curveTo(y,b,S,x,u,l),O.curveTo(p,c,h,f,w,D);break;case 37:y=w+E.shift(),b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),u=S+E.shift(),l=x+E.shift(),p=u+E.shift(),c=l+E.shift(),h=p+E.shift(),f=c+E.shift(),Math.abs(h-w)>Math.abs(f-D)?w=h+E.shift():D=f+E.shift(),O.curveTo(y,b,S,x,u,l),O.curveTo(p,c,h,f,w,D);break;default:console.log("Glyph "+m.index+": unknown operator 1200"+g),E.length=0}break;case 14:0<E.length&&!L&&(I=E.shift()+U,L=!0),C&&(O.closePath(),C=!1);break;case 18:G();break;case 19:case 20:G(),d+=R+7>>3;break;case 21:2<E.length&&!L&&(I=E.shift()+U,L=!0),D+=E.pop(),M(w+=E.pop(),D);break;case 22:1<E.length&&!L&&(I=E.shift()+U,L=!0),M(w+=E.pop(),D);break;case 23:G();break;case 24:for(;2<E.length;)y=w+E.shift(),b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),w=S+E.shift(),D=x+E.shift(),O.curveTo(y,b,S,x,w,D);w+=E.shift(),D+=E.shift(),O.lineTo(w,D);break;case 25:for(;6<E.length;)w+=E.shift(),D+=E.shift(),O.lineTo(w,D);y=w+E.shift(),b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),w=S+E.shift(),D=x+E.shift(),O.curveTo(y,b,S,x,w,D);break;case 26:for(E.length%2&&(w+=E.shift());0<E.length;)y=w,b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),w=S,D=x+E.shift(),O.curveTo(y,b,S,x,w,D);break;case 27:for(E.length%2&&(D+=E.shift());0<E.length;)y=w+E.shift(),b=D,S=y+E.shift(),x=b+E.shift(),w=S+E.shift(),D=x,O.curveTo(y,b,S,x,w,D);break;case 28:r=t[d],n=t[d+1],E.push((r<<24|n<<16)>>16),d+=2;break;case 29:s=E.pop()+v.gsubrsBias,(i=v.gsubrs[s])&&e(i);break;case 30:for(;0<E.length&&(y=w,b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),w=S+E.shift(),D=x+(1===E.length?E.shift():0),O.curveTo(y,b,S,x,w,D),0!==E.length);)y=w+E.shift(),b=D,S=y+E.shift(),x=b+E.shift(),D=x+E.shift(),w=S+(1===E.length?E.shift():0),O.curveTo(y,b,S,x,w,D);break;case 31:for(;0<E.length&&(y=w+E.shift(),b=D,S=y+E.shift(),x=b+E.shift(),D=x+E.shift(),w=S+(1===E.length?E.shift():0),O.curveTo(y,b,S,x,w,D),0!==E.length);)y=w,b=D+E.shift(),S=y+E.shift(),x=b+E.shift(),w=S+E.shift(),D=x+(1===E.length?E.shift():0),O.curveTo(y,b,S,x,w,D);break;default:g<32?console.log("Glyph "+m.index+": unknown operator "+g):g<247?E.push(g-139):g<251?(r=t[d],d+=1,E.push(256*(g-247)+r+108)):g<255?(r=t[d],d+=1,E.push(256*-(g-251)-r-108)):(r=t[d],n=t[d+1],a=t[d+2],o=t[d+3],d+=4,E.push((r<<24|n<<16|a<<8|o)/65536))}}}(e),m.advanceWidth=I,O}function Be(e,t){var r,n=le.indexOf(e);return 0<=n&&(r=n),0<=(n=t.indexOf(e))?r=n+le.length:(r=le.length+t.length,t.push(e)),r}function Fe(e,t,r){for(var n={},a=0;a<e.length;a+=1){var o=e[a],s=t[o.name];void 0===s||ke(s,o.value)||("SID"===o.type&&(s=Be(s,r)),n[o.op]={name:o.name,type:o.type,value:s})}return n}function Ae(e,t){var r=new $.Record("Top DICT",[{name:"dict",type:"DICT",value:{}}]);return r.dict=Fe(we,e,t),r}function Pe(e){var t=new $.Record("Top DICT INDEX",[{name:"topDicts",type:"INDEX",value:[]}]);return t.topDicts=[{name:"topDict_0",type:"TABLE",value:e}],t}function Ne(e){var t=[],r=e.path;t.push({name:"width",type:"NUMBER",value:e.advanceWidth});for(var n=0,a=0,o=0;o<r.commands.length;o+=1){var s=void 0,i=void 0,u=r.commands[o];if("Q"===u.type){u={type:"C",x:u.x,y:u.y,x1:Math.round(1/3*n+2/3*u.x1),y1:Math.round(1/3*a+2/3*u.y1),x2:Math.round(1/3*u.x+2/3*u.x1),y2:Math.round(1/3*u.y+2/3*u.y1)}}if("M"===u.type)s=Math.round(u.x-n),i=Math.round(u.y-a),t.push({name:"dx",type:"NUMBER",value:s}),t.push({name:"dy",type:"NUMBER",value:i}),t.push({name:"rmoveto",type:"OP",value:21}),n=Math.round(u.x),a=Math.round(u.y);else if("L"===u.type)s=Math.round(u.x-n),i=Math.round(u.y-a),t.push({name:"dx",type:"NUMBER",value:s}),t.push({name:"dy",type:"NUMBER",value:i}),t.push({name:"rlineto",type:"OP",value:5}),n=Math.round(u.x),a=Math.round(u.y);else if("C"===u.type){var l=Math.round(u.x1-n),p=Math.round(u.y1-a),c=Math.round(u.x2-u.x1),h=Math.round(u.y2-u.y1);s=Math.round(u.x-u.x2),i=Math.round(u.y-u.y2),t.push({name:"dx1",type:"NUMBER",value:l}),t.push({name:"dy1",type:"NUMBER",value:p}),t.push({name:"dx2",type:"NUMBER",value:c}),t.push({name:"dy2",type:"NUMBER",value:h}),t.push({name:"dx",type:"NUMBER",value:s}),t.push({name:"dy",type:"NUMBER",value:i}),t.push({name:"rrcurveto",type:"OP",value:8}),n=Math.round(u.x),a=Math.round(u.y)}}return t.push({name:"endchar",type:"OP",value:14}),t}var He={parse:function(r,n,a,e){a.tables.cff={};var t,o,s,i=(t=r,o=n,(s={}).formatMajor=ie.getCard8(t,o),s.formatMinor=ie.getCard8(t,o+1),s.size=ie.getCard8(t,o+2),s.offsetSize=ie.getCard8(t,o+3),s.startOffset=o,s.endOffset=o+4,s),u=Oe(r,i.endOffset,ie.bytesToString),l=Oe(r,u.endOffset),p=Oe(r,l.endOffset,ie.bytesToString),c=Oe(r,p.endOffset);a.gsubrs=c.objects,a.gsubrsBias=Ue(a.gsubrs);var h=Me(r,n,l.objects,p.objects);if(1!==h.length)throw new Error("CFF table has too many fonts in 'FontSet' - count of fonts NameIndex.length = "+h.length);var f=h[0];if((a.tables.cff.topDict=f)._privateDict&&(a.defaultWidthX=f._privateDict.defaultWidthX,a.nominalWidthX=f._privateDict.nominalWidthX),void 0!==f.ros[0]&&void 0!==f.ros[1]&&(a.isCIDFont=!0),a.isCIDFont){var d=f.fdArray,g=f.fdSelect;if(0===d||0===g)throw new Error("Font is marked as a CID font, but FDArray and/or FDSelect information is missing");var v=Oe(r,d+=n),m=Me(r,n,v.objects,p.objects);f._fdArray=m,g+=n,f._fdSelect=function(e,t,r,n){var a,o=[],s=new ie.Parser(e,t),i=s.parseCard8();if(0===i)for(var u=0;u<r;u++){if(n<=(a=s.parseCard8()))throw new Error("CFF table CID Font FDSelect has bad FD index value "+a+" (FD count "+n+")");o.push(a)}else{if(3!==i)throw new Error("CFF Table CID Font FDSelect table has unsupported format "+i);var l,p=s.parseCard16(),c=s.parseCard16();if(0!==c)throw new Error("CFF Table CID Font FDSelect format 3 range has bad initial GID "+c);for(var h=0;h<p;h++){if(a=s.parseCard8(),l=s.parseCard16(),n<=a)throw new Error("CFF table CID Font FDSelect has bad FD index value "+a+" (FD count "+n+")");if(r<l)throw new Error("CFF Table CID Font FDSelect format 3 range has bad GID "+l);for(;c<l;c++)o.push(a);c=l}if(l!==r)throw new Error("CFF Table CID Font FDSelect format 3 range has bad final GID "+l)}return o}(r,g,a.numGlyphs,m.length)}var y,b=n+f.private[1],S=Ie(r,b,f.private[0],p.objects);if(a.defaultWidthX=S.defaultWidthX,a.nominalWidthX=S.nominalWidthX,0!==S.subrs){var x=b+S.subrs,T=Oe(r,x);a.subrs=T.objects,a.subrsBias=Ue(a.subrs)}else a.subrs=[],a.subrsBias=0;e.lowMemory?(y=function(e,t){var r,n,a=[],o=ie.getCard16(e,t);if(0!==o){var s=ie.getByte(e,t+2);r=t+(o+1)*s+2;for(var i=t+3,u=0;u<o+1;u+=1)a.push(ie.getOffset(e,i,s)),i+=s;n=r+a[o]}else n=t+2;return{offsets:a,startOffset:t,endOffset:n}}(r,n+f.charStrings),a.nGlyphs=y.offsets.length):(y=Oe(r,n+f.charStrings),a.nGlyphs=y.objects.length);var k=function(e,t,r,n){var a,o,s=new ie.Parser(e,t);--r;var i=[".notdef"],u=s.parseCard8();if(0===u)for(var l=0;l<r;l+=1)a=s.parseSID(),i.push(Le(n,a));else if(1===u)for(;i.length<=r;){a=s.parseSID(),o=s.parseCard8();for(var p=0;p<=o;p+=1)i.push(Le(n,a)),a+=1}else{if(2!==u)throw new Error("Unknown charset format "+u);for(;i.length<=r;){a=s.parseSID(),o=s.parseCard16();for(var c=0;c<=o;c+=1)i.push(Le(n,a)),a+=1}}return i}(r,n+f.charset,a.nGlyphs,p.objects);if(0===f.encoding?a.cffEncoding=new ge(pe,k):1===f.encoding?a.cffEncoding=new ge(ce,k):a.cffEncoding=function(e,t,r){var n,a={},o=new ie.Parser(e,t),s=o.parseCard8();if(0===s)for(var i=o.parseCard8(),u=0;u<i;u+=1)a[n=o.parseCard8()]=u;else{if(1!==s)throw new Error("Unknown encoding format "+s);var l=o.parseCard8();n=1;for(var p=0;p<l;p+=1)for(var c=o.parseCard8(),h=o.parseCard8(),f=c;f<=c+h;f+=1)a[f]=n,n+=1}return new ge(a,r)}(r,n+f.encoding,k),a.encoding=a.encoding||a.cffEncoding,a.glyphs=new Te.GlyphSet(a),e.lowMemory)a._push=function(e){var t=function(e,t,r,n,a){var o=ie.getCard16(r,n),s=0;0!==o&&(s=n+(o+1)*ie.getByte(r,n+2)+2);var i=ie.getBytes(r,s+t[e],s+t[e+1]);return a&&(i=a(i)),i}(e,y.offsets,r,n+f.charStrings);a.glyphs.push(e,Te.cffGlyphLoader(a,e,Ge,t))};else for(var U=0;U<a.nGlyphs;U+=1){var O=y.objects[U];a.glyphs.push(U,Te.cffGlyphLoader(a,U,Ge,O))}},make:function(e,t){for(var r,n=new $.Table("CFF ",[{name:"header",type:"RECORD"},{name:"nameIndex",type:"RECORD"},{name:"topDictIndex",type:"RECORD"},{name:"stringIndex",type:"RECORD"},{name:"globalSubrIndex",type:"RECORD"},{name:"charsets",type:"RECORD"},{name:"charStringsIndex",type:"RECORD"},{name:"privateDict",type:"RECORD"}]),a=1/t.unitsPerEm,o={version:t.version,fullName:t.fullName,familyName:t.familyName,weight:t.weightName,fontBBox:t.fontBBox||[0,0,0,0],fontMatrix:[a,0,0,a,0,0],charset:999,encoding:0,charStrings:999,private:[0,999]},s=[],i=1;i<e.length;i+=1)r=e.get(i),s.push(r.name);var u=[];n.header=new $.Record("Header",[{name:"major",type:"Card8",value:1},{name:"minor",type:"Card8",value:0},{name:"hdrSize",type:"Card8",value:4},{name:"major",type:"Card8",value:1}]),n.nameIndex=function(e){var t=new $.Record("Name INDEX",[{name:"names",type:"INDEX",value:[]}]);t.names=[];for(var r=0;r<e.length;r+=1)t.names.push({name:"name_"+r,type:"NAME",value:e[r]});return t}([t.postScriptName]);var l,p,c,h=Ae(o,u);n.topDictIndex=Pe(h),n.globalSubrIndex=new $.Record("Global Subr INDEX",[{name:"subrs",type:"INDEX",value:[]}]),n.charsets=function(e,t){for(var r=new $.Record("Charsets",[{name:"format",type:"Card8",value:0}]),n=0;n<e.length;n+=1){var a=Be(e[n],t);r.fields.push({name:"glyph_"+n,type:"SID",value:a})}return r}(s,u),n.charStringsIndex=function(e){for(var t=new $.Record("CharStrings INDEX",[{name:"charStrings",type:"INDEX",value:[]}]),r=0;r<e.length;r+=1){var n=e.get(r),a=Ne(n);t.charStrings.push({name:n.name,type:"CHARSTRING",value:a})}return t}(e),n.privateDict=(l={},p=u,(c=new $.Record("Private DICT",[{name:"dict",type:"DICT",value:{}}])).dict=Fe(De,l,p),c),n.stringIndex=function(e){var t=new $.Record("String INDEX",[{name:"strings",type:"INDEX",value:[]}]);t.strings=[];for(var r=0;r<e.length;r+=1)t.strings.push({name:"string_"+r,type:"STRING",value:e[r]});return t}(u);var f=n.header.sizeOf()+n.nameIndex.sizeOf()+n.topDictIndex.sizeOf()+n.stringIndex.sizeOf()+n.globalSubrIndex.sizeOf();return o.charset=f,o.encoding=0,o.charStrings=o.charset+n.charsets.sizeOf(),o.private[1]=o.charStrings+n.charStringsIndex.sizeOf(),h=Ae(o,u),n.topDictIndex=Pe(h),n}};var ze={parse:function(e,t){var r={},n=new ie.Parser(e,t);return r.version=n.parseVersion(),r.fontRevision=Math.round(1e3*n.parseFixed())/1e3,r.checkSumAdjustment=n.parseULong(),r.magicNumber=n.parseULong(),w.argument(1594834165===r.magicNumber,"Font header has wrong magic number."),r.flags=n.parseUShort(),r.unitsPerEm=n.parseUShort(),r.created=n.parseLongDateTime(),r.modified=n.parseLongDateTime(),r.xMin=n.parseShort(),r.yMin=n.parseShort(),r.xMax=n.parseShort(),r.yMax=n.parseShort(),r.macStyle=n.parseUShort(),r.lowestRecPPEM=n.parseUShort(),r.fontDirectionHint=n.parseShort(),r.indexToLocFormat=n.parseShort(),r.glyphDataFormat=n.parseShort(),r},make:function(e){var t=Math.round((new Date).getTime()/1e3)+2082844800,r=t;return e.createdTimestamp&&(r=e.createdTimestamp+2082844800),new $.Table("head",[{name:"version",type:"FIXED",value:65536},{name:"fontRevision",type:"FIXED",value:65536},{name:"checkSumAdjustment",type:"ULONG",value:0},{name:"magicNumber",type:"ULONG",value:1594834165},{name:"flags",type:"USHORT",value:0},{name:"unitsPerEm",type:"USHORT",value:1e3},{name:"created",type:"LONGDATETIME",value:r},{name:"modified",type:"LONGDATETIME",value:t},{name:"xMin",type:"SHORT",value:0},{name:"yMin",type:"SHORT",value:0},{name:"xMax",type:"SHORT",value:0},{name:"yMax",type:"SHORT",value:0},{name:"macStyle",type:"USHORT",value:0},{name:"lowestRecPPEM",type:"USHORT",value:0},{name:"fontDirectionHint",type:"SHORT",value:2},{name:"indexToLocFormat",type:"SHORT",value:0},{name:"glyphDataFormat",type:"SHORT",value:0}],e)}};var We={parse:function(e,t){var r={},n=new ie.Parser(e,t);return r.version=n.parseVersion(),r.ascender=n.parseShort(),r.descender=n.parseShort(),r.lineGap=n.parseShort(),r.advanceWidthMax=n.parseUShort(),r.minLeftSideBearing=n.parseShort(),r.minRightSideBearing=n.parseShort(),r.xMaxExtent=n.parseShort(),r.caretSlopeRise=n.parseShort(),r.caretSlopeRun=n.parseShort(),r.caretOffset=n.parseShort(),n.relativeOffset+=8,r.metricDataFormat=n.parseShort(),r.numberOfHMetrics=n.parseUShort(),r},make:function(e){return new $.Table("hhea",[{name:"version",type:"FIXED",value:65536},{name:"ascender",type:"FWORD",value:0},{name:"descender",type:"FWORD",value:0},{name:"lineGap",type:"FWORD",value:0},{name:"advanceWidthMax",type:"UFWORD",value:0},{name:"minLeftSideBearing",type:"FWORD",value:0},{name:"minRightSideBearing",type:"FWORD",value:0},{name:"xMaxExtent",type:"FWORD",value:0},{name:"caretSlopeRise",type:"SHORT",value:1},{name:"caretSlopeRun",type:"SHORT",value:0},{name:"caretOffset",type:"SHORT",value:0},{name:"reserved1",type:"SHORT",value:0},{name:"reserved2",type:"SHORT",value:0},{name:"reserved3",type:"SHORT",value:0},{name:"reserved4",type:"SHORT",value:0},{name:"metricDataFormat",type:"SHORT",value:0},{name:"numberOfHMetrics",type:"USHORT",value:0}],e)}};var qe={parse:function(e,t,r,n,a,o,s){s.lowMemory?function(e,t,r,n,a){var o,s;e._hmtxTableData={};for(var i=new ie.Parser(t,r),u=0;u<a;u+=1)u<n&&(o=i.parseUShort(),s=i.parseShort()),e._hmtxTableData[u]={advanceWidth:o,leftSideBearing:s}}(e,t,r,n,a):function(e,t,r,n,a){for(var o,s,i=new ie.Parser(e,t),u=0;u<n;u+=1){u<r&&(o=i.parseUShort(),s=i.parseShort());var l=a.get(u);l.advanceWidth=o,l.leftSideBearing=s}}(t,r,n,a,o)},make:function(e){for(var t=new $.Table("hmtx",[]),r=0;r<e.length;r+=1){var n=e.get(r),a=n.advanceWidth||0,o=n.leftSideBearing||0;t.fields.push({name:"advanceWidth_"+r,type:"USHORT",value:a}),t.fields.push({name:"leftSideBearing_"+r,type:"SHORT",value:o})}return t}};var _e={make:function(e){for(var t=new $.Table("ltag",[{name:"version",type:"ULONG",value:1},{name:"flags",type:"ULONG",value:0},{name:"numTags",type:"ULONG",value:e.length}]),r="",n=12+4*e.length,a=0;a<e.length;++a){var o=r.indexOf(e[a]);o<0&&(o=r.length,r+=e[a]),t.fields.push({name:"offset "+a,type:"USHORT",value:n+o}),t.fields.push({name:"length "+a,type:"USHORT",value:e[a].length})}return t.fields.push({name:"stringPool",type:"CHARARRAY",value:r}),t},parse:function(e,t){var r=new ie.Parser(e,t),n=r.parseULong();w.argument(1===n,"Unsupported ltag table version."),r.skip("uLong",1);for(var a=r.parseULong(),o=[],s=0;s<a;s++){for(var i="",u=t+r.parseUShort(),l=r.parseUShort(),p=u;p<u+l;++p)i+=String.fromCharCode(e.getInt8(p));o.push(i)}return o}};var Xe={parse:function(e,t){var r={},n=new ie.Parser(e,t);return r.version=n.parseVersion(),r.numGlyphs=n.parseUShort(),1===r.version&&(r.maxPoints=n.parseUShort(),r.maxContours=n.parseUShort(),r.maxCompositePoints=n.parseUShort(),r.maxCompositeContours=n.parseUShort(),r.maxZones=n.parseUShort(),r.maxTwilightPoints=n.parseUShort(),r.maxStorage=n.parseUShort(),r.maxFunctionDefs=n.parseUShort(),r.maxInstructionDefs=n.parseUShort(),r.maxStackElements=n.parseUShort(),r.maxSizeOfInstructions=n.parseUShort(),r.maxComponentElements=n.parseUShort(),r.maxComponentDepth=n.parseUShort()),r},make:function(e){return new $.Table("maxp",[{name:"version",type:"FIXED",value:20480},{name:"numGlyphs",type:"USHORT",value:e}])}},Ve=["copyright","fontFamily","fontSubfamily","uniqueID","fullName","version","postScriptName","trademark","manufacturer","designer","description","manufacturerURL","designerURL","license","licenseURL","reserved","preferredFamily","preferredSubfamily","compatibleFullName","sampleText","postScriptFindFontName","wwsFamily","wwsSubfamily"],Ye={0:"en",1:"fr",2:"de",3:"it",4:"nl",5:"sv",6:"es",7:"da",8:"pt",9:"no",10:"he",11:"ja",12:"ar",13:"fi",14:"el",15:"is",16:"mt",17:"tr",18:"hr",19:"zh-Hant",20:"ur",21:"hi",22:"th",23:"ko",24:"lt",25:"pl",26:"hu",27:"es",28:"lv",29:"se",30:"fo",31:"fa",32:"ru",33:"zh",34:"nl-BE",35:"ga",36:"sq",37:"ro",38:"cz",39:"sk",40:"si",41:"yi",42:"sr",43:"mk",44:"bg",45:"uk",46:"be",47:"uz",48:"kk",49:"az-Cyrl",50:"az-Arab",51:"hy",52:"ka",53:"mo",54:"ky",55:"tg",56:"tk",57:"mn-CN",58:"mn",59:"ps",60:"ks",61:"ku",62:"sd",63:"bo",64:"ne",65:"sa",66:"mr",67:"bn",68:"as",69:"gu",70:"pa",71:"or",72:"ml",73:"kn",74:"ta",75:"te",76:"si",77:"my",78:"km",79:"lo",80:"vi",81:"id",82:"tl",83:"ms",84:"ms-Arab",85:"am",86:"ti",87:"om",88:"so",89:"sw",90:"rw",91:"rn",92:"ny",93:"mg",94:"eo",128:"cy",129:"eu",130:"ca",131:"la",132:"qu",133:"gn",134:"ay",135:"tt",136:"ug",137:"dz",138:"jv",139:"su",140:"gl",141:"af",142:"br",143:"iu",144:"gd",145:"gv",146:"ga",147:"to",148:"el-polyton",149:"kl",150:"az",151:"nn"},je={0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:5,11:1,12:4,13:0,14:6,15:0,16:0,17:0,18:0,19:2,20:4,21:9,22:21,23:3,24:29,25:29,26:29,27:29,28:29,29:0,30:0,31:4,32:7,33:25,34:0,35:0,36:0,37:0,38:29,39:29,40:0,41:5,42:7,43:7,44:7,45:7,46:7,47:7,48:7,49:7,50:4,51:24,52:23,53:7,54:7,55:7,56:7,57:27,58:7,59:4,60:4,61:4,62:4,63:26,64:9,65:9,66:9,67:13,68:13,69:11,70:10,71:12,72:17,73:16,74:14,75:15,76:18,77:19,78:20,79:22,80:30,81:0,82:0,83:0,84:4,85:28,86:28,87:28,88:0,89:0,90:0,91:0,92:0,93:0,94:0,128:0,129:0,130:0,131:0,132:0,133:0,134:0,135:7,136:4,137:26,138:0,139:0,140:0,141:0,142:0,143:28,144:0,145:0,146:0,147:0,148:6,149:0,150:0,151:0},Ze={1078:"af",1052:"sq",1156:"gsw",1118:"am",5121:"ar-DZ",15361:"ar-BH",3073:"ar",2049:"ar-IQ",11265:"ar-JO",13313:"ar-KW",12289:"ar-LB",4097:"ar-LY",6145:"ary",8193:"ar-OM",16385:"ar-QA",1025:"ar-SA",10241:"ar-SY",7169:"aeb",14337:"ar-AE",9217:"ar-YE",1067:"hy",1101:"as",2092:"az-Cyrl",1068:"az",1133:"ba",1069:"eu",1059:"be",2117:"bn",1093:"bn-IN",8218:"bs-Cyrl",5146:"bs",1150:"br",1026:"bg",1027:"ca",3076:"zh-HK",5124:"zh-MO",2052:"zh",4100:"zh-SG",1028:"zh-TW",1155:"co",1050:"hr",4122:"hr-BA",1029:"cs",1030:"da",1164:"prs",1125:"dv",2067:"nl-BE",1043:"nl",3081:"en-AU",10249:"en-BZ",4105:"en-CA",9225:"en-029",16393:"en-IN",6153:"en-IE",8201:"en-JM",17417:"en-MY",5129:"en-NZ",13321:"en-PH",18441:"en-SG",7177:"en-ZA",11273:"en-TT",2057:"en-GB",1033:"en",12297:"en-ZW",1061:"et",1080:"fo",1124:"fil",1035:"fi",2060:"fr-BE",3084:"fr-CA",1036:"fr",5132:"fr-LU",6156:"fr-MC",4108:"fr-CH",1122:"fy",1110:"gl",1079:"ka",3079:"de-AT",1031:"de",5127:"de-LI",4103:"de-LU",2055:"de-CH",1032:"el",1135:"kl",1095:"gu",1128:"ha",1037:"he",1081:"hi",1038:"hu",1039:"is",1136:"ig",1057:"id",1117:"iu",2141:"iu-Latn",2108:"ga",1076:"xh",1077:"zu",1040:"it",2064:"it-CH",1041:"ja",1099:"kn",1087:"kk",1107:"km",1158:"quc",1159:"rw",1089:"sw",1111:"kok",1042:"ko",1088:"ky",1108:"lo",1062:"lv",1063:"lt",2094:"dsb",1134:"lb",1071:"mk",2110:"ms-BN",1086:"ms",1100:"ml",1082:"mt",1153:"mi",1146:"arn",1102:"mr",1148:"moh",1104:"mn",2128:"mn-CN",1121:"ne",1044:"nb",2068:"nn",1154:"oc",1096:"or",1123:"ps",1045:"pl",1046:"pt",2070:"pt-PT",1094:"pa",1131:"qu-BO",2155:"qu-EC",3179:"qu",1048:"ro",1047:"rm",1049:"ru",9275:"smn",4155:"smj-NO",5179:"smj",3131:"se-FI",1083:"se",2107:"se-SE",8251:"sms",6203:"sma-NO",7227:"sms",1103:"sa",7194:"sr-Cyrl-BA",3098:"sr",6170:"sr-Latn-BA",2074:"sr-Latn",1132:"nso",1074:"tn",1115:"si",1051:"sk",1060:"sl",11274:"es-AR",16394:"es-BO",13322:"es-CL",9226:"es-CO",5130:"es-CR",7178:"es-DO",12298:"es-EC",17418:"es-SV",4106:"es-GT",18442:"es-HN",2058:"es-MX",19466:"es-NI",6154:"es-PA",15370:"es-PY",10250:"es-PE",20490:"es-PR",3082:"es",1034:"es",21514:"es-US",14346:"es-UY",8202:"es-VE",2077:"sv-FI",1053:"sv",1114:"syr",1064:"tg",2143:"tzm",1097:"ta",1092:"tt",1098:"te",1054:"th",1105:"bo",1055:"tr",1090:"tk",1152:"ug",1058:"uk",1070:"hsb",1056:"ur",2115:"uz-Cyrl",1091:"uz",1066:"vi",1106:"cy",1160:"wo",1157:"sah",1144:"ii",1130:"yo"};function Qe(e,t,r){switch(e){case 0:if(65535===t)return"und";if(r)return r[t];break;case 1:return Ye[t];case 3:return Ze[t]}}var Ke="utf-16",Je={0:"macintosh",1:"x-mac-japanese",2:"x-mac-chinesetrad",3:"x-mac-korean",6:"x-mac-greek",7:"x-mac-cyrillic",9:"x-mac-devanagai",10:"x-mac-gurmukhi",11:"x-mac-gujarati",12:"x-mac-oriya",13:"x-mac-bengali",14:"x-mac-tamil",15:"x-mac-telugu",16:"x-mac-kannada",17:"x-mac-malayalam",18:"x-mac-sinhalese",19:"x-mac-burmese",20:"x-mac-khmer",21:"x-mac-thai",22:"x-mac-lao",23:"x-mac-georgian",24:"x-mac-armenian",25:"x-mac-chinesesimp",26:"x-mac-tibetan",27:"x-mac-mongolian",28:"x-mac-ethiopic",29:"x-mac-ce",30:"x-mac-vietnamese",31:"x-mac-extarabic"},$e={15:"x-mac-icelandic",17:"x-mac-turkish",18:"x-mac-croatian",24:"x-mac-ce",25:"x-mac-ce",26:"x-mac-ce",27:"x-mac-ce",28:"x-mac-ce",30:"x-mac-icelandic",37:"x-mac-romanian",38:"x-mac-ce",39:"x-mac-ce",40:"x-mac-ce",143:"x-mac-inuit",146:"x-mac-gaelic"};function et(e,t,r){switch(e){case 0:return Ke;case 1:return $e[r]||Je[t];case 3:if(1===t||10===t)return Ke}}function tt(e){var t={};for(var r in e)t[e[r]]=parseInt(r);return t}function rt(e,t,r,n,a,o){return new $.Record("NameRecord",[{name:"platformID",type:"USHORT",value:e},{name:"encodingID",type:"USHORT",value:t},{name:"languageID",type:"USHORT",value:r},{name:"nameID",type:"USHORT",value:n},{name:"length",type:"USHORT",value:a},{name:"offset",type:"USHORT",value:o}])}function nt(e,t){var r=function(e,t){var r=e.length,n=t.length-r+1;e:for(var a=0;a<n;a++)for(;a<n;a++){for(var o=0;o<r;o++)if(t[a+o]!==e[o])continue e;return a}return-1}(e,t);if(r<0){r=t.length;for(var n=0,a=e.length;n<a;++n)t.push(e[n])}return r}var at={parse:function(e,t,r){for(var n={},a=new ie.Parser(e,t),o=a.parseUShort(),s=a.parseUShort(),i=a.offset+a.parseUShort(),u=0;u<s;u++){var l=a.parseUShort(),p=a.parseUShort(),c=a.parseUShort(),h=a.parseUShort(),f=Ve[h]||h,d=a.parseUShort(),g=a.parseUShort(),v=Qe(l,c,r),m=et(l,p,c);if(void 0!==m&&void 0!==v){var y=void 0;if(y=m===Ke?I.UTF16(e,i+g,d):I.MACSTRING(e,i+g,d,m)){var b=n[f];void 0===b&&(b=n[f]={}),b[v]=y}}}return 1===o&&a.parseUShort(),n},make:function(e,t){var r,n=[],a={},o=tt(Ve);for(var s in e){var i=o[s];if(void 0===i&&(i=s),r=parseInt(i),isNaN(r))throw new Error('Name table entry "'+s+'" does not exist, see nameTableNames for complete list.');a[r]=e[s],n.push(r)}for(var u=tt(Ye),l=tt(Ze),p=[],c=[],h=0;h<n.length;h++){var f=a[r=n[h]];for(var d in f){var g=f[d],v=1,m=u[d],y=je[m],b=et(v,y,m),S=M.MACSTRING(g,b);void 0===S&&(v=0,(m=t.indexOf(d))<0&&(m=t.length,t.push(d)),y=4,S=M.UTF16(g));var x=nt(S,c);p.push(rt(v,y,m,r,S.length,x));var T=l[d];if(void 0!==T){var k=M.UTF16(g),U=nt(k,c);p.push(rt(3,1,T,r,k.length,U))}}}p.sort(function(e,t){return e.platformID-t.platformID||e.encodingID-t.encodingID||e.languageID-t.languageID||e.nameID-t.nameID});for(var O=new $.Table("name",[{name:"format",type:"USHORT",value:0},{name:"count",type:"USHORT",value:p.length},{name:"stringOffset",type:"USHORT",value:6+12*p.length}]),E=0;E<p.length;E++)O.fields.push({name:"record_"+E,type:"RECORD",value:p[E]});return O.fields.push({name:"strings",type:"LITERAL",value:c}),O}},ot=[{begin:0,end:127},{begin:128,end:255},{begin:256,end:383},{begin:384,end:591},{begin:592,end:687},{begin:688,end:767},{begin:768,end:879},{begin:880,end:1023},{begin:11392,end:11519},{begin:1024,end:1279},{begin:1328,end:1423},{begin:1424,end:1535},{begin:42240,end:42559},{begin:1536,end:1791},{begin:1984,end:2047},{begin:2304,end:2431},{begin:2432,end:2559},{begin:2560,end:2687},{begin:2688,end:2815},{begin:2816,end:2943},{begin:2944,end:3071},{begin:3072,end:3199},{begin:3200,end:3327},{begin:3328,end:3455},{begin:3584,end:3711},{begin:3712,end:3839},{begin:4256,end:4351},{begin:6912,end:7039},{begin:4352,end:4607},{begin:7680,end:7935},{begin:7936,end:8191},{begin:8192,end:8303},{begin:8304,end:8351},{begin:8352,end:8399},{begin:8400,end:8447},{begin:8448,end:8527},{begin:8528,end:8591},{begin:8592,end:8703},{begin:8704,end:8959},{begin:8960,end:9215},{begin:9216,end:9279},{begin:9280,end:9311},{begin:9312,end:9471},{begin:9472,end:9599},{begin:9600,end:9631},{begin:9632,end:9727},{begin:9728,end:9983},{begin:9984,end:10175},{begin:12288,end:12351},{begin:12352,end:12447},{begin:12448,end:12543},{begin:12544,end:12591},{begin:12592,end:12687},{begin:43072,end:43135},{begin:12800,end:13055},{begin:13056,end:13311},{begin:44032,end:55215},{begin:55296,end:57343},{begin:67840,end:67871},{begin:19968,end:40959},{begin:57344,end:63743},{begin:12736,end:12783},{begin:64256,end:64335},{begin:64336,end:65023},{begin:65056,end:65071},{begin:65040,end:65055},{begin:65104,end:65135},{begin:65136,end:65279},{begin:65280,end:65519},{begin:65520,end:65535},{begin:3840,end:4095},{begin:1792,end:1871},{begin:1920,end:1983},{begin:3456,end:3583},{begin:4096,end:4255},{begin:4608,end:4991},{begin:5024,end:5119},{begin:5120,end:5759},{begin:5760,end:5791},{begin:5792,end:5887},{begin:6016,end:6143},{begin:6144,end:6319},{begin:10240,end:10495},{begin:40960,end:42127},{begin:5888,end:5919},{begin:66304,end:66351},{begin:66352,end:66383},{begin:66560,end:66639},{begin:118784,end:119039},{begin:119808,end:120831},{begin:1044480,end:1048573},{begin:65024,end:65039},{begin:917504,end:917631},{begin:6400,end:6479},{begin:6480,end:6527},{begin:6528,end:6623},{begin:6656,end:6687},{begin:11264,end:11359},{begin:11568,end:11647},{begin:19904,end:19967},{begin:43008,end:43055},{begin:65536,end:65663},{begin:65856,end:65935},{begin:66432,end:66463},{begin:66464,end:66527},{begin:66640,end:66687},{begin:66688,end:66735},{begin:67584,end:67647},{begin:68096,end:68191},{begin:119552,end:119647},{begin:73728,end:74751},{begin:119648,end:119679},{begin:7040,end:7103},{begin:7168,end:7247},{begin:7248,end:7295},{begin:43136,end:43231},{begin:43264,end:43311},{begin:43312,end:43359},{begin:43520,end:43615},{begin:65936,end:65999},{begin:66e3,end:66047},{begin:66208,end:66271},{begin:127024,end:127135}];var st={parse:function(e,t){var r={},n=new ie.Parser(e,t);r.version=n.parseUShort(),r.xAvgCharWidth=n.parseShort(),r.usWeightClass=n.parseUShort(),r.usWidthClass=n.parseUShort(),r.fsType=n.parseUShort(),r.ySubscriptXSize=n.parseShort(),r.ySubscriptYSize=n.parseShort(),r.ySubscriptXOffset=n.parseShort(),r.ySubscriptYOffset=n.parseShort(),r.ySuperscriptXSize=n.parseShort(),r.ySuperscriptYSize=n.parseShort(),r.ySuperscriptXOffset=n.parseShort(),r.ySuperscriptYOffset=n.parseShort(),r.yStrikeoutSize=n.parseShort(),r.yStrikeoutPosition=n.parseShort(),r.sFamilyClass=n.parseShort(),r.panose=[];for(var a=0;a<10;a++)r.panose[a]=n.parseByte();return r.ulUnicodeRange1=n.parseULong(),r.ulUnicodeRange2=n.parseULong(),r.ulUnicodeRange3=n.parseULong(),r.ulUnicodeRange4=n.parseULong(),r.achVendID=String.fromCharCode(n.parseByte(),n.parseByte(),n.parseByte(),n.parseByte()),r.fsSelection=n.parseUShort(),r.usFirstCharIndex=n.parseUShort(),r.usLastCharIndex=n.parseUShort(),r.sTypoAscender=n.parseShort(),r.sTypoDescender=n.parseShort(),r.sTypoLineGap=n.parseShort(),r.usWinAscent=n.parseUShort(),r.usWinDescent=n.parseUShort(),1<=r.version&&(r.ulCodePageRange1=n.parseULong(),r.ulCodePageRange2=n.parseULong()),2<=r.version&&(r.sxHeight=n.parseShort(),r.sCapHeight=n.parseShort(),r.usDefaultChar=n.parseUShort(),r.usBreakChar=n.parseUShort(),r.usMaxContent=n.parseUShort()),r},make:function(e){return new $.Table("OS/2",[{name:"version",type:"USHORT",value:3},{name:"xAvgCharWidth",type:"SHORT",value:0},{name:"usWeightClass",type:"USHORT",value:0},{name:"usWidthClass",type:"USHORT",value:0},{name:"fsType",type:"USHORT",value:0},{name:"ySubscriptXSize",type:"SHORT",value:650},{name:"ySubscriptYSize",type:"SHORT",value:699},{name:"ySubscriptXOffset",type:"SHORT",value:0},{name:"ySubscriptYOffset",type:"SHORT",value:140},{name:"ySuperscriptXSize",type:"SHORT",value:650},{name:"ySuperscriptYSize",type:"SHORT",value:699},{name:"ySuperscriptXOffset",type:"SHORT",value:0},{name:"ySuperscriptYOffset",type:"SHORT",value:479},{name:"yStrikeoutSize",type:"SHORT",value:49},{name:"yStrikeoutPosition",type:"SHORT",value:258},{name:"sFamilyClass",type:"SHORT",value:0},{name:"bFamilyType",type:"BYTE",value:0},{name:"bSerifStyle",type:"BYTE",value:0},{name:"bWeight",type:"BYTE",value:0},{name:"bProportion",type:"BYTE",value:0},{name:"bContrast",type:"BYTE",value:0},{name:"bStrokeVariation",type:"BYTE",value:0},{name:"bArmStyle",type:"BYTE",value:0},{name:"bLetterform",type:"BYTE",value:0},{name:"bMidline",type:"BYTE",value:0},{name:"bXHeight",type:"BYTE",value:0},{name:"ulUnicodeRange1",type:"ULONG",value:0},{name:"ulUnicodeRange2",type:"ULONG",value:0},{name:"ulUnicodeRange3",type:"ULONG",value:0},{name:"ulUnicodeRange4",type:"ULONG",value:0},{name:"achVendID",type:"CHARARRAY",value:"XXXX"},{name:"fsSelection",type:"USHORT",value:0},{name:"usFirstCharIndex",type:"USHORT",value:0},{name:"usLastCharIndex",type:"USHORT",value:0},{name:"sTypoAscender",type:"SHORT",value:0},{name:"sTypoDescender",type:"SHORT",value:0},{name:"sTypoLineGap",type:"SHORT",value:0},{name:"usWinAscent",type:"USHORT",value:0},{name:"usWinDescent",type:"USHORT",value:0},{name:"ulCodePageRange1",type:"ULONG",value:0},{name:"ulCodePageRange2",type:"ULONG",value:0},{name:"sxHeight",type:"SHORT",value:0},{name:"sCapHeight",type:"SHORT",value:0},{name:"usDefaultChar",type:"USHORT",value:0},{name:"usBreakChar",type:"USHORT",value:0},{name:"usMaxContext",type:"USHORT",value:0}],e)},unicodeRanges:ot,getUnicodeRange:function(e){for(var t=0;t<ot.length;t+=1){var r=ot[t];if(e>=r.begin&&e<r.end)return t}return-1}};var it={parse:function(e,t){var r={},n=new ie.Parser(e,t);switch(r.version=n.parseVersion(),r.italicAngle=n.parseFixed(),r.underlinePosition=n.parseShort(),r.underlineThickness=n.parseShort(),r.isFixedPitch=n.parseULong(),r.minMemType42=n.parseULong(),r.maxMemType42=n.parseULong(),r.minMemType1=n.parseULong(),r.maxMemType1=n.parseULong(),r.version){case 1:r.names=he.slice();break;case 2:r.numberOfGlyphs=n.parseUShort(),r.glyphNameIndex=new Array(r.numberOfGlyphs);for(var a=0;a<r.numberOfGlyphs;a++)r.glyphNameIndex[a]=n.parseUShort();r.names=[];for(var o=0;o<r.numberOfGlyphs;o++)if(r.glyphNameIndex[o]>=he.length){var s=n.parseChar();r.names.push(n.parseString(s))}break;case 2.5:r.numberOfGlyphs=n.parseUShort(),r.offset=new Array(r.numberOfGlyphs);for(var i=0;i<r.numberOfGlyphs;i++)r.offset[i]=n.parseChar()}return r},make:function(){return new $.Table("post",[{name:"version",type:"FIXED",value:196608},{name:"italicAngle",type:"FIXED",value:0},{name:"underlinePosition",type:"FWORD",value:0},{name:"underlineThickness",type:"FWORD",value:0},{name:"isFixedPitch",type:"ULONG",value:0},{name:"minMemType42",type:"ULONG",value:0},{name:"maxMemType42",type:"ULONG",value:0},{name:"minMemType1",type:"ULONG",value:0},{name:"maxMemType1",type:"ULONG",value:0}])}},ut=new Array(9);ut[1]=function(){var e=this.offset+this.relativeOffset,t=this.parseUShort();return 1===t?{substFormat:1,coverage:this.parsePointer(oe.coverage),deltaGlyphId:this.parseUShort()}:2===t?{substFormat:2,coverage:this.parsePointer(oe.coverage),substitute:this.parseOffset16List()}:void w.assert(!1,"0x"+e.toString(16)+": lookup type 1 format must be 1 or 2.")},ut[2]=function(){var e=this.parseUShort();return w.argument(1===e,"GSUB Multiple Substitution Subtable identifier-format must be 1"),{substFormat:e,coverage:this.parsePointer(oe.coverage),sequences:this.parseListOfLists()}},ut[3]=function(){var e=this.parseUShort();return w.argument(1===e,"GSUB Alternate Substitution Subtable identifier-format must be 1"),{substFormat:e,coverage:this.parsePointer(oe.coverage),alternateSets:this.parseListOfLists()}},ut[4]=function(){var e=this.parseUShort();return w.argument(1===e,"GSUB ligature table identifier-format must be 1"),{substFormat:e,coverage:this.parsePointer(oe.coverage),ligatureSets:this.parseListOfLists(function(){return{ligGlyph:this.parseUShort(),components:this.parseUShortList(this.parseUShort()-1)}})}};var lt={sequenceIndex:oe.uShort,lookupListIndex:oe.uShort};ut[5]=function(){var e=this.offset+this.relativeOffset,t=this.parseUShort();if(1===t)return{substFormat:t,coverage:this.parsePointer(oe.coverage),ruleSets:this.parseListOfLists(function(){var e=this.parseUShort(),t=this.parseUShort();return{input:this.parseUShortList(e-1),lookupRecords:this.parseRecordList(t,lt)}})};if(2===t)return{substFormat:t,coverage:this.parsePointer(oe.coverage),classDef:this.parsePointer(oe.classDef),classSets:this.parseListOfLists(function(){var e=this.parseUShort(),t=this.parseUShort();return{classes:this.parseUShortList(e-1),lookupRecords:this.parseRecordList(t,lt)}})};if(3===t){var r=this.parseUShort(),n=this.parseUShort();return{substFormat:t,coverages:this.parseList(r,oe.pointer(oe.coverage)),lookupRecords:this.parseRecordList(n,lt)}}w.assert(!1,"0x"+e.toString(16)+": lookup type 5 format must be 1, 2 or 3.")},ut[6]=function(){var e=this.offset+this.relativeOffset,t=this.parseUShort();return 1===t?{substFormat:1,coverage:this.parsePointer(oe.coverage),chainRuleSets:this.parseListOfLists(function(){return{backtrack:this.parseUShortList(),input:this.parseUShortList(this.parseShort()-1),lookahead:this.parseUShortList(),lookupRecords:this.parseRecordList(lt)}})}:2===t?{substFormat:2,coverage:this.parsePointer(oe.coverage),backtrackClassDef:this.parsePointer(oe.classDef),inputClassDef:this.parsePointer(oe.classDef),lookaheadClassDef:this.parsePointer(oe.classDef),chainClassSet:this.parseListOfLists(function(){return{backtrack:this.parseUShortList(),input:this.parseUShortList(this.parseShort()-1),lookahead:this.parseUShortList(),lookupRecords:this.parseRecordList(lt)}})}:3===t?{substFormat:3,backtrackCoverage:this.parseList(oe.pointer(oe.coverage)),inputCoverage:this.parseList(oe.pointer(oe.coverage)),lookaheadCoverage:this.parseList(oe.pointer(oe.coverage)),lookupRecords:this.parseRecordList(lt)}:void w.assert(!1,"0x"+e.toString(16)+": lookup type 6 format must be 1, 2 or 3.")},ut[7]=function(){var e=this.parseUShort();w.argument(1===e,"GSUB Extension Substitution subtable identifier-format must be 1");var t=this.parseUShort(),r=new oe(this.data,this.offset+this.parseULong());return{substFormat:1,lookupType:t,extension:ut[t].call(r)}},ut[8]=function(){var e=this.parseUShort();return w.argument(1===e,"GSUB Reverse Chaining Contextual Single Substitution Subtable identifier-format must be 1"),{substFormat:e,coverage:this.parsePointer(oe.coverage),backtrackCoverage:this.parseList(oe.pointer(oe.coverage)),lookaheadCoverage:this.parseList(oe.pointer(oe.coverage)),substitutes:this.parseUShortList()}};var pt=new Array(9);pt[1]=function(e){return 1===e.substFormat?new $.Table("substitutionTable",[{name:"substFormat",type:"USHORT",value:1},{name:"coverage",type:"TABLE",value:new $.Coverage(e.coverage)},{name:"deltaGlyphID",type:"USHORT",value:e.deltaGlyphId}]):new $.Table("substitutionTable",[{name:"substFormat",type:"USHORT",value:2},{name:"coverage",type:"TABLE",value:new $.Coverage(e.coverage)}].concat($.ushortList("substitute",e.substitute)))},pt[2]=function(e){return w.assert(1===e.substFormat,"Lookup type 2 substFormat must be 1."),new $.Table("substitutionTable",[{name:"substFormat",type:"USHORT",value:1},{name:"coverage",type:"TABLE",value:new $.Coverage(e.coverage)}].concat($.tableList("seqSet",e.sequences,function(e){return new $.Table("sequenceSetTable",$.ushortList("sequence",e))})))},pt[3]=function(e){return w.assert(1===e.substFormat,"Lookup type 3 substFormat must be 1."),new $.Table("substitutionTable",[{name:"substFormat",type:"USHORT",value:1},{name:"coverage",type:"TABLE",value:new $.Coverage(e.coverage)}].concat($.tableList("altSet",e.alternateSets,function(e){return new $.Table("alternateSetTable",$.ushortList("alternate",e))})))},pt[4]=function(e){return w.assert(1===e.substFormat,"Lookup type 4 substFormat must be 1."),new $.Table("substitutionTable",[{name:"substFormat",type:"USHORT",value:1},{name:"coverage",type:"TABLE",value:new $.Coverage(e.coverage)}].concat($.tableList("ligSet",e.ligatureSets,function(e){return new $.Table("ligatureSetTable",$.tableList("ligature",e,function(e){return new $.Table("ligatureTable",[{name:"ligGlyph",type:"USHORT",value:e.ligGlyph}].concat($.ushortList("component",e.components,e.components.length+1)))}))})))},pt[6]=function(e){if(1===e.substFormat)return new $.Table("chainContextTable",[{name:"substFormat",type:"USHORT",value:e.substFormat},{name:"coverage",type:"TABLE",value:new $.Coverage(e.coverage)}].concat($.tableList("chainRuleSet",e.chainRuleSets,function(e){return new $.Table("chainRuleSetTable",$.tableList("chainRule",e,function(e){var r=$.ushortList("backtrackGlyph",e.backtrack,e.backtrack.length).concat($.ushortList("inputGlyph",e.input,e.input.length+1)).concat($.ushortList("lookaheadGlyph",e.lookahead,e.lookahead.length)).concat($.ushortList("substitution",[],e.lookupRecords.length));return e.lookupRecords.forEach(function(e,t){r=r.concat({name:"sequenceIndex"+t,type:"USHORT",value:e.sequenceIndex}).concat({name:"lookupListIndex"+t,type:"USHORT",value:e.lookupListIndex})}),new $.Table("chainRuleTable",r)}))})));if(2===e.substFormat)w.assert(!1,"lookup type 6 format 2 is not yet supported.");else if(3===e.substFormat){var r=[{name:"substFormat",type:"USHORT",value:e.substFormat}];return r.push({name:"backtrackGlyphCount",type:"USHORT",value:e.backtrackCoverage.length}),e.backtrackCoverage.forEach(function(e,t){r.push({name:"backtrackCoverage"+t,type:"TABLE",value:new $.Coverage(e)})}),r.push({name:"inputGlyphCount",type:"USHORT",value:e.inputCoverage.length}),e.inputCoverage.forEach(function(e,t){r.push({name:"inputCoverage"+t,type:"TABLE",value:new $.Coverage(e)})}),r.push({name:"lookaheadGlyphCount",type:"USHORT",value:e.lookaheadCoverage.length}),e.lookaheadCoverage.forEach(function(e,t){r.push({name:"lookaheadCoverage"+t,type:"TABLE",value:new $.Coverage(e)})}),r.push({name:"substitutionCount",type:"USHORT",value:e.lookupRecords.length}),e.lookupRecords.forEach(function(e,t){r=r.concat({name:"sequenceIndex"+t,type:"USHORT",value:e.sequenceIndex}).concat({name:"lookupListIndex"+t,type:"USHORT",value:e.lookupListIndex})}),new $.Table("chainContextTable",r)}w.assert(!1,"lookup type 6 format must be 1, 2 or 3.")};var ct={parse:function(e,t){var r=new oe(e,t=t||0),n=r.parseVersion(1);return w.argument(1===n||1.1===n,"Unsupported GSUB table version."),1===n?{version:n,scripts:r.parseScriptList(),features:r.parseFeatureList(),lookups:r.parseLookupList(ut)}:{version:n,scripts:r.parseScriptList(),features:r.parseFeatureList(),lookups:r.parseLookupList(ut),variations:r.parseFeatureVariationsList()}},make:function(e){return new $.Table("GSUB",[{name:"version",type:"ULONG",value:65536},{name:"scripts",type:"TABLE",value:new $.ScriptList(e.scripts)},{name:"features",type:"TABLE",value:new $.FeatureList(e.features)},{name:"lookups",type:"TABLE",value:new $.LookupList(e.lookups,pt)}])}};var ht={parse:function(e,t){var r=new ie.Parser(e,t),n=r.parseULong();w.argument(1===n,"Unsupported META table version."),r.parseULong(),r.parseULong();for(var a=r.parseULong(),o={},s=0;s<a;s++){var i=r.parseTag(),u=r.parseULong(),l=r.parseULong(),p=I.UTF8(e,t+u,l);o[i]=p}return o},make:function(e){var t=Object.keys(e).length,r="",n=16+12*t,a=new $.Table("meta",[{name:"version",type:"ULONG",value:1},{name:"flags",type:"ULONG",value:0},{name:"offset",type:"ULONG",value:n},{name:"numTags",type:"ULONG",value:t}]);for(var o in e){var s=r.length;r+=e[o],a.fields.push({name:"tag "+o,type:"TAG",value:o}),a.fields.push({name:"offset "+o,type:"ULONG",value:n+s}),a.fields.push({name:"length "+o,type:"ULONG",value:e[o].length})}return a.fields.push({name:"stringPool",type:"CHARARRAY",value:r}),a}};function ft(e){return Math.log(e)/Math.log(2)|0}function dt(e){for(;e.length%4!=0;)e.push(0);for(var t=0,r=0;r<e.length;r+=4)t+=(e[r]<<24)+(e[r+1]<<16)+(e[r+2]<<8)+e[r+3];return t%=Math.pow(2,32)}function gt(e,t,r,n){return new $.Record("Table Record",[{name:"tag",type:"TAG",value:void 0!==e?e:""},{name:"checkSum",type:"ULONG",value:void 0!==t?t:0},{name:"offset",type:"ULONG",value:void 0!==r?r:0},{name:"length",type:"ULONG",value:void 0!==n?n:0}])}function vt(e){var t=new $.Table("sfnt",[{name:"version",type:"TAG",value:"OTTO"},{name:"numTables",type:"USHORT",value:0},{name:"searchRange",type:"USHORT",value:0},{name:"entrySelector",type:"USHORT",value:0},{name:"rangeShift",type:"USHORT",value:0}]);t.tables=e,t.numTables=e.length;var r=Math.pow(2,ft(t.numTables));t.searchRange=16*r,t.entrySelector=ft(r),t.rangeShift=16*t.numTables-t.searchRange;for(var n=[],a=[],o=t.sizeOf()+gt().sizeOf()*t.numTables;o%4!=0;)o+=1,a.push({name:"padding",type:"BYTE",value:0});for(var s=0;s<e.length;s+=1){var i=e[s];w.argument(4===i.tableName.length,"Table name"+i.tableName+" is invalid.");var u=i.sizeOf(),l=gt(i.tableName,dt(i.encode()),o,u);for(n.push({name:l.tag+" Table Record",type:"RECORD",value:l}),a.push({name:i.tableName+" table",type:"RECORD",value:i}),o+=u,w.argument(!isNaN(o),"Something went wrong calculating the offset.");o%4!=0;)o+=1,a.push({name:"padding",type:"BYTE",value:0})}return n.sort(function(e,t){return e.value.tag>t.value.tag?1:-1}),t.fields=t.fields.concat(n),t.fields=t.fields.concat(a),t}function mt(e,t,r){for(var n=0;n<t.length;n+=1){var a=e.charToGlyphIndex(t[n]);if(0<a)return e.glyphs.get(a).getMetrics()}return r}var yt={make:vt,fontToTable:function(e){for(var t,r=[],n=[],a=[],o=[],s=[],i=[],u=[],l=0,p=0,c=0,h=0,f=0,d=0;d<e.glyphs.length;d+=1){var g=e.glyphs.get(d),v=0|g.unicode;if(isNaN(g.advanceWidth))throw new Error("Glyph "+g.name+" ("+d+"): advanceWidth is not a number.");(v<t||void 0===t)&&0<v&&(t=v),l<v&&(l=v);var m=st.getUnicodeRange(v);if(m<32)p|=1<<m;else if(m<64)c|=1<<m-32;else if(m<96)h|=1<<m-64;else{if(!(m<123))throw new Error("Unicode ranges bits > 123 are reserved for internal usage");f|=1<<m-96}if(".notdef"!==g.name){var y=g.getMetrics();r.push(y.xMin),n.push(y.yMin),a.push(y.xMax),o.push(y.yMax),i.push(y.leftSideBearing),u.push(y.rightSideBearing),s.push(g.advanceWidth)}}var b={xMin:Math.min.apply(null,r),yMin:Math.min.apply(null,n),xMax:Math.max.apply(null,a),yMax:Math.max.apply(null,o),advanceWidthMax:Math.max.apply(null,s),advanceWidthAvg:function(e){for(var t=0,r=0;r<e.length;r+=1)t+=e[r];return t/e.length}(s),minLeftSideBearing:Math.min.apply(null,i),maxLeftSideBearing:Math.max.apply(null,i),minRightSideBearing:Math.min.apply(null,u)};b.ascender=e.ascender,b.descender=e.descender;var S=ze.make({flags:3,unitsPerEm:e.unitsPerEm,xMin:b.xMin,yMin:b.yMin,xMax:b.xMax,yMax:b.yMax,lowestRecPPEM:3,createdTimestamp:e.createdTimestamp}),x=We.make({ascender:b.ascender,descender:b.descender,advanceWidthMax:b.advanceWidthMax,minLeftSideBearing:b.minLeftSideBearing,minRightSideBearing:b.minRightSideBearing,xMaxExtent:b.maxLeftSideBearing+(b.xMax-b.xMin),numberOfHMetrics:e.glyphs.length}),T=Xe.make(e.glyphs.length),k=st.make(Object.assign({xAvgCharWidth:Math.round(b.advanceWidthAvg),usFirstCharIndex:t,usLastCharIndex:l,ulUnicodeRange1:p,ulUnicodeRange2:c,ulUnicodeRange3:h,ulUnicodeRange4:f,sTypoAscender:b.ascender,sTypoDescender:b.descender,sTypoLineGap:0,usWinAscent:b.yMax,usWinDescent:Math.abs(b.yMin),ulCodePageRange1:1,sxHeight:mt(e,"xyvw",{yMax:Math.round(b.ascender/2)}).yMax,sCapHeight:mt(e,"HIKLEFJMNTZBDPRAGOQSUVWXY",b).yMax,usDefaultChar:e.hasChar(" ")?32:0,usBreakChar:e.hasChar(" ")?32:0},e.tables.os2)),U=qe.make(e.glyphs),O=ue.make(e.glyphs),E=e.getEnglishName("fontFamily"),R=e.getEnglishName("fontSubfamily"),L=E+" "+R,C=e.getEnglishName("postScriptName");C=C||E.replace(/\s/g,"")+"-"+R;var w={};for(var D in e.names)w[D]=e.names[D];w.uniqueID||(w.uniqueID={en:e.getEnglishName("manufacturer")+":"+L}),w.postScriptName||(w.postScriptName={en:C}),w.preferredFamily||(w.preferredFamily=e.names.fontFamily),w.preferredSubfamily||(w.preferredSubfamily=e.names.fontSubfamily);var I=[],M=at.make(w,I),G=0<I.length?_e.make(I):void 0,B=it.make(),F=He.make(e.glyphs,{version:e.getEnglishName("version"),fullName:L,familyName:E,weightName:R,postScriptName:C,unitsPerEm:e.unitsPerEm,fontBBox:[0,b.yMin,b.ascender,b.advanceWidthMax]}),A=e.metas&&0<Object.keys(e.metas).length?ht.make(e.metas):void 0,P=[S,x,T,k,M,O,B,F,U];G&&P.push(G),e.tables.gsub&&P.push(ct.make(e.tables.gsub)),A&&P.push(A);if(e._mhColorGlyphs&&e._mhPalette){try{var mhCC=mhMakeColrCpal(e);if(mhCC){P.push(mhCC.cpalTable);P.push(mhCC.colrTable)}}catch(mhErr2){}}for(var N=vt(P),H=dt(N.encode()),z=N.fields,W=!1,q=0;q<z.length;q+=1)if("head table"===z[q].name){z[q].value.checkSumAdjustment=2981146554-H,W=!0;break}if(!W)throw new Error("Could not find head table with checkSum to adjust.");return N},computeCheckSum:dt};function bt(e,t){for(var r=0,n=e.length-1;r<=n;){var a=r+n>>>1,o=e[a].tag;if(o===t)return a;o<t?r=1+a:n=a-1}return-r-1}function St(e,t){for(var r=0,n=e.length-1;r<=n;){var a=r+n>>>1,o=e[a];if(o===t)return a;o<t?r=1+a:n=a-1}return-r-1}function xt(e,t){for(var r,n=0,a=e.length-1;n<=a;){var o=n+a>>>1,s=(r=e[o]).start;if(s===t)return r;s<t?n=1+o:a=o-1}if(0<n)return t>(r=e[n-1]).end?0:r}function Tt(e,t){this.font=e,this.tableName=t}function kt(e){Tt.call(this,e,"gpos")}function Ut(e){Tt.call(this,e,"gsub")}function Ot(e,t){var r=e.length;if(r===t.length){for(var n=0;n<r;n++)if(e[n]!==t[n])return;return 1}}function Et(e,t,r){for(var n=e.subtables,a=0;a<n.length;a++){var o=n[a];if(o.substFormat===t)return o}if(r)return n.push(r),r}function Rt(e){for(var t=new ArrayBuffer(e.length),r=new Uint8Array(t),n=0;n<e.length;++n)r[n]=e[n];return t}function Lt(e,t){if(!e)throw t}function Ct(e,t,r,n,a){var o;return o=0<(t&n)?(o=e.parseByte(),0==(t&a)&&(o=-o),r+o):0<(t&a)?r:r+e.parseShort()}function wt(e,t,r){var n,a,o=new ie.Parser(t,r);if(e.numberOfContours=o.parseShort(),e._xMin=o.parseShort(),e._yMin=o.parseShort(),e._xMax=o.parseShort(),e._yMax=o.parseShort(),0<e.numberOfContours){for(var s=e.endPointIndices=[],i=0;i<e.numberOfContours;i+=1)s.push(o.parseUShort());e.instructionLength=o.parseUShort(),e.instructions=[];for(var u=0;u<e.instructionLength;u+=1)e.instructions.push(o.parseByte());var l=s[s.length-1]+1;n=[];for(var p=0;p<l;p+=1)if(a=o.parseByte(),n.push(a),0<(8&a))for(var c=o.parseByte(),h=0;h<c;h+=1)n.push(a),p+=1;if(w.argument(n.length===l,"Bad flags."),0<s.length){var f,d=[];if(0<l){for(var g=0;g<l;g+=1)a=n[g],(f={}).onCurve=!!(1&a),f.lastPointOfContour=0<=s.indexOf(g),d.push(f);for(var v=0,m=0;m<l;m+=1)a=n[m],(f=d[m]).x=Ct(o,a,v,2,16),v=f.x;for(var y=0,b=0;b<l;b+=1)a=n[b],(f=d[b]).y=Ct(o,a,y,4,32),y=f.y}e.points=d}else e.points=[]}else if(0===e.numberOfContours)e.points=[];else{e.isComposite=!0,e.points=[],e.components=[];for(var S=!0;S;){n=o.parseUShort();var x={glyphIndex:o.parseUShort(),xScale:1,scale01:0,scale10:0,yScale:1,dx:0,dy:0};0<(1&n)?0<(2&n)?(x.dx=o.parseShort(),x.dy=o.parseShort()):x.matchedPoints=[o.parseUShort(),o.parseUShort()]:0<(2&n)?(x.dx=o.parseChar(),x.dy=o.parseChar()):x.matchedPoints=[o.parseByte(),o.parseByte()],0<(8&n)?x.xScale=x.yScale=o.parseF2Dot14():0<(64&n)?(x.xScale=o.parseF2Dot14(),x.yScale=o.parseF2Dot14()):0<(128&n)&&(x.xScale=o.parseF2Dot14(),x.scale01=o.parseF2Dot14(),x.scale10=o.parseF2Dot14(),x.yScale=o.parseF2Dot14()),e.components.push(x),S=!!(32&n)}if(256&n){e.instructionLength=o.parseUShort(),e.instructions=[];for(var T=0;T<e.instructionLength;T+=1)e.instructions.push(o.parseByte())}}}function Dt(e,t){for(var r=[],n=0;n<e.length;n+=1){var a=e[n],o={x:t.xScale*a.x+t.scale01*a.y+t.dx,y:t.scale10*a.x+t.yScale*a.y+t.dy,onCurve:a.onCurve,lastPointOfContour:a.lastPointOfContour};r.push(o)}return r}function It(e){var t=new B;if(!e)return t;for(var r=function(e){for(var t=[],r=[],n=0;n<e.length;n+=1){var a=e[n];r.push(a),a.lastPointOfContour&&(t.push(r),r=[])}return w.argument(0===r.length,"There are still points left in the current contour."),t}(e),n=0;n<r.length;++n){var a=r[n],o=null,s=a[a.length-1],i=a[0];if(s.onCurve)t.moveTo(s.x,s.y);else if(i.onCurve)t.moveTo(i.x,i.y);else{var u={x:.5*(s.x+i.x),y:.5*(s.y+i.y)};t.moveTo(u.x,u.y)}for(var l=0;l<a.length;++l)if(o=s,s=i,i=a[(l+1)%a.length],s.onCurve)t.lineTo(s.x,s.y);else{var p=i;o.onCurve||(s.x,o.x,s.y,o.y),i.onCurve||(p={x:.5*(s.x+i.x),y:.5*(s.y+i.y)}),t.quadraticCurveTo(s.x,s.y,p.x,p.y)}t.closePath()}return t}function Mt(e,t){if(t.isComposite)for(var r=0;r<t.components.length;r+=1){var n=t.components[r],a=e.get(n.glyphIndex);if(a.getPath(),a.points){var o=void 0;if(void 0===n.matchedPoints)o=Dt(a.points,n);else{if(n.matchedPoints[0]>t.points.length-1||n.matchedPoints[1]>a.points.length-1)throw Error("Matched points out of range in "+t.name);var s=t.points[n.matchedPoints[0]],i=a.points[n.matchedPoints[1]],u={xScale:n.xScale,scale01:n.scale01,scale10:n.scale10,yScale:n.yScale,dx:0,dy:0};i=Dt([i],u)[0],u.dx=s.x-i.x,u.dy=s.y-i.y,o=Dt(a.points,u)}t.points=t.points.concat(o)}}return It(t.points)}(kt.prototype=Tt.prototype={searchTag:bt,binSearch:St,getTable:function(e){var t=this.font.tables[this.tableName];return!t&&e&&(t=this.font.tables[this.tableName]=this.createDefaultTable()),t},getScriptNames:function(){var e=this.getTable();return e?e.scripts.map(function(e){return e.tag}):[]},getDefaultScriptName:function(){var e=this.getTable();if(e){for(var t=!1,r=0;r<e.scripts.length;r++){var n=e.scripts[r].tag;if("DFLT"===n)return n;"latn"===n&&(t=!0)}return t?"latn":void 0}},getScriptTable:function(e,t){var r=this.getTable(t);if(r){e=e||"DFLT";var n=r.scripts,a=bt(r.scripts,e);if(0<=a)return n[a].script;if(t){var o={tag:e,script:{defaultLangSys:{reserved:0,reqFeatureIndex:65535,featureIndexes:[]},langSysRecords:[]}};return n.splice(-1-a,0,o),o.script}}},getLangSysTable:function(e,t,r){var n=this.getScriptTable(e,r);if(n){if(!t||"dflt"===t||"DFLT"===t)return n.defaultLangSys;var a=bt(n.langSysRecords,t);if(0<=a)return n.langSysRecords[a].langSys;if(r){var o={tag:t,langSys:{reserved:0,reqFeatureIndex:65535,featureIndexes:[]}};return n.langSysRecords.splice(-1-a,0,o),o.langSys}}},getFeatureTable:function(e,t,r,n){var a=this.getLangSysTable(e,t,n);if(a){for(var o,s=a.featureIndexes,i=this.font.tables[this.tableName].features,u=0;u<s.length;u++)if((o=i[s[u]]).tag===r)return o.feature;if(n){var l=i.length;return w.assert(0===l||r>=i[l-1].tag,"Features must be added in alphabetical order."),o={tag:r,feature:{params:0,lookupListIndexes:[]}},i.push(o),s.push(l),o.feature}}},getLookupTables:function(e,t,r,n,a){var o=this.getFeatureTable(e,t,r,a),s=[];if(o){for(var i,u=o.lookupListIndexes,l=this.font.tables[this.tableName].lookups,p=0;p<u.length;p++)(i=l[u[p]]).lookupType===n&&s.push(i);if(0===s.length&&a){i={lookupType:n,lookupFlag:0,subtables:[],markFilteringSet:void 0};var c=l.length;return l.push(i),u.push(c),[i]}}return s},getGlyphClass:function(e,t){switch(e.format){case 1:return e.startGlyph<=t&&t<e.startGlyph+e.classes.length?e.classes[t-e.startGlyph]:0;case 2:var r=xt(e.ranges,t);return r?r.classId:0}},getCoverageIndex:function(e,t){switch(e.format){case 1:var r=St(e.glyphs,t);return 0<=r?r:-1;case 2:var n=xt(e.ranges,t);return n?n.index+t-n.start:-1}},expandCoverage:function(e){if(1===e.format)return e.glyphs;for(var t=[],r=e.ranges,n=0;n<r.length;n++)for(var a=r[n],o=a.start,s=a.end,i=o;i<=s;i++)t.push(i);return t}}).init=function(){var e=this.getDefaultScriptName();this.defaultKerningTables=this.getKerningTables(e)},kt.prototype.getKerningValue=function(e,t,r){for(var n=0;n<e.length;n++)for(var a=e[n].subtables,o=0;o<a.length;o++){var s=a[o],i=this.getCoverageIndex(s.coverage,t);if(!(i<0))switch(s.posFormat){case 1:for(var u=s.pairSets[i],l=0;l<u.length;l++){var p=u[l];if(p.secondGlyph===r)return p.value1&&p.value1.xAdvance||0}break;case 2:var c=this.getGlyphClass(s.classDef1,t),h=this.getGlyphClass(s.classDef2,r),f=s.classRecords[c][h];return f.value1&&f.value1.xAdvance||0}}return 0},kt.prototype.getKerningTables=function(e,t){if(this.font.tables.gpos)return this.getLookupTables(e,t,"kern",2)},(Ut.prototype=Tt.prototype).createDefaultTable=function(){return{version:1,scripts:[{tag:"DFLT",script:{defaultLangSys:{reserved:0,reqFeatureIndex:65535,featureIndexes:[]},langSysRecords:[]}}],features:[],lookups:[]}},Ut.prototype.getSingle=function(e,t,r){for(var n=[],a=this.getLookupTables(t,r,e,1),o=0;o<a.length;o++)for(var s=a[o].subtables,i=0;i<s.length;i++){var u=s[i],l=this.expandCoverage(u.coverage),p=void 0;if(1===u.substFormat){var c=u.deltaGlyphId;for(p=0;p<l.length;p++){var h=l[p];n.push({sub:h,by:h+c})}}else{var f=u.substitute;for(p=0;p<l.length;p++)n.push({sub:l[p],by:f[p]})}}return n},Ut.prototype.getMultiple=function(e,t,r){for(var n=[],a=this.getLookupTables(t,r,e,2),o=0;o<a.length;o++)for(var s=a[o].subtables,i=0;i<s.length;i++){var u=s[i],l=this.expandCoverage(u.coverage),p=void 0;for(p=0;p<l.length;p++){var c=l[p],h=u.sequences[p];n.push({sub:c,by:h})}}return n},Ut.prototype.getAlternates=function(e,t,r){for(var n=[],a=this.getLookupTables(t,r,e,3),o=0;o<a.length;o++)for(var s=a[o].subtables,i=0;i<s.length;i++)for(var u=s[i],l=this.expandCoverage(u.coverage),p=u.alternateSets,c=0;c<l.length;c++)n.push({sub:l[c],by:p[c]});return n},Ut.prototype.getLigatures=function(e,t,r){for(var n=[],a=this.getLookupTables(t,r,e,4),o=0;o<a.length;o++)for(var s=a[o].subtables,i=0;i<s.length;i++)for(var u=s[i],l=this.expandCoverage(u.coverage),p=u.ligatureSets,c=0;c<l.length;c++)for(var h=l[c],f=p[c],d=0;d<f.length;d++){var g=f[d];n.push({sub:[h].concat(g.components),by:g.ligGlyph})}return n},Ut.prototype.addSingle=function(e,t,r,n){var a=Et(this.getLookupTables(r,n,e,1,!0)[0],2,{substFormat:2,coverage:{format:1,glyphs:[]},substitute:[]});w.assert(1===a.coverage.format,"Single: unable to modify coverage table format "+a.coverage.format);var o=t.sub,s=this.binSearch(a.coverage.glyphs,o);s<0&&(s=-1-s,a.coverage.glyphs.splice(s,0,o),a.substitute.splice(s,0,0)),a.substitute[s]=t.by},Ut.prototype.addMultiple=function(e,t,r,n){w.assert(t.by instanceof Array&&1<t.by.length,'Multiple: "by" must be an array of two or more ids');var a=Et(this.getLookupTables(r,n,e,2,!0)[0],1,{substFormat:1,coverage:{format:1,glyphs:[]},sequences:[]});w.assert(1===a.coverage.format,"Multiple: unable to modify coverage table format "+a.coverage.format);var o=t.sub,s=this.binSearch(a.coverage.glyphs,o);s<0&&(s=-1-s,a.coverage.glyphs.splice(s,0,o),a.sequences.splice(s,0,0)),a.sequences[s]=t.by},Ut.prototype.addAlternate=function(e,t,r,n){var a=Et(this.getLookupTables(r,n,e,3,!0)[0],1,{substFormat:1,coverage:{format:1,glyphs:[]},alternateSets:[]});w.assert(1===a.coverage.format,"Alternate: unable to modify coverage table format "+a.coverage.format);var o=t.sub,s=this.binSearch(a.coverage.glyphs,o);s<0&&(s=-1-s,a.coverage.glyphs.splice(s,0,o),a.alternateSets.splice(s,0,0)),a.alternateSets[s]=t.by},Ut.prototype.addLigature=function(e,t,r,n){var a=this.getLookupTables(r,n,e,4,!0)[0],o=a.subtables[0];o||(o={substFormat:1,coverage:{format:1,glyphs:[]},ligatureSets:[]},a.subtables[0]=o),w.assert(1===o.coverage.format,"Ligature: unable to modify coverage table format "+o.coverage.format);var s=t.sub[0],i=t.sub.slice(1),u={ligGlyph:t.by,components:i},l=this.binSearch(o.coverage.glyphs,s);if(0<=l){for(var p=o.ligatureSets[l],c=0;c<p.length;c++)if(Ot(p[c].components,i))return;p.push(u)}else l=-1-l,o.coverage.glyphs.splice(l,0,s),o.ligatureSets.splice(l,0,[u])},Ut.prototype.getFeature=function(e,t,r){if(/ss\d\d/.test(e))return this.getSingle(e,t,r);switch(e){case"aalt":case"salt":return this.getSingle(e,t,r).concat(this.getAlternates(e,t,r));case"dlig":case"liga":case"rlig":return this.getLigatures(e,t,r);case"ccmp":return this.getMultiple(e,t,r).concat(this.getLigatures(e,t,r));case"stch":return this.getMultiple(e,t,r)}},Ut.prototype.add=function(e,t,r,n){if(/ss\d\d/.test(e))return this.addSingle(e,t,r,n);switch(e){case"aalt":case"salt":return"number"==typeof t.by?this.addSingle(e,t,r,n):this.addAlternate(e,t,r,n);case"dlig":case"liga":case"rlig":return this.addLigature(e,t,r,n);case"ccmp":return t.by instanceof Array?this.addMultiple(e,t,r,n):this.addLigature(e,t,r,n)}};var Gt,Bt,Ft,At,Pt={getPath:It,parse:function(e,t,r,n,a){return a.lowMemory?(o=e,s=t,i=r,u=n,l=new Te.GlyphSet(u),u._push=function(e){var t=i[e];t!==i[e+1]?l.push(e,Te.ttfGlyphLoader(u,e,wt,o,s+t,Mt)):l.push(e,Te.glyphLoader(u,e))},l):function(e,t,r,n){for(var a=new Te.GlyphSet(n),o=0;o<r.length-1;o+=1){var s=r[o];s!==r[o+1]?a.push(o,Te.ttfGlyphLoader(n,o,wt,e,t+s,Mt)):a.push(o,Te.glyphLoader(n,o))}return a}(e,t,r,n);var o,s,i,u,l}};function Nt(e){this.font=e,this.getCommands=function(e){return Pt.getPath(e).commands},this._fpgmState=this._prepState=void 0,this._errorState=0}function Ht(e){return e}function zt(e){return Math.sign(e)*Math.round(Math.abs(e))}function Wt(e){return Math.sign(e)*Math.round(Math.abs(2*e))/2}function qt(e){return Math.sign(e)*(Math.round(Math.abs(e)+.5)-.5)}function _t(e){return Math.sign(e)*Math.ceil(Math.abs(e))}function Xt(e){return Math.sign(e)*Math.floor(Math.abs(e))}function Vt(e){var t=this.srPeriod,r=this.srPhase,n=1;return e<0&&(e=-e,n=-1),e+=this.srThreshold-r,e=Math.trunc(e/t)*t,(e+=r)<0?r*n:e*n}var Yt={x:1,y:0,axis:"x",distance:function(e,t,r,n){return(r?e.xo:e.x)-(n?t.xo:t.x)},interpolate:function(e,t,r,n){var a,o,s,i,u,l,p;if(!n||n===this)return a=e.xo-t.xo,o=e.xo-r.xo,u=t.x-t.xo,l=r.x-r.xo,0===(p=(s=Math.abs(a))+(i=Math.abs(o)))?void(e.x=e.xo+(u+l)/2):void(e.x=e.xo+(u*i+l*s)/p);a=n.distance(e,t,!0,!0),o=n.distance(e,r,!0,!0),u=n.distance(t,t,!1,!0),l=n.distance(r,r,!1,!0),0!==(p=(s=Math.abs(a))+(i=Math.abs(o)))?Yt.setRelative(e,e,(u*i+l*s)/p,n,!0):Yt.setRelative(e,e,(u+l)/2,n,!0)},normalSlope:Number.NEGATIVE_INFINITY,setRelative:function(e,t,r,n,a){if(n&&n!==this){var o=a?t.xo:t.x,s=a?t.yo:t.y,i=o+r*n.x,u=s+r*n.y;e.x=i+(e.y-u)/n.normalSlope}else e.x=(a?t.xo:t.x)+r},slope:0,touch:function(e){e.xTouched=!0},touched:function(e){return e.xTouched},untouch:function(e){e.xTouched=!1}},jt={x:0,y:1,axis:"y",distance:function(e,t,r,n){return(r?e.yo:e.y)-(n?t.yo:t.y)},interpolate:function(e,t,r,n){var a,o,s,i,u,l,p;if(!n||n===this)return a=e.yo-t.yo,o=e.yo-r.yo,u=t.y-t.yo,l=r.y-r.yo,0===(p=(s=Math.abs(a))+(i=Math.abs(o)))?void(e.y=e.yo+(u+l)/2):void(e.y=e.yo+(u*i+l*s)/p);a=n.distance(e,t,!0,!0),o=n.distance(e,r,!0,!0),u=n.distance(t,t,!1,!0),l=n.distance(r,r,!1,!0),0!==(p=(s=Math.abs(a))+(i=Math.abs(o)))?jt.setRelative(e,e,(u*i+l*s)/p,n,!0):jt.setRelative(e,e,(u+l)/2,n,!0)},normalSlope:0,setRelative:function(e,t,r,n,a){if(n&&n!==this){var o=a?t.xo:t.x,s=a?t.yo:t.y,i=o+r*n.x,u=s+r*n.y;e.y=u+n.normalSlope*(e.x-i)}else e.y=(a?t.yo:t.y)+r},slope:Number.POSITIVE_INFINITY,touch:function(e){e.yTouched=!0},touched:function(e){return e.yTouched},untouch:function(e){e.yTouched=!1}};function Zt(e,t){this.x=e,this.y=t,this.axis=void 0,this.slope=t/e,this.normalSlope=-e/t,Object.freeze(this)}function Qt(e,t){var r=Math.sqrt(e*e+t*t);return t/=r,1===(e/=r)&&0===t?Yt:0===e&&1===t?jt:new Zt(e,t)}function Kt(e,t,r,n){this.x=this.xo=Math.round(64*e)/64,this.y=this.yo=Math.round(64*t)/64,this.lastPointOfContour=r,this.onCurve=n,this.prevPointOnContour=void 0,this.nextPointOnContour=void 0,this.xTouched=!1,this.yTouched=!1,Object.preventExtensions(this)}Object.freeze(Yt),Object.freeze(jt),Zt.prototype.distance=function(e,t,r,n){return this.x*Yt.distance(e,t,r,n)+this.y*jt.distance(e,t,r,n)},Zt.prototype.interpolate=function(e,t,r,n){var a,o,s,i,u,l,p;s=n.distance(e,t,!0,!0),i=n.distance(e,r,!0,!0),a=n.distance(t,t,!1,!0),o=n.distance(r,r,!1,!0),0!==(p=(u=Math.abs(s))+(l=Math.abs(i)))?this.setRelative(e,e,(a*l+o*u)/p,n,!0):this.setRelative(e,e,(a+o)/2,n,!0)},Zt.prototype.setRelative=function(e,t,r,n,a){n=n||this;var o=a?t.xo:t.x,s=a?t.yo:t.y,i=o+r*n.x,u=s+r*n.y,l=n.normalSlope,p=this.slope,c=e.x,h=e.y;e.x=(p*c-l*i+u-h)/(p-l),e.y=p*(e.x-c)+h},Zt.prototype.touch=function(e){e.xTouched=!0,e.yTouched=!0},Kt.prototype.nextTouched=function(e){for(var t=this.nextPointOnContour;!e.touched(t)&&t!==this;)t=t.nextPointOnContour;return t},Kt.prototype.prevTouched=function(e){for(var t=this.prevPointOnContour;!e.touched(t)&&t!==this;)t=t.prevPointOnContour;return t};var Jt=Object.freeze(new Kt(0,0)),$t={cvCutIn:17/16,deltaBase:9,deltaShift:.125,loop:1,minDis:1,autoFlip:!0};function er(e,t){switch(this.env=e,this.stack=[],this.prog=t,e){case"glyf":this.zp0=this.zp1=this.zp2=1,this.rp0=this.rp1=this.rp2=0;case"prep":this.fv=this.pv=this.dpv=Yt,this.round=zt}}function tr(e){for(var t=e.tZone=new Array(e.gZone.length),r=0;r<t.length;r++)t[r]=new Kt(0,0)}function rr(e,t){var r,n=e.prog,a=e.ip,o=1;do{if(88===(r=n[++a]))o++;else if(89===r)o--;else if(64===r)a+=n[a+1]+1;else if(65===r)a+=2*n[a+1]+1;else if(176<=r&&r<=183)a+=r-176+1;else if(184<=r&&r<=191)a+=2*(r-184+1);else if(t&&1===o&&27===r)break}while(0<o);e.ip=a}function nr(e,t){O.DEBUG&&console.log(t.step,"SVTCA["+e.axis+"]"),t.fv=t.pv=t.dpv=e}function ar(e,t){O.DEBUG&&console.log(t.step,"SPVTCA["+e.axis+"]"),t.pv=t.dpv=e}function or(e,t){O.DEBUG&&console.log(t.step,"SFVTCA["+e.axis+"]"),t.fv=e}function sr(e,t){var r,n,a=t.stack,o=a.pop(),s=a.pop(),i=t.z2[o],u=t.z1[s];O.DEBUG&&console.log("SPVTL["+e+"]",o,s),n=e?(r=i.y-u.y,u.x-i.x):(r=u.x-i.x,u.y-i.y),t.pv=t.dpv=Qt(r,n)}function ir(e,t){var r,n,a=t.stack,o=a.pop(),s=a.pop(),i=t.z2[o],u=t.z1[s];O.DEBUG&&console.log("SFVTL["+e+"]",o,s),n=e?(r=i.y-u.y,u.x-i.x):(r=u.x-i.x,u.y-i.y),t.fv=Qt(r,n)}function ur(e){O.DEBUG&&console.log(e.step,"POP[]"),e.stack.pop()}function lr(e,t){var r=t.stack.pop(),n=t.z0[r],a=t.fv,o=t.pv;O.DEBUG&&console.log(t.step,"MDAP["+e+"]",r);var s=o.distance(n,Jt);e&&(s=t.round(s)),a.setRelative(n,Jt,s,o),a.touch(n),t.rp0=t.rp1=r}function pr(e,t){var r,n,a,o=t.z2,s=o.length-2;O.DEBUG&&console.log(t.step,"IUP["+e.axis+"]");for(var i=0;i<s;i++)r=o[i],e.touched(r)||(n=r.prevTouched(e))!==r&&(n===(a=r.nextTouched(e))&&e.setRelative(r,r,e.distance(n,n,!1,!0),e,!0),e.interpolate(r,n,a,e))}function cr(e,t){for(var r=t.stack,n=e?t.rp1:t.rp2,a=(e?t.z0:t.z1)[n],o=t.fv,s=t.pv,i=t.loop,u=t.z2;i--;){var l=r.pop(),p=u[l],c=s.distance(a,a,!1,!0);o.setRelative(p,p,c,s),o.touch(p),O.DEBUG&&console.log(t.step,(1<t.loop?"loop "+(t.loop-i)+": ":"")+"SHP["+(e?"rp1":"rp2")+"]",l)}t.loop=1}function hr(e,t){var r=t.stack,n=e?t.rp1:t.rp2,a=(e?t.z0:t.z1)[n],o=t.fv,s=t.pv,i=r.pop(),u=t.z2[t.contours[i]],l=u;O.DEBUG&&console.log(t.step,"SHC["+e+"]",i);for(var p=s.distance(a,a,!1,!0);l!==a&&o.setRelative(l,l,p,s),(l=l.nextPointOnContour)!==u;);}function fr(e,t){var r,n,a=t.stack,o=e?t.rp1:t.rp2,s=(e?t.z0:t.z1)[o],i=t.fv,u=t.pv,l=a.pop();switch(O.DEBUG&&console.log(t.step,"SHZ["+e+"]",l),l){case 0:r=t.tZone;break;case 1:r=t.gZone;break;default:throw new Error("Invalid zone")}for(var p=u.distance(s,s,!1,!0),c=r.length-2,h=0;h<c;h++)n=r[h],i.setRelative(n,n,p,u)}function dr(e,t){var r=t.stack,n=r.pop()/64,a=r.pop(),o=t.z1[a],s=t.z0[t.rp0],i=t.fv,u=t.pv;i.setRelative(o,s,n,u),i.touch(o),O.DEBUG&&console.log(t.step,"MSIRP["+e+"]",n,a),t.rp1=t.rp0,t.rp2=a,e&&(t.rp0=a)}function gr(e,t){var r=t.stack,n=r.pop(),a=r.pop(),o=t.z0[a],s=t.fv,i=t.pv,u=t.cvt[n];O.DEBUG&&console.log(t.step,"MIAP["+e+"]",n,"(",u,")",a);var l=i.distance(o,Jt);e&&(Math.abs(l-u)<t.cvCutIn&&(l=u),l=t.round(l)),s.setRelative(o,Jt,l,i),0===t.zp0&&(o.xo=o.x,o.yo=o.y),s.touch(o),t.rp0=t.rp1=a}function vr(e,t){var r=t.stack,n=r.pop(),a=t.z2[n];O.DEBUG&&console.log(t.step,"GC["+e+"]",n),r.push(64*t.dpv.distance(a,Jt,e,!1))}function mr(e,t){var r=t.stack,n=r.pop(),a=r.pop(),o=t.z1[n],s=t.z0[a],i=t.dpv.distance(s,o,e,e);O.DEBUG&&console.log(t.step,"MD["+e+"]",n,a,"->",i),t.stack.push(Math.round(64*i))}function yr(e,t){var r=t.stack,n=r.pop(),a=t.fv,o=t.pv,s=t.ppem,i=t.deltaBase+16*(e-1),u=t.deltaShift,l=t.z0;O.DEBUG&&console.log(t.step,"DELTAP["+e+"]",n,r);for(var p=0;p<n;p++){var c=r.pop(),h=r.pop();if(i+((240&h)>>4)===s){var f=(15&h)-8;0<=f&&f++,O.DEBUG&&console.log(t.step,"DELTAPFIX",c,"by",f*u);var d=l[c];a.setRelative(d,d,f*u,o)}}}function br(e,t){var r=t.stack,n=r.pop();O.DEBUG&&console.log(t.step,"ROUND[]"),r.push(64*t.round(n/64))}function Sr(e,t){var r=t.stack,n=r.pop(),a=t.ppem,o=t.deltaBase+16*(e-1),s=t.deltaShift;O.DEBUG&&console.log(t.step,"DELTAC["+e+"]",n,r);for(var i=0;i<n;i++){var u=r.pop(),l=r.pop();if(o+((240&l)>>4)===a){var p=(15&l)-8;0<=p&&p++;var c=p*s;O.DEBUG&&console.log(t.step,"DELTACFIX",u,"by",c),t.cvt[u]+=c}}}function xr(e,t){var r,n,a=t.stack,o=a.pop(),s=a.pop(),i=t.z2[o],u=t.z1[s];O.DEBUG&&console.log(t.step,"SDPVTL["+e+"]",o,s),n=e?(r=i.y-u.y,u.x-i.x):(r=u.x-i.x,u.y-i.y),t.dpv=Qt(r,n)}function Tr(e,t){var r=t.stack,n=t.prog,a=t.ip;O.DEBUG&&console.log(t.step,"PUSHB["+e+"]");for(var o=0;o<e;o++)r.push(n[++a]);t.ip=a}function kr(e,t){var r=t.ip,n=t.prog,a=t.stack;O.DEBUG&&console.log(t.ip,"PUSHW["+e+"]");for(var o=0;o<e;o++){var s=n[++r]<<8|n[++r];32768&s&&(s=-(1+(65535^s))),a.push(s)}t.ip=r}function Ur(e,t,r,n,a,o){var s,i,u,l,p=o.stack,c=e&&p.pop(),h=p.pop(),f=o.rp0,d=o.z0[f],g=o.z1[h],v=o.minDis,m=o.fv,y=o.dpv;u=0<=(i=s=y.distance(g,d,!0,!0))?1:-1,i=Math.abs(i),e&&(l=o.cvt[c],n&&Math.abs(i-l)<o.cvCutIn&&(i=l)),r&&i<v&&(i=v),n&&(i=o.round(i)),m.setRelative(g,d,u*i,y),m.touch(g),O.DEBUG&&console.log(o.step,(e?"MIRP[":"MDRP[")+(t?"M":"m")+(r?">":"_")+(n?"R":"_")+(0===a?"Gr":1===a?"Bl":2===a?"Wh":"")+"]",e?c+"("+o.cvt[c]+","+l+")":"",h,"(d =",s,"->",u*i,")"),o.rp1=o.rp0,o.rp2=h,t&&(o.rp0=h)}function Or(e){this.char=e,this.state={},this.activeState=null}function Er(e,t,r){this.contextName=r,this.startIndex=e,this.endOffset=t}function Rr(e,t,r){this.contextName=e,this.openRange=null,this.ranges=[],this.checkStart=t,this.checkEnd=r}function Lr(e,t){this.context=e,this.index=t,this.length=e.length,this.current=e[t],this.backtrack=e.slice(0,t),this.lookahead=e.slice(t+1)}function Cr(e){this.eventId=e,this.subscribers=[]}function wr(e){this.tokens=[],this.registeredContexts={},this.contextCheckers=[],this.events={},this.registeredModifiers=[],function(r){var n=this,e=["start","end","next","newToken","contextStart","contextEnd","insertToken","removeToken","removeRange","replaceToken","replaceRange","composeRUD","updateContextsRanges"];e.forEach(function(e){Object.defineProperty(n.events,e,{value:new Cr(e)})}),r&&e.forEach(function(e){var t=r[e];"function"==typeof t&&n.events[e].subscribe(t)}),["insertToken","removeToken","removeRange","replaceToken","replaceRange","composeRUD"].forEach(function(e){n.events[e].subscribe(n.updateContextsRanges)})}.call(this,e)}function Dr(e){return/[\u0600-\u065F\u066A-\u06D2\u06FA-\u06FF]/.test(e)}function Ir(e){return/[\u0630\u0690\u0621\u0631\u0661\u0671\u0622\u0632\u0672\u0692\u06C2\u0623\u0673\u0693\u06C3\u0624\u0694\u06C4\u0625\u0675\u0695\u06C5\u06E5\u0676\u0696\u06C6\u0627\u0677\u0697\u06C7\u0648\u0688\u0698\u06C8\u0689\u0699\u06C9\u068A\u06CA\u066B\u068B\u06CB\u068C\u068D\u06CD\u06FD\u068E\u06EE\u06FE\u062F\u068F\u06CF\u06EF]/.test(e)}function Mr(e){return/[\u0600-\u0605\u060C-\u060E\u0610-\u061B\u061E\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7\u06E8\u06EA-\u06ED]/.test(e)}function Gr(e){return/[A-z]/.test(e)}function Br(e){this.font=e,this.features={}}function Fr(e){this.id=e.id,this.tag=e.tag,this.substitution=e.substitution}function Ar(e,t){if(!e)return-1;switch(t.format){case 1:return t.glyphs.indexOf(e);case 2:for(var r=t.ranges,n=0;n<r.length;n++){var a=r[n];if(e>=a.start&&e<=a.end){var o=e-a.start;return a.index+o}}break;default:return-1}return-1}function Pr(e,t){for(var r=[],n=0;n<e.length;n++){var a=e[n],o=t.current,s=Ar(o=Array.isArray(o)?o[0]:o,a);-1!==s&&r.push(s)}return r.length!==e.length?-1:r}Nt.prototype.exec=function(e,t){if("number"!=typeof t)throw new Error("Point size is not a number!");if(!(2<this._errorState)){var r=this.font,n=this._prepState;if(!n||n.ppem!==t){var a=this._fpgmState;if(!a){er.prototype=$t,(a=this._fpgmState=new er("fpgm",r.tables.fpgm)).funcs=[],a.font=r,O.DEBUG&&(console.log("---EXEC FPGM---"),a.step=-1);try{Bt(a)}catch(e){return console.log("Hinting error in FPGM:"+e),void(this._errorState=3)}}er.prototype=a,(n=this._prepState=new er("prep",r.tables.prep)).ppem=t;var o=r.tables.cvt;if(o)for(var s=n.cvt=new Array(o.length),i=t/r.unitsPerEm,u=0;u<o.length;u++)s[u]=o[u]*i;else n.cvt=[];O.DEBUG&&(console.log("---EXEC PREP---"),n.step=-1);try{Bt(n)}catch(e){this._errorState<2&&console.log("Hinting error in PREP:"+e),this._errorState=2}}if(!(1<this._errorState))try{return Ft(e,n)}catch(e){return this._errorState<1&&(console.log("Hinting error:"+e),console.log("Note: further hinting errors are silenced")),void(this._errorState=1)}}},Ft=function(e,t){var r,n,a,o=t.ppem/t.font.unitsPerEm,s=o,i=e.components;if(er.prototype=t,i){var u=t.font;n=[],r=[];for(var l=0;l<i.length;l++){var p=i[l],c=u.glyphs.get(p.glyphIndex);a=new er("glyf",c.instructions),O.DEBUG&&(console.log("---EXEC COMP "+l+"---"),a.step=-1),At(c,a,o,s);for(var h=Math.round(p.dx*o),f=Math.round(p.dy*s),d=a.gZone,g=a.contours,v=0;v<d.length;v++){var m=d[v];m.xTouched=m.yTouched=!1,m.xo=m.x=m.x+h,m.yo=m.y=m.y+f}var y=n.length;n.push.apply(n,d);for(var b=0;b<g.length;b++)r.push(g[b]+y)}e.instructions&&!a.inhibitGridFit&&((a=new er("glyf",e.instructions)).gZone=a.z0=a.z1=a.z2=n,a.contours=r,n.push(new Kt(0,0),new Kt(Math.round(e.advanceWidth*o),0)),O.DEBUG&&(console.log("---EXEC COMPOSITE---"),a.step=-1),Bt(a),n.length-=2)}else a=new er("glyf",e.instructions),O.DEBUG&&(console.log("---EXEC GLYPH---"),a.step=-1),At(e,a,o,s),n=a.gZone;return n},At=function(e,t,r,n){for(var a,o,s,i=e.points||[],u=i.length,l=t.gZone=t.z0=t.z1=t.z2=[],p=t.contours=[],c=0;c<u;c++)a=i[c],l[c]=new Kt(a.x*r,a.y*n,a.lastPointOfContour,a.onCurve);for(var h=0;h<u;h++)a=l[h],o||(o=a,p.push(h)),a.lastPointOfContour?((a.nextPointOnContour=o).prevPointOnContour=a,o=void 0):(s=l[h+1],(a.nextPointOnContour=s).prevPointOnContour=a);if(!t.inhibitGridFit){if(O.DEBUG){console.log("PROCESSING GLYPH",t.stack);for(var f=0;f<u;f++)console.log(f,l[f].x,l[f].y)}if(l.push(new Kt(0,0),new Kt(Math.round(e.advanceWidth*r),0)),Bt(t),l.length-=2,O.DEBUG){console.log("FINISHED GLYPH",t.stack);for(var d=0;d<u;d++)console.log(d,l[d].x,l[d].y)}}},Bt=function(e){var t=e.prog;if(t){var r,n=t.length;for(e.ip=0;e.ip<n;e.ip++){if(O.DEBUG&&e.step++,!(r=Gt[t[e.ip]]))throw new Error("unknown instruction: 0x"+Number(t[e.ip]).toString(16));r(e)}}},Gt=[nr.bind(void 0,jt),nr.bind(void 0,Yt),ar.bind(void 0,jt),ar.bind(void 0,Yt),or.bind(void 0,jt),or.bind(void 0,Yt),sr.bind(void 0,0),sr.bind(void 0,1),ir.bind(void 0,0),ir.bind(void 0,1),function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"SPVFS[]",r,n),e.pv=e.dpv=Qt(n,r)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"SPVFS[]",r,n),e.fv=Qt(n,r)},function(e){var t=e.stack,r=e.pv;O.DEBUG&&console.log(e.step,"GPV[]"),t.push(16384*r.x),t.push(16384*r.y)},function(e){var t=e.stack,r=e.fv;O.DEBUG&&console.log(e.step,"GFV[]"),t.push(16384*r.x),t.push(16384*r.y)},function(e){e.fv=e.pv,O.DEBUG&&console.log(e.step,"SFVTPV[]")},function(e){var t=e.stack,r=t.pop(),n=t.pop(),a=t.pop(),o=t.pop(),s=t.pop(),i=e.z0,u=e.z1,l=i[r],p=i[n],c=u[a],h=u[o],f=e.z2[s];O.DEBUG&&console.log("ISECT[], ",r,n,a,o,s);var d=l.x,g=l.y,v=p.x,m=p.y,y=c.x,b=c.y,S=h.x,x=h.y,T=(d-v)*(b-x)-(g-m)*(y-S),k=d*m-g*v,U=y*x-b*S;f.x=(k*(y-S)-U*(d-v))/T,f.y=(k*(b-x)-U*(g-m))/T},function(e){e.rp0=e.stack.pop(),O.DEBUG&&console.log(e.step,"SRP0[]",e.rp0)},function(e){e.rp1=e.stack.pop(),O.DEBUG&&console.log(e.step,"SRP1[]",e.rp1)},function(e){e.rp2=e.stack.pop(),O.DEBUG&&console.log(e.step,"SRP2[]",e.rp2)},function(e){var t=e.stack.pop();switch(O.DEBUG&&console.log(e.step,"SZP0[]",t),e.zp0=t){case 0:e.tZone||tr(e),e.z0=e.tZone;break;case 1:e.z0=e.gZone;break;default:throw new Error("Invalid zone pointer")}},function(e){var t=e.stack.pop();switch(O.DEBUG&&console.log(e.step,"SZP1[]",t),e.zp1=t){case 0:e.tZone||tr(e),e.z1=e.tZone;break;case 1:e.z1=e.gZone;break;default:throw new Error("Invalid zone pointer")}},function(e){var t=e.stack.pop();switch(O.DEBUG&&console.log(e.step,"SZP2[]",t),e.zp2=t){case 0:e.tZone||tr(e),e.z2=e.tZone;break;case 1:e.z2=e.gZone;break;default:throw new Error("Invalid zone pointer")}},function(e){var t=e.stack.pop();switch(O.DEBUG&&console.log(e.step,"SZPS[]",t),e.zp0=e.zp1=e.zp2=t,t){case 0:e.tZone||tr(e),e.z0=e.z1=e.z2=e.tZone;break;case 1:e.z0=e.z1=e.z2=e.gZone;break;default:throw new Error("Invalid zone pointer")}},function(e){e.loop=e.stack.pop(),O.DEBUG&&console.log(e.step,"SLOOP[]",e.loop)},function(e){O.DEBUG&&console.log(e.step,"RTG[]"),e.round=zt},function(e){O.DEBUG&&console.log(e.step,"RTHG[]"),e.round=qt},function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"SMD[]",t),e.minDis=t/64},function(e){O.DEBUG&&console.log(e.step,"ELSE[]"),rr(e,!1)},function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"JMPR[]",t),e.ip+=t-1},function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"SCVTCI[]",t),e.cvCutIn=t/64},void 0,void 0,function(e){var t=e.stack;O.DEBUG&&console.log(e.step,"DUP[]"),t.push(t[t.length-1])},ur,function(e){O.DEBUG&&console.log(e.step,"CLEAR[]"),e.stack.length=0},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"SWAP[]"),t.push(r),t.push(n)},function(e){var t=e.stack;O.DEBUG&&console.log(e.step,"DEPTH[]"),t.push(t.length)},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"CINDEX[]",r),t.push(t[t.length-r])},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"MINDEX[]",r),t.push(t.splice(t.length-r,1)[0])},void 0,void 0,void 0,function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"LOOPCALL[]",r,n);var a=e.ip,o=e.prog;e.prog=e.funcs[r];for(var s=0;s<n;s++)Bt(e),O.DEBUG&&console.log(++e.step,s+1<n?"next loopcall":"done loopcall",s);e.ip=a,e.prog=o},function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"CALL[]",t);var r=e.ip,n=e.prog;e.prog=e.funcs[t],Bt(e),e.ip=r,e.prog=n,O.DEBUG&&console.log(++e.step,"returning from",t)},function(e){if("fpgm"!==e.env)throw new Error("FDEF not allowed here");var t=e.stack,r=e.prog,n=e.ip,a=t.pop(),o=n;for(O.DEBUG&&console.log(e.step,"FDEF[]",a);45!==r[++n];);e.ip=n,e.funcs[a]=r.slice(o+1,n)},void 0,lr.bind(void 0,0),lr.bind(void 0,1),pr.bind(void 0,jt),pr.bind(void 0,Yt),cr.bind(void 0,0),cr.bind(void 0,1),hr.bind(void 0,0),hr.bind(void 0,1),fr.bind(void 0,0),fr.bind(void 0,1),function(e){for(var t=e.stack,r=e.loop,n=e.fv,a=t.pop()/64,o=e.z2;r--;){var s=t.pop(),i=o[s];O.DEBUG&&console.log(e.step,(1<e.loop?"loop "+(e.loop-r)+": ":"")+"SHPIX[]",s,a),n.setRelative(i,i,a),n.touch(i)}e.loop=1},function(e){for(var t=e.stack,r=e.rp1,n=e.rp2,a=e.loop,o=e.z0[r],s=e.z1[n],i=e.fv,u=e.dpv,l=e.z2;a--;){var p=t.pop(),c=l[p];O.DEBUG&&console.log(e.step,(1<e.loop?"loop "+(e.loop-a)+": ":"")+"IP[]",p,r,"<->",n),i.interpolate(c,o,s,u),i.touch(c)}e.loop=1},dr.bind(void 0,0),dr.bind(void 0,1),function(e){for(var t=e.stack,r=e.rp0,n=e.z0[r],a=e.loop,o=e.fv,s=e.pv,i=e.z1;a--;){var u=t.pop(),l=i[u];O.DEBUG&&console.log(e.step,(1<e.loop?"loop "+(e.loop-a)+": ":"")+"ALIGNRP[]",u),o.setRelative(l,n,0,s),o.touch(l)}e.loop=1},function(e){O.DEBUG&&console.log(e.step,"RTDG[]"),e.round=Wt},gr.bind(void 0,0),gr.bind(void 0,1),function(e){var t=e.prog,r=e.ip,n=e.stack,a=t[++r];O.DEBUG&&console.log(e.step,"NPUSHB[]",a);for(var o=0;o<a;o++)n.push(t[++r]);e.ip=r},function(e){var t=e.ip,r=e.prog,n=e.stack,a=r[++t];O.DEBUG&&console.log(e.step,"NPUSHW[]",a);for(var o=0;o<a;o++){var s=r[++t]<<8|r[++t];32768&s&&(s=-(1+(65535^s))),n.push(s)}e.ip=t},function(e){var t=e.stack,r=e.store;r=r||(e.store=[]);var n=t.pop(),a=t.pop();O.DEBUG&&console.log(e.step,"WS",n,a),r[a]=n},function(e){var t=e.stack,r=e.store,n=t.pop();O.DEBUG&&console.log(e.step,"RS",n);var a=r&&r[n]||0;t.push(a)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"WCVTP",r,n),e.cvt[n]=r/64},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"RCVT",r),t.push(64*e.cvt[r])},vr.bind(void 0,0),vr.bind(void 0,1),void 0,mr.bind(void 0,0),mr.bind(void 0,1),function(e){O.DEBUG&&console.log(e.step,"MPPEM[]"),e.stack.push(e.ppem)},void 0,function(e){O.DEBUG&&console.log(e.step,"FLIPON[]"),e.autoFlip=!0},void 0,void 0,function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"LT[]",r,n),t.push(n<r?1:0)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"LTEQ[]",r,n),t.push(n<=r?1:0)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"GT[]",r,n),t.push(r<n?1:0)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"GTEQ[]",r,n),t.push(r<=n?1:0)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"EQ[]",r,n),t.push(r===n?1:0)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"NEQ[]",r,n),t.push(r!==n?1:0)},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"ODD[]",r),t.push(Math.trunc(r)%2?1:0)},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"EVEN[]",r),t.push(Math.trunc(r)%2?0:1)},function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"IF[]",t),t||(rr(e,!0),O.DEBUG&&console.log(e.step,"EIF[]"))},function(e){O.DEBUG&&console.log(e.step,"EIF[]")},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"AND[]",r,n),t.push(r&&n?1:0)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"OR[]",r,n),t.push(r||n?1:0)},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"NOT[]",r),t.push(r?0:1)},yr.bind(void 0,1),function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"SDB[]",t),e.deltaBase=t},function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"SDS[]",t),e.deltaShift=Math.pow(.5,t)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"ADD[]",r,n),t.push(n+r)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"SUB[]",r,n),t.push(n-r)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"DIV[]",r,n),t.push(64*n/r)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"MUL[]",r,n),t.push(n*r/64)},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"ABS[]",r),t.push(Math.abs(r))},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"NEG[]",r),t.push(-r)},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"FLOOR[]",r),t.push(64*Math.floor(r/64))},function(e){var t=e.stack,r=t.pop();O.DEBUG&&console.log(e.step,"CEILING[]",r),t.push(64*Math.ceil(r/64))},br.bind(void 0,0),br.bind(void 0,1),br.bind(void 0,2),br.bind(void 0,3),void 0,void 0,void 0,void 0,function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"WCVTF[]",r,n),e.cvt[n]=r*e.ppem/e.font.unitsPerEm},yr.bind(void 0,2),yr.bind(void 0,3),Sr.bind(void 0,1),Sr.bind(void 0,2),Sr.bind(void 0,3),function(e){var t,r=e.stack.pop();switch(O.DEBUG&&console.log(e.step,"SROUND[]",r),e.round=Vt,192&r){case 0:t=.5;break;case 64:t=1;break;case 128:t=2;break;default:throw new Error("invalid SROUND value")}switch(e.srPeriod=t,48&r){case 0:e.srPhase=0;break;case 16:e.srPhase=.25*t;break;case 32:e.srPhase=.5*t;break;case 48:e.srPhase=.75*t;break;default:throw new Error("invalid SROUND value")}r&=15,e.srThreshold=0===r?0:(r/8-.5)*t},function(e){var t,r=e.stack.pop();switch(O.DEBUG&&console.log(e.step,"S45ROUND[]",r),e.round=Vt,192&r){case 0:t=Math.sqrt(2)/2;break;case 64:t=Math.sqrt(2);break;case 128:t=2*Math.sqrt(2);break;default:throw new Error("invalid S45ROUND value")}switch(e.srPeriod=t,48&r){case 0:e.srPhase=0;break;case 16:e.srPhase=.25*t;break;case 32:e.srPhase=.5*t;break;case 48:e.srPhase=.75*t;break;default:throw new Error("invalid S45ROUND value")}r&=15,e.srThreshold=0===r?0:(r/8-.5)*t},void 0,void 0,function(e){O.DEBUG&&console.log(e.step,"ROFF[]"),e.round=Ht},void 0,function(e){O.DEBUG&&console.log(e.step,"RUTG[]"),e.round=_t},function(e){O.DEBUG&&console.log(e.step,"RDTG[]"),e.round=Xt},ur,ur,void 0,void 0,void 0,void 0,void 0,function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"SCANCTRL[]",t)},xr.bind(void 0,0),xr.bind(void 0,1),function(e){var t=e.stack,r=t.pop(),n=0;O.DEBUG&&console.log(e.step,"GETINFO[]",r),1&r&&(n=35),32&r&&(n|=4096),t.push(n)},void 0,function(e){var t=e.stack,r=t.pop(),n=t.pop(),a=t.pop();O.DEBUG&&console.log(e.step,"ROLL[]"),t.push(n),t.push(r),t.push(a)},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"MAX[]",r,n),t.push(Math.max(n,r))},function(e){var t=e.stack,r=t.pop(),n=t.pop();O.DEBUG&&console.log(e.step,"MIN[]",r,n),t.push(Math.min(n,r))},function(e){var t=e.stack.pop();O.DEBUG&&console.log(e.step,"SCANTYPE[]",t)},function(e){var t=e.stack.pop(),r=e.stack.pop();switch(O.DEBUG&&console.log(e.step,"INSTCTRL[]",t,r),t){case 1:return void(e.inhibitGridFit=!!r);case 2:return void(e.ignoreCvt=!!r);default:throw new Error("invalid INSTCTRL[] selector")}},void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,void 0,Tr.bind(void 0,1),Tr.bind(void 0,2),Tr.bind(void 0,3),Tr.bind(void 0,4),Tr.bind(void 0,5),Tr.bind(void 0,6),Tr.bind(void 0,7),Tr.bind(void 0,8),kr.bind(void 0,1),kr.bind(void 0,2),kr.bind(void 0,3),kr.bind(void 0,4),kr.bind(void 0,5),kr.bind(void 0,6),kr.bind(void 0,7),kr.bind(void 0,8),Ur.bind(void 0,0,0,0,0,0),Ur.bind(void 0,0,0,0,0,1),Ur.bind(void 0,0,0,0,0,2),Ur.bind(void 0,0,0,0,0,3),Ur.bind(void 0,0,0,0,1,0),Ur.bind(void 0,0,0,0,1,1),Ur.bind(void 0,0,0,0,1,2),Ur.bind(void 0,0,0,0,1,3),Ur.bind(void 0,0,0,1,0,0),Ur.bind(void 0,0,0,1,0,1),Ur.bind(void 0,0,0,1,0,2),Ur.bind(void 0,0,0,1,0,3),Ur.bind(void 0,0,0,1,1,0),Ur.bind(void 0,0,0,1,1,1),Ur.bind(void 0,0,0,1,1,2),Ur.bind(void 0,0,0,1,1,3),Ur.bind(void 0,0,1,0,0,0),Ur.bind(void 0,0,1,0,0,1),Ur.bind(void 0,0,1,0,0,2),Ur.bind(void 0,0,1,0,0,3),Ur.bind(void 0,0,1,0,1,0),Ur.bind(void 0,0,1,0,1,1),Ur.bind(void 0,0,1,0,1,2),Ur.bind(void 0,0,1,0,1,3),Ur.bind(void 0,0,1,1,0,0),Ur.bind(void 0,0,1,1,0,1),Ur.bind(void 0,0,1,1,0,2),Ur.bind(void 0,0,1,1,0,3),Ur.bind(void 0,0,1,1,1,0),Ur.bind(void 0,0,1,1,1,1),Ur.bind(void 0,0,1,1,1,2),Ur.bind(void 0,0,1,1,1,3),Ur.bind(void 0,1,0,0,0,0),Ur.bind(void 0,1,0,0,0,1),Ur.bind(void 0,1,0,0,0,2),Ur.bind(void 0,1,0,0,0,3),Ur.bind(void 0,1,0,0,1,0),Ur.bind(void 0,1,0,0,1,1),Ur.bind(void 0,1,0,0,1,2),Ur.bind(void 0,1,0,0,1,3),Ur.bind(void 0,1,0,1,0,0),Ur.bind(void 0,1,0,1,0,1),Ur.bind(void 0,1,0,1,0,2),Ur.bind(void 0,1,0,1,0,3),Ur.bind(void 0,1,0,1,1,0),Ur.bind(void 0,1,0,1,1,1),Ur.bind(void 0,1,0,1,1,2),Ur.bind(void 0,1,0,1,1,3),Ur.bind(void 0,1,1,0,0,0),Ur.bind(void 0,1,1,0,0,1),Ur.bind(void 0,1,1,0,0,2),Ur.bind(void 0,1,1,0,0,3),Ur.bind(void 0,1,1,0,1,0),Ur.bind(void 0,1,1,0,1,1),Ur.bind(void 0,1,1,0,1,2),Ur.bind(void 0,1,1,0,1,3),Ur.bind(void 0,1,1,1,0,0),Ur.bind(void 0,1,1,1,0,1),Ur.bind(void 0,1,1,1,0,2),Ur.bind(void 0,1,1,1,0,3),Ur.bind(void 0,1,1,1,1,0),Ur.bind(void 0,1,1,1,1,1),Ur.bind(void 0,1,1,1,1,2),Ur.bind(void 0,1,1,1,1,3)],Or.prototype.setState=function(e,t){return this.state[e]=t,this.activeState={key:e,value:this.state[e]},this.activeState},Or.prototype.getState=function(e){return this.state[e]||null},wr.prototype.inboundIndex=function(e){return 0<=e&&e<this.tokens.length},wr.prototype.composeRUD=function(e){function t(e){return"object"==typeof e&&e.hasOwnProperty("FAIL")}var r=this,n=e.map(function(e){return r[e[0]].apply(r,e.slice(1).concat(!0))});if(n.every(t))return{FAIL:"composeRUD: one or more operations hasn't completed successfully",report:n.filter(t)};this.dispatch("composeRUD",[n.filter(function(e){return!t(e)})])},wr.prototype.replaceRange=function(e,t,r,n){t=null!==t?t:this.tokens.length;var a=r.every(function(e){return e instanceof Or});if(!isNaN(e)&&this.inboundIndex(e)&&a){var o=this.tokens.splice.apply(this.tokens,[e,t].concat(r));return n||this.dispatch("replaceToken",[e,t,r]),[o,r]}return{FAIL:"replaceRange: invalid tokens or startIndex."}},wr.prototype.replaceToken=function(e,t,r){if(!isNaN(e)&&this.inboundIndex(e)&&t instanceof Or){var n=this.tokens.splice(e,1,t);return r||this.dispatch("replaceToken",[e,t]),[n[0],t]}return{FAIL:"replaceToken: invalid token or index."}},wr.prototype.removeRange=function(e,t,r){t=isNaN(t)?this.tokens.length:t;var n=this.tokens.splice(e,t);return r||this.dispatch("removeRange",[n,e,t]),n},wr.prototype.removeToken=function(e,t){if(isNaN(e)||!this.inboundIndex(e))return{FAIL:"removeToken: invalid token index."};var r=this.tokens.splice(e,1);return t||this.dispatch("removeToken",[r,e]),r},wr.prototype.insertToken=function(e,t,r){return e.every(function(e){return e instanceof Or})?(this.tokens.splice.apply(this.tokens,[t,0].concat(e)),r||this.dispatch("insertToken",[e,t]),e):{FAIL:"insertToken: invalid token(s)."}},wr.prototype.registerModifier=function(o,s,i){this.events.newToken.subscribe(function(e,t){var r=[e,t],n=[e,t];if(null===s||!0===s.apply(this,r)){var a=i.apply(this,n);e.setState(o,a)}}),this.registeredModifiers.push(o)},Cr.prototype.subscribe=function(e){return"function"==typeof e?this.subscribers.push(e)-1:{FAIL:"invalid '"+this.eventId+"' event handler"}},Cr.prototype.unsubscribe=function(e){this.subscribers.splice(e,1)},Lr.prototype.setCurrentIndex=function(e){this.index=e,this.current=this.context[e],this.backtrack=this.context.slice(0,e),this.lookahead=this.context.slice(e+1)},Lr.prototype.get=function(e){switch(!0){case 0===e:return this.current;case e<0&&Math.abs(e)<=this.backtrack.length:return this.backtrack.slice(e)[0];case 0<e&&e<=this.lookahead.length:return this.lookahead[e-1];default:return null}},wr.prototype.rangeToText=function(e){if(e instanceof Er)return this.getRangeTokens(e).map(function(e){return e.char}).join("")},wr.prototype.getText=function(){return this.tokens.map(function(e){return e.char}).join("")},wr.prototype.getContext=function(e){var t=this.registeredContexts[e];return t||null},wr.prototype.on=function(e,t){var r=this.events[e];return r?r.subscribe(t):null},wr.prototype.dispatch=function(e,t){var r=this,n=this.events[e];n instanceof Cr&&n.subscribers.forEach(function(e){e.apply(r,t||[])})},wr.prototype.registerContextChecker=function(e,t,r){if(this.getContext(e))return{FAIL:"context name '"+e+"' is already registered."};if("function"!=typeof t)return{FAIL:"missing context start check."};if("function"!=typeof r)return{FAIL:"missing context end check."};var n=new Rr(e,t,r);return this.registeredContexts[e]=n,this.contextCheckers.push(n),n},wr.prototype.getRangeTokens=function(e){var t=e.startIndex+e.endOffset;return[].concat(this.tokens.slice(e.startIndex,t))},wr.prototype.getContextRanges=function(e){var t=this.getContext(e);return t?t.ranges:{FAIL:"context checker '"+e+"' is not registered."}},wr.prototype.resetContextsRanges=function(){var e=this.registeredContexts;for(var t in e){if(e.hasOwnProperty(t))e[t].ranges=[]}},wr.prototype.updateContextsRanges=function(){this.resetContextsRanges();for(var e=this.tokens.map(function(e){return e.char}),t=0;t<e.length;t++){var r=new Lr(e,t);this.runContextCheck(r)}this.dispatch("updateContextsRanges",[this.registeredContexts])},wr.prototype.setEndOffset=function(e,t){var r=new Er(this.getContext(t).openRange.startIndex,e,t),n=this.getContext(t).ranges;return r.rangeId=t+"."+n.length,n.push(r),this.getContext(t).openRange=null,r},wr.prototype.runContextCheck=function(o){var s=this,i=o.index;this.contextCheckers.forEach(function(e){var t=e.contextName,r=s.getContext(t).openRange;if(!r&&e.checkStart(o)&&(r=new Er(i,null,t),s.getContext(t).openRange=r,s.dispatch("contextStart",[t,i])),r&&e.checkEnd(o)){var n=i-r.startIndex+1,a=s.setEndOffset(n,t);s.dispatch("contextEnd",[t,a])}})},wr.prototype.tokenize=function(e){this.tokens=[],this.resetContextsRanges();var t=Array.from(e);this.dispatch("start");for(var r=0;r<t.length;r++){var n=t[r],a=new Lr(t,r);this.dispatch("next",[a]),this.runContextCheck(a);var o=new Or(n);this.tokens.push(o),this.dispatch("newToken",[o,a])}return this.dispatch("end",[this.tokens]),this.tokens},Br.prototype.getDefaultScriptFeaturesIndexes=function(){for(var e=this.font.tables.gsub.scripts,t=0;t<e.length;t++){var r=e[t];if("DFLT"===r.tag)return r.script.defaultLangSys.featureIndexes}return[]},Br.prototype.getScriptFeaturesIndexes=function(e){if(!this.font.tables.gsub)return[];if(!e)return this.getDefaultScriptFeaturesIndexes();for(var t=this.font.tables.gsub.scripts,r=0;r<t.length;r++){var n=t[r];if(n.tag===e&&n.script.defaultLangSys)return n.script.defaultLangSys.featureIndexes;var a=n.langSysRecords;if(a)for(var o=0;o<a.length;o++){var s=a[o];if(s.tag===e)return s.langSys.featureIndexes}}return this.getDefaultScriptFeaturesIndexes()},Br.prototype.mapTagsToFeatures=function(e,t){for(var r={},n=0;n<e.length;n++){var a=e[n].tag,o=e[n].feature;r[a]=o}this.features[t].tags=r},Br.prototype.getScriptFeatures=function(e){var t=this.features[e];if(this.features.hasOwnProperty(e))return t;var r=this.getScriptFeaturesIndexes(e);if(!r)return null;var n=this.font.tables.gsub;return t=r.map(function(e){return n.features[e]}),this.features[e]=t,this.mapTagsToFeatures(t,e),t},Br.prototype.getSubstitutionType=function(e,t){return e.lookupType.toString()+t.substFormat.toString()},Br.prototype.getLookupMethod=function(e,t){var r=this;switch(this.getSubstitutionType(e,t)){case"11":return function(e){return function(e,t){return-1===Ar(e,t.coverage)?null:e+t.deltaGlyphId}.apply(r,[e,t])};case"12":return function(e){return function(e,t){var r=Ar(e,t.coverage);return-1===r?null:t.substitute[r]}.apply(r,[e,t])};case"63":return function(e){return function(e,t){var r=t.inputCoverage.length+t.lookaheadCoverage.length+t.backtrackCoverage.length;if(e.context.length<r)return[];var n=Pr(t.inputCoverage,e);if(-1===n)return[];var a=t.inputCoverage.length-1;if(e.lookahead.length<t.lookaheadCoverage.length)return[];for(var o=e.lookahead.slice(a);o.length&&Mr(o[0].char);)o.shift();var s=new Lr(o,0),i=Pr(t.lookaheadCoverage,s),u=[].concat(e.backtrack);for(u.reverse();u.length&&Mr(u[0].char);)u.shift();if(u.length<t.backtrackCoverage.length)return[];var l=new Lr(u,0),p=Pr(t.backtrackCoverage,l),c=[];if(n.length===t.inputCoverage.length&&i.length===t.lookaheadCoverage.length&&p.length===t.backtrackCoverage.length)for(var h=0;h<t.lookupRecords.length;h++)for(var f=t.lookupRecords[h].lookupListIndex,d=this.getLookupByIndex(f),g=0;g<d.subtables.length;g++){var v=d.subtables[g],m=this.getLookupMethod(d,v);if("12"===this.getSubstitutionType(d,v))for(var y=0;y<n.length;y++){var b=m(e.get(y));b&&c.push(b)}}return c}.apply(r,[e,t])};case"41":return function(e){return function(e,t){var r,n=Ar(e.current,t.coverage);if(-1===n)return null;for(var a=t.ligatureSets[n],o=0;o<a.length;o++){r=a[o];for(var s=0;s<r.components.length;s++){if(e.lookahead[s]!==r.components[s])break;if(s===r.components.length-1)return r}}return null}.apply(r,[e,t])};case"21":return function(e){return function(e,t){var r=Ar(e,t.coverage);return-1===r?null:t.sequences[r]}.apply(r,[e,t])};default:throw new Error("lookupType: "+e.lookupType+" - substFormat: "+t.substFormat+" is not yet supported")}},Br.prototype.lookupFeature=function(e){var t=e.contextParams,r=t.index,n=this.getFeature({tag:e.tag,script:e.script});if(!n)return new Error("font '"+this.font.names.fullName.en+"' doesn't support feature '"+e.tag+"' for script '"+e.script+"'.");for(var a=this.getFeatureLookups(n),o=[].concat(t.context),s=0;s<a.length;s++)for(var i=a[s],u=this.getLookupSubtables(i),l=0;l<u.length;l++){var p=u[l],c=this.getSubstitutionType(i,p),h=this.getLookupMethod(i,p),f=void 0;switch(c){case"11":(f=h(t.current))&&o.splice(r,1,new Fr({id:11,tag:e.tag,substitution:f}));break;case"12":(f=h(t.current))&&o.splice(r,1,new Fr({id:12,tag:e.tag,substitution:f}));break;case"63":f=h(t),Array.isArray(f)&&f.length&&o.splice(r,1,new Fr({id:63,tag:e.tag,substitution:f}));break;case"41":(f=h(t))&&o.splice(r,1,new Fr({id:41,tag:e.tag,substitution:f}));break;case"21":(f=h(t.current))&&o.splice(r,1,new Fr({id:21,tag:e.tag,substitution:f}))}t=new Lr(o,r),Array.isArray(f)&&!f.length||(f=null)}return o.length?o:null},Br.prototype.supports=function(t){if(!t.script)return!1;this.getScriptFeatures(t.script);var e=this.features.hasOwnProperty(t.script);if(!t.tag)return e;var r=this.features[t.script].some(function(e){return e.tag===t.tag});return e&&r},Br.prototype.getLookupSubtables=function(e){return e.subtables||null},Br.prototype.getLookupByIndex=function(e){return this.font.tables.gsub.lookups[e]||null},Br.prototype.getFeatureLookups=function(e){return e.lookupListIndexes.map(this.getLookupByIndex.bind(this))},Br.prototype.getFeature=function(e){if(!this.font)return{FAIL:"No font was found"};this.features.hasOwnProperty(e.script)||this.getScriptFeatures(e.script);var t=this.features[e.script];return t?t.tags[e.tag]?this.features[e.script].tags[e.tag]:null:{FAIL:"No feature for script "+e.script}};var Nr={startCheck:function(e){var t=e.current,r=e.get(-1);return null===r&&Dr(t)||!Dr(r)&&Dr(t)},endCheck:function(e){var t=e.get(1);return null===t||!Dr(t)}};var Hr={startCheck:function(e){var t=e.current,r=e.get(-1);return(Dr(t)||Mr(t))&&!Dr(r)},endCheck:function(e){var t=e.get(1);switch(!0){case null===t:return!0;case!Dr(t)&&!Mr(t):var r=/\s/.test(t);if(!r)return!0;if(r){if(!e.lookahead.some(function(e){return Dr(e)||Mr(e)}))return!0}break;default:return!1}}};var zr={11:function(e,t,r){t[r].setState(e.tag,e.substitution)},12:function(e,t,r){t[r].setState(e.tag,e.substitution)},63:function(r,n,a){r.substitution.forEach(function(e,t){n[a+t].setState(r.tag,e)})},41:function(e,t,r){var n=t[r];n.setState(e.tag,e.substitution.ligGlyph);for(var a=e.substitution.components.length,o=0;o<a;o++)(n=t[r+o+1]).setState("deleted",!0)}};function Wr(e,t,r){e instanceof Fr&&zr[e.id]&&zr[e.id](e,t,r)}function qr(e){var o=this,s=this.featuresTags.arab,i=this.tokenizer.getRangeTokens(e);if(1!==i.length){var u=new Lr(i.map(function(e){return e.getState("glyphIndex")}),0),l=new Lr(i.map(function(e){return e.char}),0);i.forEach(function(e,t){if(!Mr(e.char)){u.setCurrentIndex(t),l.setCurrentIndex(t);var r,n=0;switch(!function(e){for(var t=[].concat(e.backtrack),r=t.length-1;0<=r;r--){var n=t[r],a=Ir(n),o=Mr(n);if(!a&&!o)return 1;if(a)return}}(l)||(n|=1),function(e){if(!Ir(e.current))for(var t=0;t<e.lookahead.length;t++){if(!Mr(e.lookahead[t]))return 1}}(l)&&(n|=2),n){case 1:r="fina";break;case 2:r="init";break;case 3:r="medi"}if(-1!==s.indexOf(r)){var a=o.query.lookupFeature({tag:r,script:"arab",contextParams:u});if(a instanceof Error)return console.info(a.message);a.forEach(function(e,t){e instanceof Fr&&(Wr(e,i,t),u.context[t]=e.substitution)})}}})}}function _r(e,t){return new Lr(e.map(function(e){return e.activeState.value}),t||0)}var Xr={startCheck:function(e){var t=e.current,r=e.get(-1);return null===r&&Gr(t)||!Gr(r)&&Gr(t)},endCheck:function(e){var t=e.get(1);return null===t||!Gr(t)}};function Vr(e,t){return new Lr(e.map(function(e){return e.activeState.value}),t||0)}function Yr(e){this.baseDir=e||"ltr",this.tokenizer=new wr,this.featuresTags={}}function jr(e){var t=this.contextChecks[e+"Check"];return this.tokenizer.registerContextChecker(e,t.startCheck,t.endCheck)}function Zr(){if(-1===this.tokenizer.registeredModifiers.indexOf("glyphIndex"))throw new Error("glyphIndex modifier is required to apply arabic presentation features.")}function Qr(){var t=this;this.featuresTags.hasOwnProperty("arab")&&-1!==this.featuresTags.arab.indexOf("rlig")&&(Zr.call(this),this.tokenizer.getContextRanges("arabicWord").forEach(function(e){(function(e){var n=this,a=this.tokenizer.getRangeTokens(e),o=_r(a);o.context.forEach(function(e,t){o.setCurrentIndex(t);var r=n.query.lookupFeature({tag:"rlig",script:"arab",contextParams:o});r.length&&(r.forEach(function(e){return Wr(e,a,t)}),o=_r(a))})}).call(t,e)}))}function Kr(){var t=this;this.featuresTags.hasOwnProperty("latn")&&-1!==this.featuresTags.latn.indexOf("liga")&&(Zr.call(this),this.tokenizer.getContextRanges("latinWord").forEach(function(e){(function(e){var n=this,a=this.tokenizer.getRangeTokens(e),o=Vr(a);o.context.forEach(function(e,t){o.setCurrentIndex(t);var r=n.query.lookupFeature({tag:"liga",script:"latn",contextParams:o});r.length&&(r.forEach(function(e){return Wr(e,a,t)}),o=Vr(a))})}).call(t,e)}))}function Jr(e){(e=e||{}).tables=e.tables||{},e.empty||(Lt(e.familyName,"When creating a new Font object, familyName is required."),Lt(e.styleName,"When creating a new Font object, styleName is required."),Lt(e.unitsPerEm,"When creating a new Font object, unitsPerEm is required."),Lt(e.ascender,"When creating a new Font object, ascender is required."),Lt(e.descender<=0,"When creating a new Font object, negative descender value is required."),this.names={fontFamily:{en:e.familyName||" "},fontSubfamily:{en:e.styleName||" "},fullName:{en:e.fullName||e.familyName+" "+e.styleName},postScriptName:{en:e.postScriptName||(e.familyName+e.styleName).replace(/\s/g,"")},designer:{en:e.designer||" "},designerURL:{en:e.designerURL||" "},manufacturer:{en:e.manufacturer||" "},manufacturerURL:{en:e.manufacturerURL||" "},license:{en:e.license||" "},licenseURL:{en:e.licenseURL||" "},version:{en:e.version||"Version 0.1"},description:{en:e.description||" "},copyright:{en:e.copyright||" "},trademark:{en:e.trademark||" "}},this.unitsPerEm=e.unitsPerEm||1e3,this.ascender=e.ascender,this.descender=e.descender,this.createdTimestamp=e.createdTimestamp,this.tables=Object.assign(e.tables,{os2:Object.assign({usWeightClass:e.weightClass||this.usWeightClasses.MEDIUM,usWidthClass:e.widthClass||this.usWidthClasses.MEDIUM,fsSelection:e.fsSelection||this.fsSelectionValues.REGULAR},e.tables.os2)})),this.supported=!0,this.glyphs=new Te.GlyphSet(this,e.glyphs||[]),this.encoding=new fe(this),this.position=new kt(this),this.substitution=new Ut(this),this.tables=this.tables||{},this._push=null,this._hmtxTableData={},Object.defineProperty(this,"hinting",{get:function(){return this._hinting?this._hinting:"truetype"===this.outlinesFormat?this._hinting=new Nt(this):void 0}})}function $r(e,t){var r=JSON.stringify(e),n=256;for(var a in t){var o=parseInt(a);if(o&&!(o<256)){if(JSON.stringify(t[a])===r)return o;n<=o&&(n=o+1)}}return t[n]=e,n}function en(e,t,r,n){for(var a=[{name:"nameID_"+e,type:"USHORT",value:$r(t.name,n)},{name:"flags_"+e,type:"USHORT",value:0}],o=0;o<r.length;++o){var s=r[o].tag;a.push({name:"axis_"+e+" "+s,type:"FIXED",value:t.coordinates[s]<<16})}return a}function tn(e,t,r,n){var a={},o=new ie.Parser(e,t);a.name=n[o.parseUShort()]||{},o.skip("uShort",1),a.coordinates={};for(var s=0;s<r.length;++s)a.coordinates[r[s].tag]=o.parseFixed();return a}Yr.prototype.setText=function(e){this.text=e},Yr.prototype.contextChecks={latinWordCheck:Xr,arabicWordCheck:Nr,arabicSentenceCheck:Hr},Yr.prototype.registerFeatures=function(t,e){var r=this,n=e.filter(function(e){return r.query.supports({script:t,tag:e})});this.featuresTags.hasOwnProperty(t)?this.featuresTags[t]=this.featuresTags[t].concat(n):this.featuresTags[t]=n},Yr.prototype.applyFeatures=function(e,t){if(!e)throw new Error("No valid font was provided to apply features");this.query||(this.query=new Br(e));for(var r=0;r<t.length;r++){var n=t[r];this.query.supports({script:n.script})&&this.registerFeatures(n.script,n.tags)}},Yr.prototype.registerModifier=function(e,t,r){this.tokenizer.registerModifier(e,t,r)},Yr.prototype.checkContextReady=function(e){return!!this.tokenizer.getContext(e)},Yr.prototype.applyFeaturesToContexts=function(){this.checkContextReady("arabicWord")&&(function(){var t=this;this.featuresTags.hasOwnProperty("arab")&&(Zr.call(this),this.tokenizer.getContextRanges("arabicWord").forEach(function(e){qr.call(t,e)}))}.call(this),Qr.call(this)),this.checkContextReady("latinWord")&&Kr.call(this),this.checkContextReady("arabicSentence")&&function(){var r=this;this.tokenizer.getContextRanges("arabicSentence").forEach(function(e){var t=r.tokenizer.getRangeTokens(e);r.tokenizer.replaceRange(e.startIndex,e.endOffset,t.reverse())})}.call(this)},Yr.prototype.processText=function(e){this.text&&this.text===e||(this.setText(e),function(){return jr.call(this,"latinWord"),jr.call(this,"arabicWord"),jr.call(this,"arabicSentence"),this.tokenizer.tokenize(this.text)}.call(this),this.applyFeaturesToContexts())},Yr.prototype.getBidiText=function(e){return this.processText(e),this.tokenizer.getText()},Yr.prototype.getTextGlyphs=function(e){this.processText(e);for(var t=[],r=0;r<this.tokenizer.tokens.length;r++){var n=this.tokenizer.tokens[r];if(!n.state.deleted){var a=n.activeState.value;t.push(Array.isArray(a)?a[0]:a)}}return t},Jr.prototype.hasChar=function(e){return null!==this.encoding.charToGlyphIndex(e)},Jr.prototype.charToGlyphIndex=function(e){return this.encoding.charToGlyphIndex(e)},Jr.prototype.charToGlyph=function(e){var t=this.charToGlyphIndex(e),r=this.glyphs.get(t);return r=r||this.glyphs.get(0)},Jr.prototype.updateFeatures=function(t){return this.defaultRenderOptions.features.map(function(e){return"latn"===e.script?{script:"latn",tags:e.tags.filter(function(e){return t[e]})}:e})},Jr.prototype.stringToGlyphs=function(e,t){var r=this,n=new Yr;n.registerModifier("glyphIndex",null,function(e){return r.charToGlyphIndex(e.char)});var a=t?this.updateFeatures(t.features):this.defaultRenderOptions.features;n.applyFeatures(this,a);for(var o=n.getTextGlyphs(e),s=o.length,i=new Array(s),u=this.glyphs.get(0),l=0;l<s;l+=1)i[l]=this.glyphs.get(o[l])||u;return i},Jr.prototype.nameToGlyphIndex=function(e){return this.glyphNames.nameToGlyphIndex(e)},Jr.prototype.nameToGlyph=function(e){var t=this.nameToGlyphIndex(e),r=this.glyphs.get(t);return r=r||this.glyphs.get(0)},Jr.prototype.glyphIndexToName=function(e){return this.glyphNames.glyphIndexToName?this.glyphNames.glyphIndexToName(e):""},Jr.prototype.getKerningValue=function(e,t){e=e.index||e,t=t.index||t;var r=this.position.defaultKerningTables;return r?this.position.getKerningValue(r,e,t):this.kerningPairs[e+","+t]||0},Jr.prototype.defaultRenderOptions={kerning:!0,features:[{script:"arab",tags:["init","medi","fina","rlig"]},{script:"latn",tags:["liga","rlig"]}]},Jr.prototype.forEachGlyph=function(e,t,r,n,a,o){t=void 0!==t?t:0,r=void 0!==r?r:0,n=void 0!==n?n:72,a=Object.assign({},this.defaultRenderOptions,a);var s,i=1/this.unitsPerEm*n,u=this.stringToGlyphs(e,a);if(a.kerning){var l=a.script||this.position.getDefaultScriptName();s=this.position.getKerningTables(l,a.language)}for(var p=0;p<u.length;p+=1){var c=u[p];if(o.call(this,c,t,r,n,a),c.advanceWidth&&(t+=c.advanceWidth*i),a.kerning&&p<u.length-1)t+=(s?this.position.getKerningValue(s,c.index,u[p+1].index):this.getKerningValue(c,u[p+1]))*i;a.letterSpacing?t+=a.letterSpacing*n:a.tracking&&(t+=a.tracking/1e3*n)}return t},Jr.prototype.getPath=function(e,t,r,n,o){var s=new B;return this.forEachGlyph(e,t,r,n,o,function(e,t,r,n){var a=e.getPath(t,r,n,o,this);s.extend(a)}),s},Jr.prototype.getPaths=function(e,t,r,n,o){var s=[];return this.forEachGlyph(e,t,r,n,o,function(e,t,r,n){var a=e.getPath(t,r,n,o,this);s.push(a)}),s},Jr.prototype.getAdvanceWidth=function(e,t,r){return this.forEachGlyph(e,0,0,t,r,function(){})},Jr.prototype.draw=function(e,t,r,n,a,o){this.getPath(t,r,n,a,o).draw(e)},Jr.prototype.drawPoints=function(a,e,t,r,n,o){this.forEachGlyph(e,t,r,n,o,function(e,t,r,n){e.drawPoints(a,t,r,n)})},Jr.prototype.drawMetrics=function(a,e,t,r,n,o){this.forEachGlyph(e,t,r,n,o,function(e,t,r,n){e.drawMetrics(a,t,r,n)})},Jr.prototype.getEnglishName=function(e){var t=this.names[e];if(t)return t.en},Jr.prototype.validate=function(){var r=this;function e(e){var t=r.getEnglishName(e);t&&t.trim().length}e("fontFamily"),e("weightName"),e("manufacturer"),e("copyright"),e("version"),this.unitsPerEm},Jr.prototype.toTables=function(){return yt.fontToTable(this)},Jr.prototype.toBuffer=function(){return console.warn("Font.toBuffer is deprecated. Use Font.toArrayBuffer instead."),this.toArrayBuffer()},Jr.prototype.toArrayBuffer=function(){for(var e=this.toTables().encode(),t=new ArrayBuffer(e.length),r=new Uint8Array(t),n=0;n<e.length;n++)r[n]=e[n];return t},Jr.prototype.download=function(e){var t=this.getEnglishName("fontFamily"),r=this.getEnglishName("fontSubfamily");e=e||t.replace(/\s/g,"")+"-"+r+".otf";var n=this.toArrayBuffer();if("undefined"!=typeof window)if(window.URL=window.URL||window.webkitURL,window.URL){var a=new DataView(n),o=new Blob([a],{type:"font/opentype"}),s=document.createElement("a");s.href=window.URL.createObjectURL(o),s.download=e;var i=document.createEvent("MouseEvents");i.initEvent("click",!0,!1),s.dispatchEvent(i)}else console.warn("Font file could not be downloaded. Try using a different browser.");else{var u=require("fs"),l=function(e){for(var t=new Buffer(e.byteLength),r=new Uint8Array(e),n=0;n<t.length;++n)t[n]=r[n];return t}(n);u.writeFileSync(e,l)}},Jr.prototype.fsSelectionValues={ITALIC:1,UNDERSCORE:2,NEGATIVE:4,OUTLINED:8,STRIKEOUT:16,BOLD:32,REGULAR:64,USER_TYPO_METRICS:128,WWS:256,OBLIQUE:512},Jr.prototype.usWidthClasses={ULTRA_CONDENSED:1,EXTRA_CONDENSED:2,CONDENSED:3,SEMI_CONDENSED:4,MEDIUM:5,SEMI_EXPANDED:6,EXPANDED:7,EXTRA_EXPANDED:8,ULTRA_EXPANDED:9},Jr.prototype.usWeightClasses={THIN:100,EXTRA_LIGHT:200,LIGHT:300,NORMAL:400,MEDIUM:500,SEMI_BOLD:600,BOLD:700,EXTRA_BOLD:800,BLACK:900};function rn(){return{coverage:this.parsePointer(oe.coverage),attachPoints:this.parseList(oe.pointer(oe.uShortList))}}function nn(){var e=this.parseUShort();return w.argument(1===e||2===e||3===e,"Unsupported CaretValue table version."),1===e?{coordinate:this.parseShort()}:2===e?{pointindex:this.parseShort()}:3===e?{coordinate:this.parseShort()}:void 0}function an(){return this.parseList(oe.pointer(nn))}function on(){return{coverage:this.parsePointer(oe.coverage),ligGlyphs:this.parseList(oe.pointer(an))}}function sn(){return this.parseUShort(),this.parseList(oe.pointer(oe.coverage))}var un={make:function(e,t){var r,n,a,o,s=new $.Table("fvar",[{name:"version",type:"ULONG",value:65536},{name:"offsetToData",type:"USHORT",value:0},{name:"countSizePairs",type:"USHORT",value:2},{name:"axisCount",type:"USHORT",value:e.axes.length},{name:"axisSize",type:"USHORT",value:20},{name:"instanceCount",type:"USHORT",value:e.instances.length},{name:"instanceSize",type:"USHORT",value:4+4*e.axes.length}]);s.offsetToData=s.sizeOf();for(var i=0;i<e.axes.length;i++)s.fields=s.fields.concat((r=i,n=e.axes[i],a=t,o=$r(n.name,a),[{name:"tag_"+r,type:"TAG",value:n.tag},{name:"minValue_"+r,type:"FIXED",value:n.minValue<<16},{name:"defaultValue_"+r,type:"FIXED",value:n.defaultValue<<16},{name:"maxValue_"+r,type:"FIXED",value:n.maxValue<<16},{name:"flags_"+r,type:"USHORT",value:0},{name:"nameID_"+r,type:"USHORT",value:o}]));for(var u=0;u<e.instances.length;u++)s.fields=s.fields.concat(en(u,e.instances[u],e.axes,t));return s},parse:function(e,t,r){var n=new ie.Parser(e,t),a=n.parseULong();w.argument(65536===a,"Unsupported fvar table version.");var o=n.parseOffset16();n.skip("uShort",1);for(var s,i,u,l,p,c=n.parseUShort(),h=n.parseUShort(),f=n.parseUShort(),d=n.parseUShort(),g=[],v=0;v<c;v++)g.push((s=e,i=t+o+v*h,u=r,p=l=void 0,l={},p=new ie.Parser(s,i),l.tag=p.parseTag(),l.minValue=p.parseFixed(),l.defaultValue=p.parseFixed(),l.maxValue=p.parseFixed(),p.skip("uShort",1),l.name=u[p.parseUShort()]||{},l));for(var m=[],y=t+o+c*h,b=0;b<f;b++)m.push(tn(e,y+b*d,g,r));return{axes:g,instances:m}}};var ln={parse:function(e,t){var r=new oe(e,t=t||0),n=r.parseVersion(1);w.argument(1===n||1.2===n||1.3===n,"Unsupported GDEF table version.");var a={version:n,classDef:r.parsePointer(oe.classDef),attachList:r.parsePointer(rn),ligCaretList:r.parsePointer(on),markAttachClassDef:r.parsePointer(oe.classDef)};return 1.2<=n&&(a.markGlyphSets=r.parsePointer(sn)),a}},pn=new Array(10);pn[1]=function(){var e=this.offset+this.relativeOffset,t=this.parseUShort();return 1===t?{posFormat:1,coverage:this.parsePointer(oe.coverage),value:this.parseValueRecord()}:2===t?{posFormat:2,coverage:this.parsePointer(oe.coverage),values:this.parseValueRecordList()}:void w.assert(!1,"0x"+e.toString(16)+": GPOS lookup type 1 format must be 1 or 2.")},pn[2]=function(){var e=this.offset+this.relativeOffset,t=this.parseUShort();w.assert(1===t||2===t,"0x"+e.toString(16)+": GPOS lookup type 2 format must be 1 or 2.");var r=this.parsePointer(oe.coverage),n=this.parseUShort(),a=this.parseUShort();if(1===t)return{posFormat:t,coverage:r,valueFormat1:n,valueFormat2:a,pairSets:this.parseList(oe.pointer(oe.list(function(){return{secondGlyph:this.parseUShort(),value1:this.parseValueRecord(n),value2:this.parseValueRecord(a)}})))};if(2===t){var o=this.parsePointer(oe.classDef),s=this.parsePointer(oe.classDef),i=this.parseUShort(),u=this.parseUShort();return{posFormat:t,coverage:r,valueFormat1:n,valueFormat2:a,classDef1:o,classDef2:s,class1Count:i,class2Count:u,classRecords:this.parseList(i,oe.list(u,function(){return{value1:this.parseValueRecord(n),value2:this.parseValueRecord(a)}}))}}},pn[3]=function(){return{error:"GPOS Lookup 3 not supported"}},pn[4]=function(){return{error:"GPOS Lookup 4 not supported"}},pn[5]=function(){return{error:"GPOS Lookup 5 not supported"}},pn[6]=function(){return{error:"GPOS Lookup 6 not supported"}},pn[7]=function(){return{error:"GPOS Lookup 7 not supported"}},pn[8]=function(){return{error:"GPOS Lookup 8 not supported"}},pn[9]=function(){return{error:"GPOS Lookup 9 not supported"}};var cn=new Array(10);var hn={parse:function(e,t){var r=new oe(e,t=t||0),n=r.parseVersion(1);return w.argument(1===n||1.1===n,"Unsupported GPOS table version "+n),1===n?{version:n,scripts:r.parseScriptList(),features:r.parseFeatureList(),lookups:r.parseLookupList(pn)}:{version:n,scripts:r.parseScriptList(),features:r.parseFeatureList(),lookups:r.parseLookupList(pn),variations:r.parseFeatureVariationsList()}},make:function(e){return new $.Table("GPOS",[{name:"version",type:"ULONG",value:65536},{name:"scripts",type:"TABLE",value:new $.ScriptList(e.scripts)},{name:"features",type:"TABLE",value:new $.FeatureList(e.features)},{name:"lookups",type:"TABLE",value:new $.LookupList(e.lookups,cn)}])}};var fn={parse:function(e,t){var r=new ie.Parser(e,t),n=r.parseUShort();if(0===n)return function(e){var t={};e.skip("uShort");var r=e.parseUShort();w.argument(0===r,"Unsupported kern sub-table version."),e.skip("uShort",2);var n=e.parseUShort();e.skip("uShort",3);for(var a=0;a<n;a+=1){var o=e.parseUShort(),s=e.parseUShort(),i=e.parseShort();t[o+","+s]=i}return t}(r);if(1===n)return function(e){var t={};e.skip("uShort"),1<e.parseULong()&&console.warn("Only the first kern subtable is supported."),e.skip("uLong");var r=255&e.parseUShort();if(e.skip("uShort"),0==r){var n=e.parseUShort();e.skip("uShort",3);for(var a=0;a<n;a+=1){var o=e.parseUShort(),s=e.parseUShort(),i=e.parseShort();t[o+","+s]=i}}return t}(r);throw new Error("Unsupported kern table version ("+n+").")}};var dn={parse:function(e,t,r,n){for(var a=new ie.Parser(e,t),o=n?a.parseUShort:a.parseULong,s=[],i=0;i<r+1;i+=1){var u=o.call(a);n&&(u*=2),s.push(u)}return s}};function gn(e,r){require("fs").readFile(e,function(e,t){if(e)return r(e.message);r(null,Rt(t))})}function vn(e,t){var r=new XMLHttpRequest;r.open("get",e,!0),r.responseType="arraybuffer",r.onload=function(){return r.response?t(null,r.response):t("Font could not be loaded: "+r.statusText)},r.onerror=function(){t("Font could not be loaded")},r.send()}function mn(e,t){for(var r=[],n=12,a=0;a<t;a+=1){var o=ie.getTag(e,n),s=ie.getULong(e,n+4),i=ie.getULong(e,n+8),u=ie.getULong(e,n+12);r.push({tag:o,checksum:s,offset:i,length:u,compression:!1}),n+=16}return r}function yn(e,t){if("WOFF"!==t.compression)return{data:e,offset:t.offset};var r=new Uint8Array(e.buffer,t.offset+2,t.compressedLength-2),n=new Uint8Array(t.length);if(a(r,n),n.byteLength!==t.length)throw new Error("Decompression error: "+t.tag+" decompressed length doesn't match recorded length");return{data:new DataView(n.buffer,0),offset:0}}function mhParseSvgTable(dv,font){
+  var rec=font._mhSvgTable;
+  if(!rec)return;
+  try{
+    var so=rec.offset;
+    var ver=dv.getUint16(so,false);
+    var indexOff=dv.getUint32(so+2,false);
+    var idx=so+indexOff;
+    var count=dv.getUint16(idx,false);
+    var out={};
+    for(var i=0;i<count;i++){
+      var e=idx+2+i*12;
+      var first=dv.getUint16(e,false), last=dv.getUint16(e+2,false);
+      var docOff=dv.getUint32(e+4,false), docLen=dv.getUint32(e+8,false);
+      var start=so+docOff;
+      if(start<0||docLen<=0||start+docLen>dv.byteLength)continue;
+      var bytes=new Uint8Array(dv.buffer,dv.byteOffset+start,docLen);
+      var text=new TextDecoder("utf-8").decode(bytes);
+      for(var gid=first;gid<=last;gid++)out[gid]=text;
+    }
+    font._mhSvgGlyphs=out;
+    font._mhSvgVersion=ver;
+  }catch(e){ font._mhSvgGlyphs={}; }
+}
+function mhParseColrCpal(dv,font){
+  var cpalRec=font._mhCpalTable,colrRec=font._mhColrTable;
+  if(!cpalRec||!colrRec)return;
+  var cp=cpalRec.offset;
+  var cpalVersion=dv.getUint16(cp,false);
+  var numPaletteEntries=dv.getUint16(cp+2,false);
+  var numPalettes=dv.getUint16(cp+4,false);
+  var numColorRecords=dv.getUint16(cp+6,false);
+  var colorRecordsArrayOffset=dv.getUint32(cp+8,false);
+  var palette=[];
+  for(var i=0;i<numPaletteEntries;i+=1){
+    var rec=cp+colorRecordsArrayOffset+i*4;
+    var b=dv.getUint8(rec),g=dv.getUint8(rec+1),r=dv.getUint8(rec+2),a=dv.getUint8(rec+3);
+    palette.push("rgba("+r+","+g+","+b+","+(a/255).toFixed(3)+")");
+  }
+  font._mhPalette=palette;
+  var co=colrRec.offset;
+  var colrVersion=dv.getUint16(co,false);
+  var numBaseGlyphRecords=dv.getUint16(co+2,false);
+  var baseGlyphRecordsOffset=dv.getUint32(co+4,false);
+  var layerRecordsOffset=dv.getUint32(co+8,false);
+  var numLayerRecords=dv.getUint16(co+12,false);
+  var colorGlyphs={};
+  for(var j=0;j<numBaseGlyphRecords;j+=1){
+    var brec=co+baseGlyphRecordsOffset+j*6;
+    var glyphID=dv.getUint16(brec,false);
+    var firstLayerIndex=dv.getUint16(brec+2,false);
+    var numLayers=dv.getUint16(brec+4,false);
+    var layers=[];
+    for(var l=0;l<numLayers;l+=1){
+      var lrec=co+layerRecordsOffset+(firstLayerIndex+l)*4;
+      var layerGlyphID=dv.getUint16(lrec,false);
+      var paletteIndex=dv.getUint16(lrec+2,false);
+      layers.push({glyphIndex:layerGlyphID,paletteIndex:paletteIndex});
+    }
+    colorGlyphs[glyphID]=layers;
+  }
+  font._mhColorGlyphs=colorGlyphs;
+}
+function mhMakeColrCpal(font){
+  var palette=font._mhPalette||[];
+  var colorGlyphs=font._mhColorGlyphs||{};
+  var disabled=font._mhColorDisabled||{};
+  var glyphIds=Object.keys(colorGlyphs).filter(function(k){return !disabled[parseInt(k,10)]}).map(function(k){return parseInt(k,10)}).sort(function(a,b){return a-b});
+  if(!palette.length||!glyphIds.length)return null;
+
+  /* CPAL v0 */
+  var cpalFields=[
+    {name:"version",type:"USHORT",value:0},
+    {name:"numPaletteEntries",type:"USHORT",value:palette.length},
+    {name:"numPalettes",type:"USHORT",value:1},
+    {name:"numColorRecords",type:"USHORT",value:palette.length},
+    {name:"colorRecordsArrayOffset",type:"ULONG",value:12}
+  ];
+  for(var i=0;i<palette.length;i+=1){
+    var m=/rgba?\((\d+),(\d+),(\d+),?([\d.]+)?\)/.exec(palette[i])||[];
+    var r=parseInt(m[1]||"0",10),g=parseInt(m[2]||"0",10),b=parseInt(m[3]||"0",10);
+    var a=m[4]!==undefined?Math.round(parseFloat(m[4])*255):255;
+    cpalFields.push({name:"b_"+i,type:"BYTE",value:b});
+    cpalFields.push({name:"g_"+i,type:"BYTE",value:g});
+    cpalFields.push({name:"r_"+i,type:"BYTE",value:r});
+    cpalFields.push({name:"a_"+i,type:"BYTE",value:a});
+  }
+  var cpalTable=new $.Table("CPAL",cpalFields);
+
+  /* COLR v0 */
+  var baseGlyphRecordsOffset=14;
+  var totalLayers=0;
+  glyphIds.forEach(function(gid){totalLayers+=(colorGlyphs[gid]||[]).length});
+  var layerRecordsOffset=baseGlyphRecordsOffset+glyphIds.length*6;
+  var colrFields=[
+    {name:"version",type:"USHORT",value:0},
+    {name:"numBaseGlyphRecords",type:"USHORT",value:glyphIds.length},
+    {name:"baseGlyphRecordsOffset",type:"ULONG",value:baseGlyphRecordsOffset},
+    {name:"layerRecordsOffset",type:"ULONG",value:layerRecordsOffset},
+    {name:"numLayerRecords",type:"USHORT",value:totalLayers}
+  ];
+  var layerCursor=0;
+  glyphIds.forEach(function(gid,idx){
+    var layers=colorGlyphs[gid]||[];
+    colrFields.push({name:"baseGlyph_"+idx,type:"USHORT",value:gid});
+    colrFields.push({name:"firstLayerIndex_"+idx,type:"USHORT",value:layerCursor});
+    colrFields.push({name:"numLayers_"+idx,type:"USHORT",value:layers.length});
+    layerCursor+=layers.length;
+  });
+  var layerIdx=0;
+  glyphIds.forEach(function(gid){
+    (colorGlyphs[gid]||[]).forEach(function(layer){
+      colrFields.push({name:"layerGlyph_"+layerIdx,type:"USHORT",value:layer.glyphIndex});
+      colrFields.push({name:"paletteIndex_"+layerIdx,type:"USHORT",value:layer.paletteIndex});
+      layerIdx+=1;
+    });
+  });
+  var colrTable=new $.Table("COLR",colrFields);
+
+  return{cpalTable:cpalTable,colrTable:colrTable};
+}
+function bn(e,t){var r,n;t=null==t?{}:t;var a,o,s,i,u,l,p,c,h,f,d,g,v,m=new Jr({empty:!0}),y=new DataView(e,0),b=[],S=ie.getTag(y,0);if(S===String.fromCharCode(0,1,0,0)||"true"===S||"typ1"===S)m.outlinesFormat="truetype",b=mn(y,a=ie.getUShort(y,4));else if("OTTO"===S)m.outlinesFormat="cff",b=mn(y,a=ie.getUShort(y,4));else{if("wOFF"!==S)throw new Error("Unsupported OpenType signature "+S);var x=ie.getTag(y,4);if(x===String.fromCharCode(0,1,0,0))m.outlinesFormat="truetype";else{if("OTTO"!==x)throw new Error("Unsupported OpenType flavor "+S);m.outlinesFormat="cff"}b=function(e,t){for(var r=[],n=44,a=0;a<t;a+=1){var o=ie.getTag(e,n),s=ie.getULong(e,n+4),i=ie.getULong(e,n+8),u=ie.getULong(e,n+12),l=void 0;l=i<u&&"WOFF",r.push({tag:o,offset:s,compression:l,compressedLength:i,length:u}),n+=20}return r}(y,a=ie.getUShort(y,12))}for(var T=0;T<a;T+=1){var k=b[T],U=void 0;switch(k.tag){case"cmap":U=yn(y,k),m.tables.cmap=ue.parse(U.data,U.offset),m.encoding=new de(m.tables.cmap);break;case"cvt ":U=yn(y,k),v=new ie.Parser(U.data,U.offset),m.tables.cvt=v.parseShortList(k.length/2);break;case"fvar":s=k;break;case"fpgm":U=yn(y,k),v=new ie.Parser(U.data,U.offset),m.tables.fpgm=v.parseByteList(k.length);break;case"head":U=yn(y,k),m.tables.head=ze.parse(U.data,U.offset),m.unitsPerEm=m.tables.head.unitsPerEm,r=m.tables.head.indexToLocFormat;break;case"hhea":U=yn(y,k),m.tables.hhea=We.parse(U.data,U.offset),m.ascender=m.tables.hhea.ascender,m.descender=m.tables.hhea.descender,m.numberOfHMetrics=m.tables.hhea.numberOfHMetrics;break;case"hmtx":c=k;break;case"ltag":U=yn(y,k),n=_e.parse(U.data,U.offset);break;case"maxp":U=yn(y,k),m.tables.maxp=Xe.parse(U.data,U.offset),m.numGlyphs=m.tables.maxp.numGlyphs;break;case"name":d=k;break;case"OS/2":U=yn(y,k),m.tables.os2=st.parse(U.data,U.offset);break;case"post":U=yn(y,k),m.tables.post=it.parse(U.data,U.offset),m.glyphNames=new ve(m.tables.post);break;case"prep":U=yn(y,k),v=new ie.Parser(U.data,U.offset),m.tables.prep=v.parseByteList(k.length);break;case"glyf":i=k;break;case"loca":f=k;break;case"CFF ":o=k;break;case"kern":h=k;break;case"GDEF":u=k;break;case"GPOS":l=k;break;case"GSUB":p=k;break;case"meta":g=k;break;case"COLR":m._mhColrTable=k;break;case"CPAL":m._mhCpalTable=k;break;case"SVG ":m._mhSvgTable=k}}var O=yn(y,d);if(m.tables.name=at.parse(O.data,O.offset,n),m.names=m.tables.name,i&&f){var E=0===r,R=yn(y,f),L=dn.parse(R.data,R.offset,m.numGlyphs,E),C=yn(y,i);m.glyphs=Pt.parse(C.data,C.offset,L,m,t)}else{if(!o)throw new Error("Font doesn't contain TrueType or CFF outlines.");var w=yn(y,o);He.parse(w.data,w.offset,m,t)}var D=yn(y,c);if(qe.parse(m,D.data,D.offset,m.numberOfHMetrics,m.numGlyphs,m.glyphs,t),me(m,t),h){var I=yn(y,h);m.kerningPairs=fn.parse(I.data,I.offset)}else m.kerningPairs={};if(u){var M=yn(y,u);m.tables.gdef=ln.parse(M.data,M.offset)}if(l){var G=yn(y,l);m.tables.gpos=hn.parse(G.data,G.offset),m.position.init()}if(p){var B=yn(y,p);m.tables.gsub=ct.parse(B.data,B.offset)}if(s){var F=yn(y,s);m.tables.fvar=un.parse(F.data,F.offset,m.names)}if(g){var A=yn(y,g);m.tables.meta=ht.parse(A.data,A.offset),m.metas=m.tables.meta}if(m._mhColrTable&&m._mhCpalTable){try{mhParseColrCpal(y,m)}catch(mhErr){}}if(m._mhSvgTable){try{var mhSvgData=yn(y,m._mhSvgTable);mhParseSvgTable(mhSvgData.data,m)}catch(mhSvgErr){m._mhSvgGlyphs={}}}return m}function Sn(e,o,s){s=null==s?{}:s;var t="undefined"==typeof window&&!s.isUrl?gn:vn;return new Promise(function(n,a){t(e,function(e,t){if(e){if(o)return o(e);a(e)}var r;try{r=bn(t,s)}catch(e){if(o)return o(e,null);a(e)}if(o)return o(null,r);n(r)})})}function xn(e,t){return bn(Rt(require("fs").readFileSync(e)),t)}var Tn=Object.freeze({__proto__:null,Font:Jr,Glyph:be,Path:B,BoundingBox:R,_parse:ie,parse:bn,load:Sn,loadSync:xn});O.BoundingBox=R,O.Font=Jr,O.Glyph=be,O.Path=B,O._parse=ie,O.default=Tn,O.load=Sn,O.loadSync=xn,O.parse=bn,Object.defineProperty(O,"__esModule",{value:!0})});
+
+/* ════════════════════════════════════════════════════════════════
+   مِحْبَر — محرر الخطوط الاستوديو
+   محرك كامل لتحرير الخطوط العربية داخل المتصفح
+   البنية: أدوات ← حالة ← مكتبات ← هندسة المسارات ← فك التشفير
+           ← عمليات الحروف ← العرض ← التشكيل ← الأدوات ← التصدير
+   ════════════════════════════════════════════════════════════════ */
+
+/* ================================================================
+   § 1 — الإعدادات
+   ================================================================ */
+const WOFF2_SOURCES = [
+  "https://esm.sh/wawoff2?bundle",
+  "https://esm.sh/wawoff2@0.2.0?bundle",
+  "https://cdn.jsdelivr.net/npm/wawoff2/+esm",
+  "https://esm.sh/wawoff2"
+];
+/* ⚠ كل روابط سكريبت fontkit القديمة (dist/fontkit.browser.js و
+   dist/fontkit.umd.js) بقت 404 من الناشر — الحزمة بقت بتوزّع ESM بس.
+   فبنعتمد على قائمة ESM تحت مباشرة (كلها شغالة) — ده بيوفّر
+   محاولات تحميل فاشلة وبيشيل أخطاء 404 من الكونسول. */
+const FONTKIT_SOURCES = [];
+const FONTKIT_ESM = [
+  "https://esm.sh/fontkit@2.0.4",
+  "https://cdn.jsdelivr.net/npm/fontkit@2.0.4/+esm",
+  "https://esm.sh/fontkit@2.0.2",
+  "https://cdn.jsdelivr.net/npm/fontkit@2.0.2/+esm",
+  "https://cdn.skypack.dev/fontkit",
+  "https://esm.sh/fontkit@1.8.8",
+  "https://cdn.jsdelivr.net/npm/fontkit@1.8.8/+esm"
+];
+
+/* حجم كانفاس المربعات — ⚠ بقى بيتحسب من كثافة الشاشة (devicePixelRatio):
+   الرسم فيكتور فالكبّر ده رفع حِدّة الحروف على شاشات الموبايل عالية الكثافة
+   (DPR 2-3) من غير ما نيكبّر الملف المعروض. للخطوط الضخمة (فوق 800 رسمة)
+   بنرجّع لمقاس أقل عشان الذاكرة ماتفلعش على الموبايلات الضعيفة */
+const __MH_DPR = Math.min(3, Math.max(1, (typeof window !== "undefined" && window.devicePixelRatio) || 1));
+function __mihabarTileFor(totalGlyphs) {
+  const base = __MH_DPR >= 3 ? 330 : (__MH_DPR >= 2 ? 280 : 220);
+  return (totalGlyphs > 800) ? Math.min(base, 256) : base;
+}
+let TILE = __mihabarTileFor(600); // حجم كانفاس المربعات (بيتحدّث عند تحميل كل خط)
+const PREVIEW = 100;       // حجم المعاينة المرجعي
+const CHUNK = 120;         // دفعة العرض
+const UNDO_MAX = 20;
+
+/* ================================================================
+   § 1-ب — تقسيم الشبكة لصفحات (حماية من تعليق المتصفح مع الخطوط
+   الضخمة — آلاف الرموز). بدل رسم كل الحروف مرة واحدة في الـ DOM،
+   بنرسم صفحة واحدة بس (حجمها 50/100/200 حسب اختيار المستخدم).
+   ================================================================ */
+function __mihabarPageSize() {
+  try {
+    const v = parseInt(localStorage.getItem("mihabarPageSize"), 10);
+    if (v === 50 || v === 100 || v === 200) return v;
+  } catch (e) {}
+  return 100;
+}
+function __mihabarSetPageSize(v) {
+  try { localStorage.setItem("mihabarPageSize", String(v)); } catch (e) {}
+}
+let gridPage = 0;               /* رقم الصفحة الحالية (العرض المسطح) */
+let gridCatPages = {};          /* رقم الصفحة الحالية لكل فئة (العرض المجمّع) */
+const INK = "#F3EDE1";     // لون الحبر — ثابت في الثيم الاستوديو
+const INK_SOFT = "#6E6455";   // لون الحبر الخافت
+const MISSING_COLOR = "#6E6455"; // لون الحروف الناقصة
+
+/* ================================================================
+   § 2 — عناصر الصفحة وأدوات عامة
+   ================================================================ */
+const $ = (id) => document.getElementById(id);
+const gridEl = $("grid");
+const statusEl = $("status");
+const searchEl = $("search");
+const modalEl = $("modal");
+const modalBox = $("modalBox");
+const dialogEl = $("dialog");
+const dialogBox = $("dialogBox");
+const tooltipEl = $("tooltip");
+const toastEl = $("toast");
+const fileInput = $("fileInput");
+const impFileInput = $("impFileInput");
+const tabsEl = $("tabs");
+const selBarEl = $("selbar");
+const selCountEl = $("selCount");
+const emptyEl = $("empty");
+const undoBtn = $("undoBtn");
+
+const esc = (s) => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+const qs = (sel) => modalBox.querySelector(sel);
+
+function withTimeout(p, ms) {
+  return new Promise((res, rej) => {
+    const t = setTimeout(() => rej(new Error("انتهت المهلة")), ms);
+    p.then((v) => { clearTimeout(t); res(v); },
+           (e) => { clearTimeout(t); rej(e); });
+  });
+}
+
+let toastTimer = null;
+function toast(msg, warn) {
+  toastEl.textContent = warn ? ("⚠ " + msg) : msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2200);
+}
+
+/* ================================================================
+   § 4-ب — شرح الأدوات (؟) — رسالة بسيطة لكل ميزة في القائمة الجانبية
+   القاموس مفتاحه نفس data-act بتاع الزرار، عشان الشرح يتربط تلقائيًا
+   بأي زرار من غير ما نكرر النص في الـ HTML
+   ================================================================ */
+const FEATURE_HELP = {
+  "test-drive": ["تجربة الكتابة", "تكتب أي نص وتشوفه فورًا مرسوم بالخط اللي بتشتغل عليه — عشان تتأكد الحروف بتتوصل صح مع بعض قبل التصدير."],
+  "space-studio": ["توحيد عرض المسافة", "كل خط ليه عرض مسافة خاص بيه (U+0020) ومختلف عن التاني — وده بيخلي تباعد الكلمات يتغير لما تبدل الخط. الأداة دي بتخليك تضبط عرض المسافة في الخط الحالي، أو تنسخه من خط تاني مفتوح، أو توحّد كل الخطوط المفتوحة على نفس العرض — والقيمة بتتحفظ لكل خط وبتتنقل في التصدير. وتقدر كمان تعدّل الكلمة المكتوبة في مربع المعاينة — اكتب أي كلمة أو جملة وشوفها مترسمة بنفس إعداد المسافة."],
+  "font-pages": ["معاينة نص بصفحات", "بتحط نص طويل (فقرة أو صفحة كاملة) ويطلعلك مقسّم صفحات زي ما هيبان لو طبعته أو حطيته في تصميم — مفيد لاختبار الخط على نص حقيقي مش حرف حرف."],
+  "open-dict": ["قاموس التشكيل", "بتربط كلمة معينة (بالنص العادي) برسمة مخصوصة في الخط — يعني كل مرة تكتب الكلمة دي، هيستخدم الرسمة اللي انت حددتها بدل الحروف المنفصلة العادية."],
+  "open-pairs": ["أشكال الأزواج (المقاسات)", "لو عندك حرف بيترسم بشكل مختلف حسب اللي جنبه (زي ميم «من» أصغر من ميم لوحدها)، هنا بتحدد الرسمة البديلة دي لكل زوج حروف."],
+  "words-list": ["كلمات الخط المدمجة", "بيوريك كل الكلمات اللي الخط نفسه (من الملف الأصلي) عنده رسمة جاهزة ليها — مفيد عشان تعرف إيه الكلمات المدعومة من غير ما تحتاج تضيفها يدويًا."],
+  "glyph-add": ["إضافة حرف جديد", "بتضيف رسمة جديدة للخط من الصفر — ترسمها بنفسك أو تلصق مسار SVG، وتربطها بحرف أو كود يونيكود."],
+  "glyph-import": ["استيراد حرف من خط آخر", "بتاخد رسمة حرف من ملف خط تاني مفتوح عندك وتحطها في الخط الحالي — من غير ما تعيد رسمها."],
+  "compare-open": ["مقارنة خطين", "بتحط خطين مفتوحين جنب بعض وتشوف الفرق بينهم حرف بحرف — مفيد لما تكون بتعدّل نسخة من خط وعايز تقارنها بالأصلي."],
+  "select-mode": ["تحديد للحذف الجماعي", "بيديك تقدر تحدد أكتر من رسمة مرة واحدة من الشبكة وتحذفهم كلهم مع بعض، بدل ما تحذف واحد واحد."],
+  "svg-converter": ["تحويل صورة / نص إلى SVG", "بياخد صورة أو نص وبيحولهم لمسار SVG قابل للاستخدام كرسمة حرف في الخط."],
+  "unicode-range-add": ["إضافة نطاق Unicode كامل", "بيضيف مجموعة حروف فاضية (بلانك) لكل الرموز في نطاق يونيكود معيّن دفعة واحدة — بدل ما تضيفهم واحد واحد يدويًا."],
+  "export-glyph-png": ["تصدير الحرف المحدد PNG", "بيحفظلك صورة PNG للرسمة اللي مفتوحة/محددة دلوقتي، عشان تستخدمها بره برنامج الخطوط (تصميم، سوشيال ميديا، إلخ)."],
+  "card-open": ["بطاقة معاينة للسوشيال", "بيولّد صورة جاهزة بتعرض شكل الخط (زي بوستر صغير) تنفع تنشرها على السوشيال ميديا كإعلان عن الخط."],
+  "book-open": ["دفتر الحروف (PDF)", "بيصدّرلك ملف PDF فيه كل حروف الخط مرتبة كدفتر/كتالوج — مفيد للمعاينة أو الطباعة أو المشاركة."],
+  "project-save": ["حفظ المشروع كامل", "بيحفظ كل حاجة شغال عليها دلوقتي (الخط + القاموس + الأزواج + السياقات) في ملف واحد تقدر تفتحه تاني بعدين وتكمل بالظبط من نفس المكان."],
+  "project-open": ["فتح مشروع محفوظ", "بيرجّعلك مشروع كامل كنت حفظته قبل كده بكل إعداداته وقواميسه."],
+  "file-info": ["معلومات وتعديل البيانات", "بتعدّل البيانات الوصفية للخط: اسمه، إصداره، حقوق الملكية، وحاجات تانية بتتسجل جوه ملف الخط نفسه."],
+  "export-ttf": ["تصدير TTF", "بيحفظلك الخط بصيغة TTF (الصيغة الأكتر انتشارًا) جاهز للاستخدام في أي برنامج أو تثبيته على الجهاز."],
+  "export-woff2": ["تصدير WOFF2", "بيحفظلك الخط بصيغة WOFF2 وهي الأنسب لو هتستخدمه في موقع ويب — حجمها أصغر بكتير من TTF."],
+  "toggle-pure-export": ["التصدير النضيف", "لما يكون مفعّل، الخط اللي بيتصدّر بيكون فاضي من أي حاجة زيادة من الخط الأصلي — بس رسماتك ورسمات القاموس بتاعتك، عشان محدش يقدر يستخدم باقي الخط الأصلي من غير قصد."],
+  "backup-all": ["نسخ احتياطي للقواميس", "بيحفظ نسخة من كل القواميس والإعدادات (التشكيل، الأزواج، السياقات) بتاعة كل الخطوط المفتوحة في ملف واحد للأمان."],
+  "restore-backup": ["استعادة نسخة احتياطية", "بيرجّع نسخة قواميس وإعدادات كنت عملتلها نسخ احتياطي قبل كده."],
+  "close-tab": ["إغلاق الملف الحالي", "بيقفل الخط اللي شغال عليه دلوقتي من التبويبات — لو عندك تعديلات مش متصدّرة، هتضيع."]
+};
+
+function showFeatureHelp(act) {
+  const info = FEATURE_HELP[act];
+  if (!info) return;
+  openModal(info[0], `
+    <p class="hint" style="margin-top:6px">${esc(info[1])}</p>
+    <div class="mbtns">
+      <button class="btn ghost" data-act="close-modal">تمام، فهمت</button>
+    </div>
+  `);
+}
+
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (e) { /* احتياطي */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  } catch (e) { return false; }
+}
+
+function showError(msg) {
+  statusEl.classList.add("err");
+  statusEl.textContent = "⚠ " + msg;
+}
+window.addEventListener("error", (e) => showError(e.message));
+window.addEventListener("unhandledrejection", (e) => {
+  const r = e.reason;
+  showError((r && r.message) ? r.message : String(r));
+});
+
+/* ================================================================
+   § 3 — الحالة
+   ================================================================ */
+const slots = [];          // ملفات الخطوط المفتوحة
+
+/* تعليم أن ترتيب الحروف تغيّر (حذف/تحريك) — يُعطّل استرجاع
+   الجداول الأصلية عند التصدير لأن أرقام الحروف GID لم تعد مطابقة */
+function markStructChanged() {
+  if (activeSlot >= 0 && slots[activeSlot]) {
+    slots[activeSlot].structChanged = true;
+  }
+  /* أي تعديل على الرسمات يبطل كاش عرض الحبر (إصلاح «الروسمات دخلة في بعض») */
+  if (typeof __mhInkWCacheClear === "function") __mhInkWCacheClear();
+}
+let activeSlot = -1;
+let importSlotIndex = -1;
+let font = null;           // الخط النشط
+let fontLabel = "";
+let fileBase = "font";
+let fileName = "";
+let fileSize = 0;
+
+let selMode = false;
+const selSet = new Set();
+let undoStack = [];
+let curIndex = null;       // الحرف المفتوح حاليًا
+let swapTargetIndex = null;// هدف "تغيير الرسمة من خط آخر"
+let importSelSet = new Set(); // تحديد متعدد لرسومات الخط المصدر
+
+const baseName = (n) => String(n || "").replace(/\.[^.]+$/, "") || "font";
+const fmtSize = (b) => !b ? "0 بايت" :
+  (b < 1048576 ? Math.round(b / 1024) + " KB" : (b / 1048576).toFixed(2) + " MB");
+
+const MIHABAR_BUILD = "٢٠٢٦-٠٩-٢٢/أ";
+
+function defaultStatus() {
+  statusEl.classList.remove("err");
+  const wc = (font && font.wordByGid) ? Object.keys(font.wordByGid).length : 0;
+  const empt = (activeSlot >= 0 && slots[activeSlot]) ? (slots[activeSlot].empties || 0) : 0;
+  statusEl.innerHTML =
+    "<span class='violet'>" + esc(fontLabel) + "</span> — " +
+    liveGlyphCount() + " حرف" +
+    (wc ? " <span class='sep'>•</span> " + wc + " كلمة مدمجة" : "") +
+    (empt ? " <span class='sep'>•</span> ⚠ " + empt + " بدون رسمة" : "") +
+    " <span class='sep'>•</span> اضغط أي رسمة للتعديل" +
+    " <span class='sep'>•</span> <small dir='ltr'>v" + MIHABAR_BUILD + "</small>";
+}
+
+/* ================================================================
+   § 4 — الحوار والمودال
+   ================================================================ */
+let dialogFinish = null;
+
+function showDialog(o) {
+  return new Promise((resolve) => {
+    o = o || {};
+    dialogBox.innerHTML =
+      "<h4>" + esc(o.title || "تنبيه") + "</h4>" +
+      "<p>" + esc(o.message || "") + "</p>" +
+      "<div class='dbtns'></div>";
+    const btns = dialogBox.querySelector(".dbtns");
+    let done = false;
+    const finish = (v) => {
+      if (done) return;
+      done = true;
+      dialogFinish = null;
+      dialogEl.hidden = true;
+      resolve(v);
+    };
+    dialogFinish = () => finish(false);
+    const okBtn = document.createElement("button");
+    okBtn.textContent = o.okText || "موافق";
+    okBtn.className = o.danger ? "danger" : "okb";
+    okBtn.onclick = () => finish(true);
+    btns.appendChild(okBtn);
+    if (o.cancelText !== null) {
+      const c = document.createElement("button");
+      c.textContent = o.cancelText || "إلغاء";
+      c.onclick = () => finish(false);
+      btns.appendChild(c);
+    }
+    dialogEl.hidden = false;
+  });
+}
+const uiAlert = (m, t) => showDialog({ title: t || "تنبيه", message: m, okText: "حسنًا" });
+const uiConfirm = (m, o) => showDialog(Object.assign(
+  { title: "تأكيد", message: m, okText: "موافق", cancelText: "إلغاء" }, o || {}));
+
+
+/* ================================================================
+   § SVG Converter — تحويل صورة أو نص إلى كود SVG
+   الصورة: ImageTracer المدمج داخل الملف.
+   النص: من Glyphs الخط المفتوح مع التشكيل الموجود في المحرر.
+   ================================================================ */
+let svgConvMode = "image";
+let svgConvLastCode = "";
+
+function svgPathTranslate(path, dx, dy) {
+  const p = new opentype.Path();
+  p.commands = (path && path.commands ? path.commands : []).map((c) => {
+    const n = Object.assign({}, c);
+    if (n.x != null) n.x += dx;
+    if (n.y != null) n.y += dy;
+    if (n.x1 != null) n.x1 += dx;
+    if (n.y1 != null) n.y1 += dy;
+    if (n.x2 != null) n.x2 += dx;
+    if (n.y2 != null) n.y2 += dy;
+    return n;
+  });
+  return p;
+}
+
+function shapedAdv(s, fontSize, upm) {
+  if (s.gid === undefined || s.gid === null) {
+    /* فواصل بيضاء ناقصة: عرض سبيس من إعداد استوديو المسافة — مش نص إم */
+    return (s.cp !== undefined && __isSpaceCp(s.cp)) ? fontSize * __mhSpaceEm() : fontSize * 0.5;
+  }
+  const g = font.glyphs.get(s.gid);
+  let adv = (g.advanceWidth || upm / 2);
+  /* جليف مسافة موجود: إعداد الاستوديو مصدر الحقيقة */
+  if (__isSpaceCp(s.cp)) {
+    const su = __mhActiveSpaceUnits(upm);
+    if (su !== null) adv = su;
+  }
+  /* رسمة كلمة مدمجة: تداخل حقيقي أو فراغ مفتعل → عرض الحبر + هامش */
+  if (s.dictWord !== undefined) {
+    const inkW = __mhGlyphInkW(s.gid);
+    if (inkW > 0 && inkW > adv && (inkW - adv) > upm * 0.25) adv = inkW + upm * 0.04;
+    else if (inkW > 0 && adv > inkW && (adv - inkW) > upm * 0.25) adv = inkW + upm * 0.04;
+  }
+  return (adv * fontSize) / upm;
+}
+
+function textToSvgCode(text, fs) {
+  if (!font) throw new Error("افتح خطًا أولًا لتحويل النص إلى SVG");
+  text = String(text || "");
+  if (!text.trim()) throw new Error("اكتب نصًا أولًا");
+
+  const upm = font.unitsPerEm || 1000;
+  const shaped = shapeArabic(text);
+  const paths = [];
+  let pen = 20;
+  let lastBaseBox = null;
+  let markStack = 0;
+  let markStackDir = 0;
+  const baseline = fs * 0.82 + 20;
+
+  /* نحسب عرض النص أولًا عشان يبدأ من اليمين */
+  const total = shaped.reduce((w, s) => w + shapedAdv(s, fs, upm), 0);
+  pen = Math.max(20, total + 20);
+
+  for (const s of shaped) {
+    const adv = shapedAdv(s, fs, upm);
+    const left = pen - adv;
+    const isMark = isMarkCp(s.cp);
+
+    if (s.missing && !isMark) {
+      pen = left;
+      continue;
+    }
+
+    if (isMark && s.gid != null && lastBaseBox) {
+      const g = __glyphFromFont(s.gid);
+      if (g) {
+        const p = g.getPath(0, 0, fs, null, font);
+        const bb = p.getBoundingBox();
+        const mw = bb.x2 - bb.x1, mh = bb.y2 - bb.y1;
+        if (isFinite(mw) && isFinite(mh) && mw > .01 && mh > .01) {
+          const below = isBelowMarkCp(s.cp);
+          const dir = below ? -1 : 1;
+          if (markStackDir === dir) markStack++; else { markStackDir = dir; markStack = 0; }
+          const gap = fs * .035;
+          const shift = markStack * fs * .26;
+          const cx = (lastBaseBox.x1 + lastBaseBox.x2) / 2;
+          const dx = cx - (bb.x1 + bb.x2) / 2;
+          const dy = below
+            ? (lastBaseBox.y2 + gap + shift) - bb.y1
+            : (lastBaseBox.y1 - gap - shift) - bb.y2;
+          const tp = svgPathTranslate(p, dx, dy);
+          paths.push(tp.toPathData(2));
+        }
+      }
+    } else if (s.gid != null) {
+      const g = __glyphFromFont(s.gid);
+      if (g) {
+        const p = g.getPath(left, baseline, fs, null, font);
+        const bb = p.getBoundingBox();
+        if (isFinite(bb.x1) && isFinite(bb.x2) && isFinite(bb.y1) && isFinite(bb.y2)) {
+          lastBaseBox = {x1:bb.x1,x2:bb.x2,y1:bb.y1,y2:bb.y2};
+        }
+        if (p.commands.length) paths.push(p.toPathData(2));
+      }
+      markStack = 0; markStackDir = 0;
+    }
+    pen = left;
+  }
+
+  if (!paths.length) throw new Error("لم توجد رسومات قابلة للتحويل في النص");
+
+  const width = Math.max(1, Math.ceil(total + 40));
+  const height = Math.max(1, Math.ceil(fs * 1.35 + 40));
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + width +
+    '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height +
+    '"><g fill="currentColor">' + paths.map((d) => '<path d="' + d + '"/>').join("") +
+    '</g></svg>';
+}
+
+function svgConvSetMode(mode) {
+  svgConvMode = mode === "text" ? "text" : "image";
+  const tabs = modalBox.querySelectorAll(".svgconv-tab");
+  tabs.forEach((b) => b.classList.toggle("active", b.dataset.mode === svgConvMode));
+  const panels = modalBox.querySelectorAll(".svgconv-panel");
+  panels.forEach((p) => p.classList.toggle("active", p.dataset.panel === svgConvMode));
+}
+
+function svgConvSetOutput(code, meta) {
+  svgConvLastCode = code || "";
+  const out = qs("#svgConvOutput");
+  const info = qs("#svgConvMeta");
+  const preview = qs("#svgConvPreview");
+  if (out) out.value = svgConvLastCode;
+  if (info) info.textContent = meta || (svgConvLastCode ? "تم إنشاء كود SVG" : "");
+  if (preview) {
+    if (svgConvLastCode) {
+      preview.innerHTML = svgConvLastCode;
+      preview.classList.remove("hidden");
+    } else {
+      preview.innerHTML = "";
+      preview.classList.add("hidden");
+    }
+  }
+}
+
+let svgConvLastFile = null;
+
+function svgConvGetOptions() {
+  const modeEl = qs("#svgConvColorMode");
+  const countEl = qs("#svgConvColorCount");
+  const mode = modeEl ? modeEl.value : "color";
+  const numberofcolors = countEl ? Math.max(2, parseInt(countEl.value, 10) || 16) : 16;
+
+  if (mode === "bw") {
+    return { ltres: 1, qtres: 1, pathomit: 4, roundcoords: 2,
+      rightangleenhance: true, blurradius: 1, bluredges: true,
+      colorsampling: 0, numberofcolors: 2, mincolorratio: 0,
+      colorquantcycles: 1, strokewidth: 0, linefilter: false,
+      scale: 1, desc: false, viewbox: true };
+  }
+  if (mode === "grayscale") {
+    return { ltres: 1, qtres: 1, pathomit: 4, roundcoords: 2,
+      rightangleenhance: true, blurradius: 1, bluredges: true,
+      colorsampling: 0, numberofcolors, mincolorratio: 0,
+      colorquantcycles: 3, strokewidth: 0, linefilter: false,
+      scale: 1, desc: false, viewbox: true };
+  }
+  // ملوّن — عيّنة ألوان حقيقية من الصورة نفسها بدل توليد رمادي
+  return { ltres: 1, qtres: 1, pathomit: 4, roundcoords: 2,
+    rightangleenhance: true, blurradius: 1, bluredges: true,
+    colorsampling: 2, numberofcolors, mincolorratio: 0.02,
+    colorquantcycles: 3, strokewidth: 0, linefilter: false,
+    scale: 1, desc: false, viewbox: true };
+}
+
+async function svgConvImage(file) {
+  if (!file) return;
+  svgConvLastFile = file;
+  const IT = (typeof ImageTracer !== "undefined") ? ImageTracer
+    : (typeof window !== "undefined" && window.ImageTracer) ? window.ImageTracer : null;
+  if (!IT || typeof IT.imagedataToSVG !== "function") {
+    toast("مكتبة تحويل الصور غير متاحة", true);
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        /* إصلاح «الصورة بتطلع مبكسلة/مش ملوّنة صح»: التتبع بيشتغل على
+           دقة الصورة الأصلية بالظبط — أيقونة صغيرة (زي ١١٢×١١٢) فيها
+           تدرّج لون وحواف ناعمة بتتحوّل لمئات القطع الصغيرة (كل بكسل
+           حافة بيتفسّر كشكل منفصل). الحل: نرسم الصورة على كانفاس أكبر
+           بكتير مع تنعيم (imageSmoothingQuality: high) قبل التتبع —
+           كده التدرّج بيبقى مساحات لونية كبيرة نضيفة يقدر التتبع
+           يلتقطها كأشكال متصلة بدل ضجيج بكسل */
+        const srcW = img.naturalWidth || img.width || 1;
+        const srcH = img.naturalHeight || img.height || 1;
+        const minSide = Math.min(srcW, srcH);
+        /* لو الصورة صغيرة، كبّرها لحد ما أصغر ضلع يوصل ~768px (سقف ×8) */
+        const upscale = minSide > 0 ? Math.min(8, Math.max(1, Math.round(768 / minSide))) : 1;
+        const cw = Math.max(1, Math.round(srcW * upscale));
+        const ch = Math.max(1, Math.round(srcH * upscale));
+
+        const canvas = document.createElement("canvas");
+        canvas.width = cw;
+        canvas.height = ch;
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        if ("imageSmoothingQuality" in ctx) ctx.imageSmoothingQuality = "high";
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.drawImage(img, 0, 0, cw, ch);
+
+        const imgd = IT.getImgdata ? IT.getImgdata(canvas) : ctx.getImageData(0, 0, cw, ch);
+        const opts = svgConvGetOptions();
+        /* الإعدادات دي اتظبطت واتقاست فعليًا (مش تخمين): على أيقونة
+           ١١٢px مكبّرة ×٧، bluradius:1 + mincolorratio الافتراضي كانوا
+           بيسيبوا ~١٦٥ رسمة، ٢٨ منها ضجيج تنعيم حواف بس (opacity قريب
+           من صفر). بلور أقوى قبل التتبع (يدمج حواف التنعيم قبل ما
+           تتحسب كألوان منفصلة) + mincolorratio أعلى (يرمي أي لون
+           نسبته أقل من ٦٪) نزّلوا العدد لـ٥٦ رسمة وفضل منهم ٢ بس ضجيج */
+        if (upscale > 1) {
+          opts.pathomit = Math.max(4, Math.round((opts.pathomit || 4) * upscale * 0.6));
+          opts.blurradius = 3;
+          opts.mincolorratio = Math.max(opts.mincolorratio || 0, 0.06);
+          if (opts.numberofcolors > 10 && qs("#svgConvColorMode") && qs("#svgConvColorMode").value === "color") {
+            /* المستخدم سايب العدد على الافتراضي (١٦) — نزّله لـ١٠ لصور
+               صغيرة عشان يقل التشظّي؛ لو غيّره بنفسه لرقم تاني نحترم اختياره */
+            const countEl = qs("#svgConvColorCount");
+            if (!countEl || countEl.value === "16") opts.numberofcolors = 10;
+          }
+        }
+
+        let svg = IT.imagedataToSVG(imgd, opts);
+
+        svgConvSetOutput(svg, "تم تحويل الصورة إلى SVG — عدّل الكود أو انسخه");
+        const name = qs("#svgConvImageName");
+        if (name) name.textContent = file.name || "الصورة";
+        const retryBtn = qs("#svgConvRetryBtn");
+        if (retryBtn) retryBtn.style.display = "";
+      } catch (e) {
+        toast("فشل تحويل الصورة: " + (e.message || e), true);
+      }
+    };
+    img.onerror = () => toast("تعذر قراءة الصورة", true);
+    img.src = reader.result;
+  };
+  reader.onerror = () => toast("تعذر قراءة الصورة", true);
+  reader.readAsDataURL(file);
+}
+
+function svgConvImageRetry() {
+  if (!svgConvLastFile) { toast("اختر صورة أولًا", true); return; }
+  svgConvImage(svgConvLastFile);
+}
+
+function svgConvText() {
+  try {
+    const input = qs("#svgConvText");
+    const size = qs("#svgConvSize");
+    const code = textToSvgCode(input ? input.value : "", Math.max(8, +(size ? size.value : 160)));
+    svgConvSetOutput(code, "تم تحويل النص من الخط المفتوح إلى SVG");
+  } catch (e) {
+    toast(e.message || "تعذر تحويل النص", true);
+  }
+}
+
+async function svgConvCopy() {
+  const out = qs("#svgConvOutput");
+  if (!out || !out.value) {
+    toast("أنشئ SVG أولًا", true);
+    return;
+  }
+  const ok = await copyText(out.value);
+  toast(ok ? "تم نسخ كود SVG ✓" : "فشل النسخ", !ok);
+}
+
+function svgConvDownload() {
+  const out = qs("#svgConvOutput");
+  if (!out || !out.value) {
+    toast("أنشئ SVG أولًا", true);
+    return;
+  }
+  const blob = new Blob([out.value], {type:"image/svg+xml;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "mihabar-svg.svg";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  toast("تم حفظ ملف SVG ✓");
+}
+
+function openSvgConverter() {
+  svgConvLastCode = "";
+  openModal("تحويل صورة / نص إلى SVG", `
+    <div class="svgconv-box" dir="rtl">
+      <div class="svgconv-tabs">
+        <button class="svgconv-tab active" data-mode="image">صورة → SVG</button>
+        <button class="svgconv-tab" data-mode="text">نص → SVG</button>
+      </div>
+
+      <div class="svgconv-panel active" data-panel="image">
+        <div class="svgconv-drop" id="svgConvDrop">
+          <div>
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <circle cx="9" cy="9" r="2"/>
+              <path d="M21 15l-5-5-9 9"/>
+            </svg>
+            <div><b>اضغط لاختيار صورة</b></div>
+            <small class="svgconv-meta">PNG · JPG · WEBP · وغيرها</small>
+            <div class="svgconv-meta" id="svgConvImageName"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>الألوان</label>
+          <select id="svgConvColorMode">
+            <option value="color" selected>ملوّن (يحافظ على ألوان الصورة)</option>
+            <option value="grayscale">تدرج رمادي</option>
+            <option value="bw">أبيض وأسود فقط</option>
+          </select>
+        </div>
+        <div class="field" id="svgConvColorCountField">
+          <label>عدد الألوان: <span id="svgConvColorCountVal">16</span></label>
+          <input id="svgConvColorCount" type="range" min="2" max="64" step="1" value="16">
+        </div>
+        <button class="btn ok" data-act="svgconv-image-retry" id="svgConvRetryBtn" style="display:none">
+          إعادة التحويل بالإعدادات الجديدة
+        </button>
+      </div>
+
+      <div class="svgconv-panel" data-panel="text">
+        <textarea id="svgConvText" class="ta" rows="5" placeholder="اكتب النص هنا…">مِحْبَر</textarea>
+        <div class="field">
+          <label>حجم SVG</label>
+          <input id="svgConvSize" type="number" min="8" max="1200" value="160">
+        </div>
+        <button class="btn ok" data-act="svgconv-text">تحويل النص إلى SVG</button>
+        ${font ? '<small class="svgconv-meta">المصدر: الخط المفتوح حاليًا — يدعم تشكيل المحرر.</small>' :
+          '<small class="svgconv-meta">افتح خطًا أولًا لاستخدام تحويل النص.</small>'}
+      </div>
+
+      <div class="field">
+        <label>كود SVG</label>
+        <textarea id="svgConvOutput" class="svgconv-out" spellcheck="false" placeholder="سيظهر كود SVG هنا…"></textarea>
+      </div>
+
+      <div class="svgconv-row">
+        <button class="btn" data-act="svgconv-copy">نسخ الكود</button>
+        <button class="btn" data-act="svgconv-download">حفظ SVG</button>
+        <button class="btn ghost" data-act="close-modal">إغلاق</button>
+      </div>
+
+      <div class="svgconv-meta" id="svgConvMeta">اختر صورة أو اكتب نصًا ثم حوّله.</div>
+      <div id="svgConvPreview" class="svgconv-preview hidden"></div>
+    </div>
+  `);
+
+  modalBox.querySelectorAll(".svgconv-tab").forEach((b) => {
+    b.addEventListener("click", () => svgConvSetMode(b.dataset.mode));
+  });
+
+  const colorModeEl = qs("#svgConvColorMode");
+  const colorCountEl = qs("#svgConvColorCount");
+  const colorCountVal = qs("#svgConvColorCountVal");
+  const colorCountField = qs("#svgConvColorCountField");
+  const syncColorCountVisibility = () => {
+    if (colorCountField) colorCountField.style.display = (colorModeEl && colorModeEl.value === "bw") ? "none" : "";
+  };
+  if (colorModeEl) colorModeEl.addEventListener("change", syncColorCountVisibility);
+  if (colorCountEl && colorCountVal) {
+    colorCountEl.addEventListener("input", () => { colorCountVal.textContent = colorCountEl.value; });
+  }
+  syncColorCountVisibility();
+
+  const drop = qs("#svgConvDrop");
+  const fi = document.getElementById("svgConvImageInput");
+  if (drop && fi) {
+    drop.addEventListener("click", () => fi.click());
+    drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.style.borderColor = "var(--accent)"; });
+    drop.addEventListener("dragleave", () => { drop.style.borderColor = ""; });
+    drop.addEventListener("drop", (e) => {
+      e.preventDefault();
+      drop.style.borderColor = "";
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) svgConvImage(e.dataTransfer.files[0]);
+    });
+  }
+  if (fi) {
+    fi.onchange = () => {
+      if (fi.files && fi.files[0]) svgConvImage(fi.files[0]);
+      fi.value = "";
+    };
+  }
+}
+
+function openModal(title, html) {
+  modalBox.innerHTML = "<h3>" + esc(title) + "</h3>" + html;
+  modalEl.hidden = false;
+  modalBox.scrollTop = 0;
+}
+function closeModal() {
+  modalEl.hidden = true;
+  modalBox.innerHTML = "";
+  swapTargetIndex = null;
+  importSelSet.clear();
+}
+modalEl.addEventListener("click", (e) => { if (e.target === modalEl) closeModal(); });
+dialogEl.addEventListener("click", (e) => {
+  if (e.target === dialogEl && dialogFinish) dialogFinish();
+});
+function uniText(g) {
+  const list = (g.unicodes && g.unicodes.length)
+    ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+  return list.map((x) => "U+" + x.toString(16).toUpperCase().padStart(4, "0")).join(", ")
+    || "بدون تعيين";
+}
+
+/* ================================================================
+   § 5 — التراجع
+   ================================================================ */
+function __mhColorDisabledMap(f){
+  if(!f._mhColorDisabled) f._mhColorDisabled={};
+  return f._mhColorDisabled;
+}
+function __mhHasColorDrawing(gid,f){
+  if(!f||gid===undefined||gid===null)return false;
+  if(f._mhColorGlyphs&&f._mhColorGlyphs[gid]&&f._mhColorGlyphs[gid].length)return true;
+  if(f._mhSvgGlyphs&&f._mhSvgGlyphs[gid])return true;
+  return false;
+}
+function __mhIsColorDisabled(gid,f){return !!(f&&f._mhColorDisabled&&f._mhColorDisabled[gid]);}
+
+function serializeGlyph(g) {
+  return {
+    name: g.name || "",
+    unicode: g.unicode,
+    unicodes: g.unicodes ? g.unicodes.slice() : [],
+    advanceWidth: g.advanceWidth,
+    commands: JSON.parse(JSON.stringify(g.path ? g.path.commands : [])),
+    deleted: !!g.deleted  /* علامة الحذف الناعم — التراجع بيرجّعها */
+  };
+}
+function pushUndo() {
+  if (!font) return;
+  undoStack.push({
+    glyphs: glyphsArr().map(serializeGlyph),
+    /* ختم «حبر المستخدم» قبل العملية — التراجع بيرجّعه زي ما كان */
+    inks: glyphsArr().map((g) => !!g.userInk),
+    colorDisabled: Object.assign({}, (font && font._mhColorDisabled) || {}),
+    names: JSON.parse(JSON.stringify(font.names || {})),
+    ascender: font.ascender,
+    descender: font.descender,
+    lineGap: font.lineGap
+  });
+  if (undoStack.length > UNDO_MAX) undoStack.shift();
+  updateUndoBtn();
+}
+function undo() {
+  if (!undoStack.length || !font) return;
+  const snap = undoStack.pop();
+  const arr = snap.glyphs.map((s, i) => {
+    const path = new opentype.Path();
+    path.commands = JSON.parse(JSON.stringify(s.commands));
+    const g = new opentype.Glyph({
+      name: s.name || ("glyph" + i),
+      unicode: s.unicode,
+      unicodes: s.unicodes.slice(),
+      advanceWidth: s.advanceWidth,
+      path: path,
+      font: font
+    });
+    g.index = i;
+    /* استرجاع علامة الحبر (الرسومات اللي رسمها المستخدم) من الختم */
+    g.userInk = !!(snap.inks && snap.inks[i]);
+    /* استرجاع علامة الحذف الناعم — الحرف المحذوف يرجع لما نتراجع */
+    g.deleted = !!s.deleted;
+    return g;
+  });
+  arr.get = function (i) { return this[i]; };
+  font.glyphs = arr;
+  font.numGlyphs = arr.length;
+  font.names = JSON.parse(JSON.stringify(snap.names || {}));
+  font.ascender = snap.ascender;
+  font.descender = snap.descender;
+  font.lineGap = snap.lineGap;
+  font._mhColorDisabled = Object.assign({}, snap.colorDisabled || {});
+  rebuildGlyphIndexMap();
+  /* التراجع بيرجّع عرض الرسمات لحالتها قبل العملية — يشمل أي شفاء
+     تلقائي كان اتعمل («الروسمات دخلة في بعض» أو استوديو المسافة).
+     نعيد الشفاء بعد كل تراجع عشان الإصلاح ميتمسحش من غير ما اليوزر
+     يقصد كده */
+  if (typeof __mhInkWCacheClear === "function") __mhInkWCacheClear();
+  if (typeof __mhApplySavedSpaceOnActivate === "function") {
+    const slot = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot] : null;
+    if (slot) __mhApplySavedSpaceOnActivate(slot);
+  }
+  updateUndoBtn();
+  renderAll();
+  toast("تم التراجع");
+}
+function updateUndoBtn() { undoBtn.disabled = !font || !undoStack.length; }
+
+/* ================================================================
+   § 6 — تحميل المكتبات
+   ================================================================ */
+let woff2Lib = null;
+
+async function getWoff2Lib() {
+  if (woff2Lib) return woff2Lib;
+  let lastErr = null;
+  for (const url of WOFF2_SOURCES) {
+    try {
+      const mod = await withTimeout(import(url), 15000);
+      const lib = (mod && mod.default) ? mod.default : mod;
+      if (lib && (typeof lib.decompress === "function" || typeof lib.compress === "function")) {
+        woff2Lib = lib;
+        return lib;
+      }
+    } catch (e) { lastErr = e; }
+  }
+  throw new Error("فشل تحميل مكتبة WOFF2" + (lastErr ? " — " + lastErr.message : ""));
+}
+
+let fontkitLib = null;
+let fontkitTried = false;  /* خلّانا نجربنا كل المصادر وفشلوا — ما نعيدش */
+
+function loadScript(url) {
+  return new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = url;
+    s.onload = () => res();
+    s.onerror = () => rej(new Error("فشل تحميل " + url));
+    document.head.appendChild(s);
+  });
+}
+
+/* ترجع fontkit لو اتحمّل، أو null لو فشل كل المصادر — بلا رمي استثناء.
+   بتفضل فاشلة طول الجلسة عشان ما نعيدش المحاولة مع كل ملف تفتحه
+   (الرسائل المتكررة كانت بتزعج المستخدم). opentype.js بديل كامل. */
+async function getFontkit() {
+  if (fontkitLib) return fontkitLib;
+  if (fontkitTried) return null;
+  fontkitTried = true;
+
+  if (window.fontkit && typeof window.fontkit.create === "function") {
+    fontkitLib = window.fontkit;
+    return fontkitLib;
+  }
+
+  statusEl.textContent = "جارٍ تحميل محرك القراءة (أول مرة فقط)…";
+  let firstErr = null;
+
+  for (const url of FONTKIT_SOURCES) {
+    try {
+      await withTimeout(loadScript(url), 15000);
+      if (window.fontkit && typeof window.fontkit.create === "function") {
+        fontkitLib = window.fontkit;
+        if (font) defaultStatus();
+        return fontkitLib;
+      }
+    } catch (e) {
+      if (!firstErr) firstErr = e.message;
+      /* تحذير واحد بس في الكونسول — مش لكل محاولة */
+    }
+  }
+  for (const url of FONTKIT_ESM) {
+    try {
+      const mod = await withTimeout(import(url), 15000);
+      const lib = (mod && mod.default) ? mod.default : mod;
+      if (lib && typeof lib.create === "function") {
+        fontkitLib = lib;
+        if (font) defaultStatus();
+        return fontkitLib;
+      }
+    } catch (e) {
+      if (!firstErr) firstErr = e.message;
+    }
+  }
+
+  /* كل المصادر فشلت — نكتم الرسائل المتكررة ونسيب opentype.js يشتغل */
+  if (font) defaultStatus();
+  console.warn("fontkit مش متاح — هشتغل بـ opentype.js (محرك بديل). الأسباب: " + (firstErr || "غير معروفة"));
+  return null;
+}
+
+/* ================================================================
+   § 7 — هندسة المسارات
+   ================================================================ */
+function cpName(cp) {
+  return cp <= 0xFFFF
+    ? "uni" + cp.toString(16).toUpperCase().padStart(4, "0")
+    : "u" + cp.toString(16).toUpperCase();
+}
+
+/* تكعيب منحنى بيزيه الثلاثي إلى ثنائيات بدقة متكيفة */
+function cubicToQuads(x0, y0, x1, y1, x2, y2, x3, y3, tol, out, depth) {
+  const d1x = x1 - x0, d1y = y1 - y0;
+  const d2x = x3 - x2, d2y = y3 - y2;
+  const cross = d1x * d2y - d1y * d2x;
+  let qx = null, qy = 0;
+  if (Math.abs(cross) > 1e-12) {
+    const s = ((x3 - x0) * d2y - (y3 - y0) * d2x) / cross;
+    if (isFinite(s) && s > -4 && s < 4) {
+      qx = x0 + s * d1x;
+      qy = y0 + s * d1y;
+    }
+  }
+  const mx = (x0 + 3 * x1 + 3 * x2 + x3) / 8;
+  const my = (y0 + 3 * y1 + 3 * y2 + y3) / 8;
+  if (qx === null) { qx = mx; qy = my; }
+  const qmx = (x0 + 2 * qx + x3) / 4;
+  const qmy = (y0 + 2 * qy + y3) / 4;
+  const err = Math.max(Math.abs(mx - qmx), Math.abs(my - qmy));
+  if (err <= tol || depth >= 5) {
+    out.push({ type: "Q", x1: qx, y1: qy, x: x3, y: y3 });
+    return;
+  }
+  const ax = (x0 + x1) / 2, ay = (y0 + y1) / 2;
+  const bx = (x1 + x2) / 2, by = (y1 + y2) / 2;
+  const cx = (x2 + x3) / 2, cy = (y2 + y3) / 2;
+  const dx = (ax + bx) / 2, dy = (ay + by) / 2;
+  const ex = (bx + cx) / 2, ey = (by + cy) / 2;
+  const fx = (dx + ex) / 2, fy = (dy + ey) / 2;
+  cubicToQuads(x0, y0, ax, ay, dx, dy, fx, fy, tol, out, depth + 1);
+  cubicToQuads(fx, fy, ex, ey, cx, cy, x3, y3, tol, out, depth + 1);
+}
+
+function pathHasContent(path) {
+  if (!path || !path.commands || !path.commands.length) return false;
+  try {
+    const bb = path.getBoundingBox();
+    return isFinite(bb.x1) && isFinite(bb.y1) &&
+      (bb.x2 - bb.x1) > 0.01 && (bb.y2 - bb.y1) > 0.01;
+  } catch (e) { return false; }
+}
+
+/* تحويل حرف fontkit إلى مسار opentype — مع تكعيب المنحنيات الثلاثية */
+function fontkitGlyphToPath(g, tol) {
+  const path = new opentype.Path();
+  if (!g || !g.path) return path;
+
+  let cmds = null;
+  try { cmds = g.path.commands; } catch (e) { cmds = null; }
+
+  if (Array.isArray(cmds) && cmds.length) {
+    let curX = 0, curY = 0, hasCurrent = false;
+    try {
+      for (const c of cmds) {
+        const a = c.args || [];
+        switch (c.command) {
+          case "move":
+            path.moveTo(a[0], a[1]);
+            curX = a[0]; curY = a[1]; hasCurrent = true;
+            break;
+          case "line":
+            if (a.length >= 2) {
+              if (!hasCurrent) path.moveTo(a[0], a[1]);
+              else path.lineTo(a[0], a[1]);
+              curX = a[0]; curY = a[1]; hasCurrent = true;
+            }
+            break;
+          case "quadratic":
+            if (a.length >= 4) {
+              if (!hasCurrent) path.moveTo(a[2], a[3]);
+              else path.quadraticCurveTo(a[0], a[1], a[2], a[3]);
+              curX = a[2]; curY = a[3]; hasCurrent = true;
+            }
+            break;
+          case "cubic":
+            if (a.length >= 6) {
+              if (!hasCurrent) {
+                path.moveTo(a[4], a[5]);
+              } else {
+                const quads = [];
+                cubicToQuads(curX, curY, a[0], a[1], a[2], a[3], a[4], a[5], tol, quads, 0);
+                quads.forEach((q) => path.quadraticCurveTo(q.x1, q.y1, q.x, q.y));
+              }
+              curX = a[4]; curY = a[5]; hasCurrent = true;
+            }
+            break;
+          case "close":
+            path.close();
+            hasCurrent = false;
+            break;
+        }
+      }
+    } catch (e) { console.warn("خطأ في أوامر المسار:", e.message); }
+  }
+
+  if (pathHasContent(path)) return path;
+
+  /* احتياطي: toSVG */
+  let d = null;
+  try { d = (typeof g.path.toSVG === "function") ? g.path.toSVG() : null; }
+  catch (e) { d = null; }
+  if (d) {
+    try {
+      const raw = parseSvgD(d);
+      const valid = raw.filter((c) => c.type === "Z" ||
+        (c.x !== undefined && isFinite(c.x) && isFinite(c.y)));
+      if (valid.length) path.commands = valid;
+    } catch (e) { console.warn("toSVG فشل:", e.message); }
+  }
+  return path;
+}
+
+/* بناء خط opentype كامل من fontkit */
+function fontkitToOpentype(fk, u8) {
+  const fkFont = fk.create(u8);
+  if (!fkFont || !fkFont.numGlyphs) throw new Error("محرك القراءة لم يجد حروفًا");
+
+  const upm = fkFont.unitsPerEm || 1000;
+  const tol = upm / 1000;
+
+  const cpsById = Object.create(null);
+  let cs = [];
+  try { cs = fkFont.characterSet || []; } catch (e) { cs = []; }
+  cs.forEach((cp) => {
+    try {
+      const g = fkFont.glyphForCodePoint(cp);
+      if (g && g.id !== undefined) {
+        (cpsById[g.id] = cpsById[g.id] || []).push(cp);
+      }
+    } catch (e) { /* تجاهل */ }
+  });
+
+  const glyphs = [];
+  for (let i = 0; i < fkFont.numGlyphs; i++) {
+    let g = null;
+    try { g = fkFont.getGlyph(i); } catch (e) { /* تجاهل */ }
+    if (!g) continue;
+    const path = fontkitGlyphToPath(g, tol);
+    const cps = cpsById[i] || [];
+    const uni = cps.length ? cps[0] : undefined;
+    const og = new opentype.Glyph({
+      name: g.name || (uni !== undefined ? cpName(uni) : "glyph" + i),
+      unicode: uni,
+      unicodes: cps,
+      advanceWidth: Math.max(0, Math.round(g.advanceWidth || upm / 2)),
+      path: path
+    });
+    /* ⚠ opentype.js 1.3.4 بيهمل unicodes الممررة ويستبدلها بـ [unicode] —
+       نفرض المصفوفة كاملة عشان كل أكواد أشكال العرض تعيش في cmap */
+    og.unicodes = cps.slice();
+    og.unicode = uni;
+    glyphs.push(og);
+  }
+  if (!glyphs.length) throw new Error("لم يتم استخراج أي حروف");
+  glyphs.forEach((g, i) => { g.index = i; });
+
+  const family = fkFont.familyName || fkFont.postscriptName || "Font";
+  const f = new opentype.Font({
+    familyName: family,
+    styleName: fkFont.subfamilyName || "Regular",
+    unitsPerEm: upm,
+    ascender: fkFont.ascent != null ? fkFont.ascent : Math.round(upm * 0.8),
+    descender: fkFont.descent != null ? fkFont.descent : -Math.round(upm * 0.2),
+    glyphs: glyphs
+  });
+  f.names = { fontFamily: { en: family }, fontSubfamily: { en: "Regular" } };
+
+  if (Array.isArray(f.glyphs) && typeof f.glyphs.get !== "function") {
+    f.glyphs.get = function (i) { return this[i]; };
+  }
+  f.glyphIndexMap = Object.create(null);
+  glyphs.forEach((g) => {
+    (g.unicodes || []).forEach((u) => {
+      if (f.glyphIndexMap[u] === undefined) f.glyphIndexMap[u] = g.index;
+    });
+  });
+  f.numGlyphs = glyphs.length;
+  f.outlinesFormat = "truetype";
+
+  try {
+    extractFromFontkitGsub(fkFont, f);
+  } catch (e) {
+    registerWordLigatures(f, {});
+  }
+  return f;
+}
+
+function readSignature(buf) {
+  if (!buf || buf.byteLength < 4) return "";
+  const b = new Uint8Array(buf, 0, 4);
+  return String.fromCharCode(b[0], b[1], b[2], b[3]);
+}
+
+/* ⚠ إصلاح جذري «الـ GSUB الأصلي مش بيتقرأ من خط WOFF1 → توليد لام-ألف
+   وأشكال init/medi/fina يدويًا حتى بدون أي تعديل من المستخدم»:
+   sfntEntries/extractTable (يُستخدما وقت التصدير لقراءة GSUB الأصلي)
+   بيفترضوا ترويسة SFNT خام (OTTO/00 01 00 00). ملف WOFF1 مبنيّ بترويسة
+   "wOFF" مختلفة تمامًا وجداوله مضغوطة بـ zlib فرديًا — فالقراءة المباشرة
+   كانت بترجع null بصمت، فالكود يظن إن الخط "مفيهوش GSUB" ويصنّع
+   لام-ألف/أشكال الحروف بنفسه (تصنيع هندسي تقريبي بيسبب اختفاء/تشوّه
+   اللام). فك WOFF2 لـ TTF كان موجود بالفعل — هنا بنعمل نفس الشيء
+   لـ WOFF1 (فك zlib inflate عبر DecompressionStream المتاحة في المتصفح)
+   فيرجع origGSUB يقرأ الجدول الحقيقي من تصميم الخط. */
+async function unwrapWoff1(buf) {
+  const u8 = new Uint8Array(buf);
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  const numTables = dv.getUint16(12);
+  const entries = [];
+  for (let i = 0; i < numTables; i++) {
+    const off = 44 + i * 20;
+    entries.push({
+      tag: String.fromCharCode(u8[off], u8[off + 1], u8[off + 2], u8[off + 3]),
+      offset: dv.getUint32(off + 4),
+      compLength: dv.getUint32(off + 8),
+      origLength: dv.getUint32(off + 12),
+      origChecksum: dv.getUint32(off + 16)
+    });
+  }
+  const inflate = async (bytes) => {
+    if (typeof DecompressionStream === "undefined") {
+      throw new Error("DecompressionStream غير متاحة في هذا المتصفح لفك WOFF1");
+    }
+    /* zlib = 2-byte header + deflate stream + 4-byte adler32 — نشيل الهيدر
+       ونمرر الـ deflate الخام لـ DecompressionStream('deflate-raw') */
+    const raw = bytes.slice(2, bytes.length - 4);
+    const ds = new DecompressionStream("deflate-raw");
+    const stream = new Blob([raw]).stream().pipeThrough(ds);
+    const out = await new Response(stream).arrayBuffer();
+    return new Uint8Array(out);
+  };
+  const tables = [];
+  for (const e of entries) {
+    const slice = u8.slice(e.offset, e.offset + e.compLength);
+    let data;
+    if (e.compLength === e.origLength) {
+      data = slice; /* الجدول مش مضغوط أصلًا */
+    } else {
+      data = await inflate(slice);
+      if (data.length !== e.origLength) {
+        throw new Error("فك WOFF1: طول جدول " + e.tag + " غلط بعد الفك");
+      }
+    }
+    tables.push({ tag: e.tag, data: data });
+  }
+  /* إعادة بناء SFNT خام (نفس منطق sfnt header بتاع opentype.js) */
+  const sfntVersionSig = readSignature(buf.slice(4, 8)) === "OTTO" ? "OTTO" : String.fromCharCode(0, 1, 0, 0);
+  const n = tables.length;
+  const pow2 = Math.pow(2, Math.floor(Math.log2(n || 1)));
+  const searchRange = pow2 * 16;
+  const entrySelector = Math.floor(Math.log2(pow2 || 1));
+  const rangeShift = n * 16 - searchRange;
+  const headerSize = 12 + n * 16;
+  let offset = headerSize;
+  const dirBytes = [];
+  const dataBytes = [];
+  const tagBytes = (s) => [s.charCodeAt(0), s.charCodeAt(1), s.charCodeAt(2), s.charCodeAt(3)];
+  const u32Bytes = (v) => [(v >>> 24) & 255, (v >>> 16) & 255, (v >>> 8) & 255, v & 255];
+  const u16Bytes = (v) => [(v >>> 8) & 255, v & 255];
+  const checksum = (bytes) => {
+    let sum = 0;
+    const padded = bytes.length % 4 ? bytes.length + (4 - bytes.length % 4) : bytes.length;
+    for (let i = 0; i < padded; i += 4) {
+      const b0 = bytes[i] || 0, b1 = bytes[i + 1] || 0, b2 = bytes[i + 2] || 0, b3 = bytes[i + 3] || 0;
+      sum = (sum + (((b0 << 24) | (b1 << 16) | (b2 << 8) | b3) >>> 0)) >>> 0;
+    }
+    return sum >>> 0;
+  };
+  tables.sort((a, b) => (a.tag < b.tag ? -1 : a.tag > b.tag ? 1 : 0));
+  for (const t of tables) {
+    const cs = checksum(t.data);
+    dirBytes.push(...tagBytes(t.tag), ...u32Bytes(cs), ...u32Bytes(offset), ...u32Bytes(t.data.length));
+    dataBytes.push({ offset: offset, data: t.data });
+    offset += t.data.length;
+    while (offset % 4 !== 0) offset++;
+  }
+  const total = offset;
+  const out = new Uint8Array(total);
+  const sigCodes = sfntVersionSig === "OTTO"
+    ? [0x4F, 0x54, 0x54, 0x4F]
+    : [0, 1, 0, 0];
+  out.set(sigCodes, 0);
+  out.set(u16Bytes(n), 4);
+  out.set(u16Bytes(searchRange), 6);
+  out.set(u16Bytes(entrySelector), 8);
+  out.set(u16Bytes(rangeShift), 10);
+  out.set(new Uint8Array(dirBytes), 12);
+  dataBytes.forEach((d) => out.set(d.data, d.offset));
+  return out.buffer;
+}
+
+function countGoodGlyphs(f) {
+  let total = 0, good = 0;
+  const n = (typeof f.numGlyphs === "number") ? f.numGlyphs : 0;
+  for (let i = 0; i < n; i++) {
+    total++;
+    let g = null;
+    try {
+      g = f.glyphs.get ? f.glyphs.get(i) : (Array.isArray(f.glyphs) ? f.glyphs[i] : null);
+    } catch (e) { g = null; }
+    if (!g) continue;
+    /* ⚠ .path هنا getter بيؤجل تحليل جدول glyf الفعلي لحد أول قراءة —
+       خطوط ناتجة عن أدوات غير قياسية (svg2ttf/Fontello مثلًا) ممكن
+       يبقى فيها رسمات قليلة ببيانات contour تالفة ("Bad flags.") أو
+       إزاحات خارج حدود الملف. من غير try/catch هنا، رمز واحد فاسد
+       كان بيوقف تحليل الخط بالكامل حتى لو باقي مئات الرموز سليمة. */
+    let hasContent = false;
+    try {
+      hasContent = pathHasContent(g.path);
+    } catch (e) {
+      console.warn("رسمة تالفة تم تجاوزها (GID " + i + "):", e.message);
+      hasContent = false;
+    }
+    if (hasContent) good++;
+  }
+  return { good: good, total: total };
+}
+
+/* ================================================================
+   § 7-bis — دعم الخطوط النقطية (SBIX) و المجموعات (TTC) و CFF2
+   خطوط زي Apple Color Emoji / إيموجي iOS مفيهاش جداول glyf/CFF —
+   فيها صور PNG جوّه جدول sbix. opentype.js بيرمي
+   «Font doesn't contain TrueType or CFF outlines» و fontkit بيفشل
+   في قراءة الحروف. الحل: نقرأ sbix مباشرة، نفك صور PNG، ونحوّلها
+   لمسارات متجهة بتتبع حدود المناطق (marching squares) مع تبسيط
+   وتنعيم — فالخط يفتح طبيعي وقابل للتحرير والتصدير ومن غير أي
+   تكسير (بكسل) لأن النتيجة فيكتور بيتحجّم على أي دقة.
+   ================================================================ */
+
+/* تحليل دليل جداول SFNT من البايتات الخام — بيفهم كمان ttcf (مجموعات) */
+function sfntTableDir(u8) {
+  try {
+    if (!u8 || u8.length < 12) return null;
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    let sig = "";
+    for (let i = 0; i < 4; i++) sig += String.fromCharCode(u8[i]);
+    const out = { sig: sig, tables: new Map(), collection: false, subfonts: [] };
+    if (sig === "ttcf") {
+      out.collection = true;
+      const numFonts = dv.getUint32(8);
+      if (numFonts < 1 || numFonts > 200) return null;
+      const offs = [];
+      for (let i = 0; i < numFonts; i++) {
+        const off = dv.getUint32(12 + i * 4);
+        if (off >= u8.length - 12) return null;
+        offs.push(off);
+      }
+      offs.sort((a, b) => a - b);
+      for (let i = 0; i < offs.length; i++) {
+        const end = (i + 1 < offs.length) ? offs[i + 1] : u8.length;
+        out.subfonts.push({ offset: offs[i], length: end - offs[i] });
+      }
+      return out;
+    }
+    const isOtto = sig === "OTTO", isTrue = sig === "true";
+    const isTtf = u8[0] === 0 && u8[1] === 1 && u8[2] === 0 && u8[3] === 0;
+    if (!isOtto && !isTrue && !isTtf) return null;
+    const num = dv.getUint16(4);
+    if (!num || num > 600) return null;
+    for (let i = 0; i < num; i++) {
+      const off = 12 + i * 16;
+      if (off + 16 > u8.length) return null;
+      let tag = "";
+      for (let j = 0; j < 4; j++) tag += String.fromCharCode(u8[off + j]);
+      const toff = dv.getUint32(off + 8), tlen = dv.getUint32(off + 12);
+      if (toff + tlen > u8.length) continue;
+      out.tables.set(tag, { offset: toff, length: tlen });
+    }
+    return out;
+  } catch (e) { return null; }
+}
+
+/* قراءة cmap → Map(codePoint → glyphID) — صيغ 0/4/6/12 بأفضلية يونيكود الكامل */
+function parseCmapMap(u8) {
+  const map = new Map();
+  try {
+    if (!u8 || u8.length < 4) return map;
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    const numTables = dv.getUint16(2);
+    const prio = (r) => {
+      if (r.p === 3 && r.e === 10) return 0;      /* UCS-4 */
+      if (r.p === 0 && (r.e === 4 || r.e === 6)) return 1;
+      if (r.p === 3 && r.e === 1) return 2;       /* BMP */
+      if (r.p === 0) return 3;
+      return 4;
+    };
+    const recs = [];
+    for (let i = 0; i < numTables && i < 32; i++) {
+      const off = 4 + i * 8;
+      if (off + 8 > u8.length) break;
+      recs.push({ p: dv.getUint16(off), e: dv.getUint16(off + 2), off: dv.getUint32(off + 4) });
+    }
+    recs.sort((a, b) => prio(a) - prio(b));
+    for (const r of recs) {
+      if (!r.off || r.off >= u8.length) continue;
+      const fmt = dv.getUint16(r.off);
+      if (fmt === 4) {
+        const segX2 = dv.getUint16(r.off + 6);
+        const seg = segX2 / 2;
+        const endBase = r.off + 14;
+        const startBase = endBase + segX2 + 2;
+        const deltaBase = startBase + segX2;
+        const rangeBase = deltaBase + segX2;
+        if (seg <= 0 || rangeBase + segX2 > u8.length) continue;
+        for (let s = 0; s < seg; s++) {
+          const end = dv.getUint16(endBase + s * 2);
+          const start = dv.getUint16(startBase + s * 2);
+          const delta = dv.getInt16(deltaBase + s * 2) | 0;
+          const rangeOff = dv.getUint16(rangeBase + s * 2);
+          if (start === 0xFFFF && end === 0xFFFF) continue;
+          if (rangeOff === 0) {
+            for (let c = start; c <= end && c !== 0xFFFF; c++) {
+              const g = (c + delta) & 0xFFFF;
+              if (g && !map.has(c)) map.set(c, g);
+            }
+          } else {
+            for (let c = start; c <= end && c !== 0xFFFF; c++) {
+              const gi = rangeBase + s * 2 + rangeOff + (c - start) * 2;
+              if (gi + 1 >= u8.length) break;
+              const g = dv.getUint16(gi);
+              if (g && !map.has(c)) map.set(c, (g + delta) & 0xFFFF);
+            }
+          }
+        }
+      } else if (fmt === 12) {
+        const n = dv.getUint32(r.off + 12);
+        for (let i2 = 0; i2 < n && i2 < 200000; i2++) {
+          const go = r.off + 16 + i2 * 12;
+          if (go + 12 > u8.length) break;
+          const s = dv.getUint32(go), e = dv.getUint32(go + 4), sg = dv.getUint32(go + 8);
+          if (e < s || e - s > 200000) continue;
+          for (let c = s; c <= e; c++) {
+            const g2 = sg + (c - s);
+            if (g2 && !map.has(c)) map.set(c, g2);
+          }
+        }
+      } else if (fmt === 6) {
+        const first = dv.getUint16(r.off + 6), cnt = dv.getUint16(r.off + 8);
+        if (first + cnt > 0x110000) continue;
+        for (let i2 = 0; i2 < cnt && i2 < 65536; i2++) {
+          const g2 = dv.getUint16(r.off + 10 + i2 * 2);
+          if (g2 && !map.has(first + i2)) map.set(first + i2, g2);
+        }
+      } else if (fmt === 0) {
+        for (let c = 0; c < 256 && r.off + 6 + c < u8.length; c++) {
+          const g2 = u8[r.off + 6 + c];
+          if (g2 && !map.has(c)) map.set(c, g2);
+        }
+      }
+    }
+  } catch (e) { /* cmap تالف — نرجّع اللي جمعناه */ }
+  return map;
+}
+
+/* اسم عائلة الخط من جدول name (قراءة مصغّرة) */
+function sfntFamilyName(u8) {
+  try {
+    if (!u8 || u8.length < 6) return null;
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    const count = dv.getUint16(2), strOff = dv.getUint16(4);
+    let best = null, bestScore = -1;
+    for (let i = 0; i < count && i < 64; i++) {
+      const off = 6 + i * 12;
+      if (off + 12 > u8.length) break;
+      const p = dv.getUint16(off), enc = dv.getUint16(off + 2), lang = dv.getUint16(off + 4);
+      const id = dv.getUint16(off + 6), len = dv.getUint16(off + 8), so = dv.getUint16(off + 10);
+      if (id !== 1 && id !== 16) continue;
+      const abs = strOff + so;
+      if (len > 512 || abs + len > u8.length) continue;
+      let name = "";
+      if (p === 3 || p === 0) {
+        for (let j = 0; j + 1 < len; j += 2) name += String.fromCharCode(dv.getUint16(abs + j));
+      } else if (p === 1 && enc === 0) {
+        for (let j = 0; j < len; j++) name += String.fromCharCode(u8[abs + j]);
+      } else continue;
+      name = (name.split("\u0000")[0] || "").trim();
+      if (!name) continue;
+      const score = (id === 16 ? 2 : 0) + (lang === 0x0409 || lang === 0 ? 1 : 0);
+      if (score > bestScore) { bestScore = score; best = name; }
+    }
+    return best;
+  } catch (e) { return null; }
+}
+
+/* كانفاس مشترك لفك صور PNG (نفس الذاكرة — بلا تراكم) */
+const _sbixCanvas = (typeof document !== "undefined") ? document.createElement("canvas") : null;
+const _sbixCtx = _sbixCanvas ? _sbixCanvas.getContext("2d", { willReadFrequently: true }) : null;
+
+async function sbixPngToImageData(bytes) {
+  try {
+    const blob = new Blob([bytes], { type: "image/png" });
+    let bmp = null;
+    if (typeof createImageBitmap === "function") {
+      try { bmp = await createImageBitmap(blob); } catch (e) { bmp = null; }
+    }
+    if (bmp) {
+      const w = bmp.width, h = bmp.height;
+      if (!w || !h || w > 1024 || h > 1024) { if (bmp.close) bmp.close(); return null; }
+      _sbixCanvas.width = w; _sbixCanvas.height = h;
+      _sbixCtx.clearRect(0, 0, w, h);
+      _sbixCtx.drawImage(bmp, 0, 0);
+      if (bmp.close) bmp.close();
+      return _sbixCtx.getImageData(0, 0, w, h);
+    }
+    return await new Promise((resolve) => {
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const w = Math.min(img.naturalWidth || 0, 1024), h = Math.min(img.naturalHeight || 0, 1024);
+          if (!w || !h) return resolve(null);
+          _sbixCanvas.width = w; _sbixCanvas.height = h;
+          _sbixCtx.clearRect(0, 0, w, h);
+          _sbixCtx.drawImage(img, 0, 0, w, h);
+          resolve(_sbixCtx.getImageData(0, 0, w, h));
+        } catch (e) { resolve(null); }
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  } catch (e) { return null; }
+}
+
+/* تتبع حدود المناطق الممتلئة (alpha أو السطوع) — marching squares:
+   نبني الحواف الموجهة بين بكسل ممتلئ وفاضي (المنطقة الممتلئة على يمين
+   المسير في إحداثيات الشاشة) ونخيطها في حلقات مغلقة.
+   بتتعامل مع نقاط الالتقاء القطرية (pinch) بقاعدة أشد دورة مع عقارب الساعة. */
+function traceMaskToLoops(data, w, h, threshold) {
+  const n = w * h;
+  let mode = "alpha";
+  let solid = new Uint8Array(n);
+  let solidCount = 0;
+  const buildMask = (useLuma) => {
+    const m = new Uint8Array(n);
+    let c = 0;
+    for (let i = 0, p = 0; i < n; i++, p += 4) {
+      let on;
+      if (useLuma) {
+        const lum = 0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2];
+        on = lum <= 200;
+      } else {
+        on = data[p + 3] >= threshold;
+      }
+      if (on) { m[i] = 1; c++; }
+    }
+    return { m: m, c: c };
+  };
+  let mk = buildMask(false);
+  /* لو الماسك فاضي أو مليان (صورة من غير شفافية) — جرّب السطوع */
+  if (mk.c === 0 || mk.c === n) {
+    const mk2 = buildMask(true);
+    if (mk2.c > 0 && mk2.c < n) { mode = "luma"; mk = mk2; }
+  }
+  solid = mk.m; solidCount = mk.c;
+  if (!solidCount || solidCount === n) return { loops: [], mode: mode };
+
+  const S = (x, y) => (x >= 0 && y >= 0 && x < w && y < h) ? solid[y * w + x] : 0;
+  const outEdges = new Map();
+  const addEdge = (x1, y1, x2, y2) => {
+    const k = x1 + "," + y1;
+    let arr = outEdges.get(k);
+    if (!arr) { arr = []; outEdges.set(k, arr); }
+    arr.push([x2, y2]);
+  };
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (!solid[y * w + x]) continue;
+      if (!S(x, y - 1)) addEdge(x, y, x + 1, y);
+      if (!S(x + 1, y)) addEdge(x + 1, y, x + 1, y + 1);
+      if (!S(x, y + 1)) addEdge(x + 1, y + 1, x, y + 1);
+      if (!S(x - 1, y)) addEdge(x, y + 1, x, y);
+    }
+  }
+  const used = new Set();
+  const loops = [];
+  const maxGuard = w * h * 8 + 64;
+  for (const [startKey, startList] of outEdges) {
+    for (const firstEdge of startList) {
+      const ek = startKey + ">" + firstEdge[0] + "," + firstEdge[1];
+      if (used.has(ek)) continue;
+      const sc = startKey.split(",");
+      const sx = +sc[0], sy = +sc[1];
+      const pts = [[sx, sy]];
+      let dx = firstEdge[0] - sx, dy = firstEdge[1] - sy;
+      let nx = firstEdge[0], ny = firstEdge[1];
+      used.add(ek);
+      let ok = false, guard = 0;
+      while (guard++ < maxGuard) {
+        pts.push([nx, ny]);
+        if (nx === sx && ny === sy) { ok = true; break; }
+        const cands = outEdges.get(nx + "," + ny);
+        if (!cands || !cands.length) break;
+        let pick = null;
+        if (cands.length === 1) pick = cands[0];
+        else {
+          let bestScore = -1e9;
+          for (const c of cands) {
+            const cdx = c[0] - nx, cdy = c[1] - ny;
+            if (cdx === -dx && cdy === -dy) continue; /* ما نرجعوش للخلف */
+            const cross = dx * cdy - dy * cdx;        /* موجب = دورة يمين */
+            const dot = dx * cdx + dy * cdy;
+            const score = (cross > 0 ? 1 : cross < 0 ? -1 : 0) * 2 + (dot > 0 ? 1 : 0);
+            if (score > bestScore) { bestScore = score; pick = c; }
+          }
+          if (!pick) pick = cands[0];
+        }
+        const pk = nx + "," + ny + ">" + pick[0] + "," + pick[1];
+        if (used.has(pk)) break;
+        used.add(pk);
+        dx = pick[0] - nx; dy = pick[1] - ny;
+        nx = pick[0]; ny = pick[1];
+      }
+      if (ok && pts.length >= 4) loops.push(pts);
+    }
+  }
+  return { loops: loops, mode: mode };
+}
+
+/* المساحة الموقعة لمضلع مغلق */
+function polyArea(pts) {
+  let s = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length];
+    s += a[0] * b[1] - b[0] * a[1];
+  }
+  return s / 2;
+}
+
+/* Douglas-Peucker لمقطع بين مؤشرين — يحتفظ بالنقط المهمة */
+function _dpSeg(pts, i0, i1, tol, keep) {
+  const stack = [[i0, i1]];
+  keep[i0] = 1; keep[i1] = 1;
+  while (stack.length) {
+    const seg = stack.pop();
+    const a = seg[0], b = seg[1];
+    if (b - a < 2) continue;
+    const px = pts[a][0], py = pts[a][1], qx = pts[b][0], qy = pts[b][1];
+    const dx = qx - px, dy = qy - py;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1e-9;
+    let worst = -1, wi = -1;
+    for (let i = a + 1; i < b; i++) {
+      const d = Math.abs((pts[i][0] - px) * dy - (pts[i][1] - py) * dx) / len;
+      if (d > worst) { worst = d; wi = i; }
+    }
+    if (worst > tol && wi > 0) { keep[wi] = 1; stack.push([a, wi], [wi, b]); }
+  }
+}
+
+/* تبسيط حلقة مغلقة بـ Douglas-Peucker — نشيل درجات السلم عشان
+   الأضلاع المائلة تطلع خطوط مائلة ناعمة بدل الدرجات المبكسلة */
+function simplifyLoopDP(pts, tol) {
+  const n = pts.length;
+  if (n <= 8) return pts;
+  let mx = 0, my = 0;
+  for (const p of pts) { mx += p[0]; my += p[1]; }
+  mx /= n; my /= n;
+  let ci = 0, best = -1;
+  for (let i = 0; i < n; i++) {
+    const d = (pts[i][0] - mx) * (pts[i][0] - mx) + (pts[i][1] - my) * (pts[i][1] - my);
+    if (d > best) { best = d; ci = i; }
+  }
+  let bi = -1; best = -1;
+  for (let i = 0; i < n; i++) {
+    const d = (pts[i][0] - pts[ci][0]) * (pts[i][0] - pts[ci][0]) +
+              (pts[i][1] - pts[ci][1]) * (pts[i][1] - pts[ci][1]);
+    if (d > best) { best = d; bi = i; }
+  }
+  if (ci === bi) return pts;
+  const a = Math.min(ci, bi), b = Math.max(ci, bi);
+  const keep = new Uint8Array(n);
+  _dpSeg(pts, a, b, tol, keep);
+  /* المقطع التاني بيلاّف من النهاية للأول */
+  const rev = pts.slice(b).concat(pts.slice(0, a + 1));
+  const keep2 = new Uint8Array(rev.length);
+  _dpSeg(rev, 0, rev.length - 1, tol, keep2);
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    if (i >= a && i <= b) { if (keep[i]) out.push(pts[i]); }
+    else {
+      const j = i < a ? i + (n - b) : i - b;
+      if (keep2[j]) out.push(pts[i]);
+    }
+  }
+  return out;
+}
+
+/* تنعيم Chaikin ذكي — بينعّم الانعطافات الخفيفة (درجات السلم/المنحنيات)
+   بس بيحافظ على الرؤوس الحادة (زوايا المربعات والمستطيلات ونهايات الخطوط) */
+function chaikinClosed(pts, passes) {
+  let cur = pts;
+  for (let p = 0; p < passes; p++) {
+    const n = cur.length;
+    if (n < 4 || n > 4000) break;
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const a = cur[(i - 1 + n) % n], b = cur[i], c = cur[(i + 1) % n];
+      const v1x = b[0] - a[0], v1y = b[1] - a[1];
+      const v2x = c[0] - b[0], v2y = c[1] - b[1];
+      const l1 = Math.sqrt(v1x * v1x + v1y * v1y) || 1e-9;
+      const l2 = Math.sqrt(v2x * v2x + v2y * v2y) || 1e-9;
+      const cosA = (v1x * v2x + v1y * v2y) / (l1 * l2);
+      if (cosA < 0.34) {
+        /* انعطافة حادة (أكتر من حوالي 70°) — نحتفظ بالرأس زي ما هو */
+        out.push(b);
+      } else {
+        /* قص زاوية Chaikin حوالين الرأس */
+        out.push([b[0] * 0.75 + a[0] * 0.25, b[1] * 0.75 + a[1] * 0.25]);
+        out.push([b[0] * 0.75 + c[0] * 0.25, b[1] * 0.75 + c[1] * 0.25]);
+      }
+    }
+    cur = out;
+  }
+  return cur;
+}
+
+/* تحويل حلقات lattice (بكسل، y لتحت) لمسار opentype (y لفوق) مع
+   ضبط اتجاه كل حلقة: الخارجي عكس عقارب الساعة والثقوب معاها —
+   عشان قاعدة nonzero تقص الثقوب صح (الدونات تطلع فيها الظفر).
+   originOffset بيحدد مكان الركن السفلي الشمال للصورة بالنسبة لأصل
+   الحرف — فقمة الصورة تبقى فوق خط الأساس زي ما الخطوط الرسمية بتتصور */
+function loopsToOpentypePath(loops, ox, oy, imgH) {
+  const polys = loops.map((lp) => {
+    const pts = new Array(lp.length);
+    for (let i = 0; i < lp.length; i++) pts[i] = [ox + lp[i][0], oy + imgH - lp[i][1]];
+    return pts;
+  });
+  const boxes = polys.map((pts) => {
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (const p of pts) {
+      if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0];
+      if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1];
+    }
+    return [x0, y0, x1, y1];
+  });
+  const inside = (poly, box, pt) => {
+    if (pt[0] < box[0] || pt[0] > box[2] || pt[1] < box[1] || pt[1] > box[3]) return false;
+    let c = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const a = poly[i], b = poly[j];
+      if (((a[1] > pt[1]) !== (b[1] > pt[1])) &&
+          (pt[0] < (b[0] - a[0]) * (pt[1] - a[1]) / ((b[1] - a[1]) || 1e-9) + a[0])) c = !c;
+    }
+    return c;
+  };
+  const areas = polys.map((pts) => Math.abs(polyArea(pts)));
+  const order = polys.map((_, i) => i).sort((a, b) => areas[b] - areas[a]);
+  const depth = new Array(polys.length).fill(0);
+  for (let oi = 0; oi < order.length; oi++) {
+    const i = order[oi];
+    let d = 0;
+    for (let oj = 0; oj < oi; oj++) {
+      const j = order[oj];
+      if (areas[j] <= areas[i]) continue;
+      if (inside(polys[j], boxes[j], polys[i][0])) d++;
+    }
+    depth[i] = d;
+  }
+  const path = new opentype.Path();
+  polys.forEach((pts, i) => {
+    const a = polyArea(pts);
+    if (!a || pts.length < 3) return;
+    const outer = (depth[i] % 2) === 0;
+    if ((a > 0) !== outer) pts.reverse();
+    path.moveTo(pts[0][0], pts[0][1]);
+    for (let k = 1; k < pts.length; k++) path.lineTo(pts[k][0], pts[k][1]);
+    path.close();
+  });
+  return path;
+}
+
+/* بناء خط opentype كامل من جدول sbix نقطي — تحويل كل صورة PNG
+   لمسار متجه مبسّط ومُنعّم (الوحدات = بكسل الـ strike المختار) */
+async function buildFontFromSbix(u8, dir, opts) {
+  opts = opts || {};
+  const g = (tag) => dir.tables.get(tag) || null;
+  const maxp = g("maxp"), sbix = g("sbix"), cmapT = g("cmap");
+  if (!maxp || !sbix) throw new Error("جداول sbix ناقصة");
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  /* numGlyphs في maxp بـ uint16 (النسختين 0.5 و 1.0) */
+  const numGlyphs = Math.min(dv.getUint16(maxp.offset + 4), 65535);
+  if (!numGlyphs) throw new Error("مفيش حروف في الخط النقطي");
+
+  const sOff = sbix.offset;
+  if (sbix.length < 12) throw new Error("جدول sbix تالف");
+  const numStrikes = dv.getUint32(sOff + 4);
+  if (!numStrikes || numStrikes > 64) throw new Error("جدول sbix تالف (strikes)");
+
+  /* اختيار أفضل strike: أكبر دقة معقولة حسب عدد الحروف —
+     التتبع بيرجّع فيكتور ناعم فالجودة عالية حتى في الدقة المتوسطة */
+  const capByCount = numGlyphs > 2400 ? 96 : (numGlyphs > 1200 ? 128 : 256);
+  let best = null;
+  for (let i = 0; i < numStrikes; i++) {
+    const so = dv.getUint32(sOff + 8 + i * 4);
+    /* رأس الـ strike: ppem uint16 + resolution uint16 + (numGlyphs+1) إزاحة uint32 */
+    if (!so || sOff + so + 4 + (numGlyphs + 1) * 4 > u8.length) continue;
+    const ppem = dv.getUint16(sOff + so);
+    if (!ppem || ppem > 1024) continue;
+    if (best === null) { best = { so: so, ppem: ppem }; continue; }
+    const bOk = best.ppem <= capByCount, cOk = ppem <= capByCount;
+    if (cOk && (!bOk || ppem > best.ppem)) best = { so: so, ppem: ppem };
+    else if (!cOk && !bOk && ppem < best.ppem) best = { so: so, ppem: ppem };
+  }
+  if (!best) throw new Error("مفيش أحجام صور صالحة في جدول sbix");
+
+  const so = sOff + best.so;
+  const upm = best.ppem;
+
+  /* قراءة رؤوس سجلات الحروف (بدون نسخ البيانات) — وإحليل «dupe» */
+  const heads = new Array(numGlyphs).fill(null);
+  let bitmapCount = 0;
+  for (let i = 0; i < numGlyphs; i++) {
+    const o1 = dv.getUint32(so + 4 + i * 4);
+    const o2 = dv.getUint32(so + 4 + (i + 1) * 4);
+    if (o2 <= o1) continue;
+    const start = so + o1, len = o2 - o1;
+    if (start + len > u8.length || len < 8) continue;
+    heads[i] = {
+      ox: dv.getInt16(start), oy: dv.getInt16(start + 2),
+      type: String.fromCharCode(u8[start + 4], u8[start + 5], u8[start + 6], u8[start + 7]),
+      off: start + 8, len: len - 8
+    };
+  }
+  for (let i = 0; i < numGlyphs; i++) {
+    const r = heads[i];
+    if (r && r.type === "dupe" && r.len >= 2) {
+      const target = (u8[r.off] << 8) | u8[r.off + 1];
+      if (target >= 0 && target < numGlyphs && heads[target] && heads[target].type === "png ") {
+        heads[i] = heads[target];
+      }
+    }
+    if (heads[i] && heads[i].type === "png ") bitmapCount++;
+  }
+  if (!bitmapCount) throw new Error("مفيش صور PNG في جدول sbix");
+
+  let cpMap = new Map();
+  if (cmapT) cpMap = parseCmapMap(u8.slice(cmapT.offset, cmapT.offset + cmapT.length));
+  const cpsByGid = {};
+  for (const [cp, gid] of cpMap) {
+    if (gid < numGlyphs) (cpsByGid[gid] = cpsByGid[gid] || []).push(cp);
+  }
+
+  let family = null;
+  const nameT = g("name");
+  if (nameT && nameT.length) {
+    family = sfntFamilyName(u8.slice(nameT.offset, nameT.offset + Math.min(nameT.length, 65536)));
+  }
+  if (!family) family = opts.fallbackName || "Bitmap Font";
+
+  let asc = Math.round(upm * 0.8), desc = -Math.round(upm * 0.2);
+  const hhea = g("hhea");
+  if (hhea && hhea.length >= 8) {
+    try {
+      const a = dv.getInt16(hhea.offset + 4), d = dv.getInt16(hhea.offset + 6);
+      if (d < 0) { asc = a; desc = d; }
+    } catch (e) { /* تجاهل */ }
+  }
+
+  const glyphs = [];
+  let good = 0;
+  for (let gid = 0; gid < numGlyphs; gid++) {
+    const r = heads[gid];
+    const cps = cpsByGid[gid] || [];
+    const uni = cps.length ? cps[0] : undefined;
+    let path = new opentype.Path();
+    let adv = Math.round(upm / 2);
+    if (r && r.type === "png " && r.len > 8) {
+      const img = await sbixPngToImageData(u8.slice(r.off, r.off + r.len));
+      if (img) {
+        adv = img.width;
+        const res = traceMaskToLoops(img.data, img.width, img.height, 96);
+        if (res.loops.length) {
+          const simp = [];
+          for (const lp of res.loops) {
+            if (Math.abs(polyArea(lp)) < 1.5) continue;
+            let l = simplifyLoopDP(lp, 0.55);
+            l = chaikinClosed(l, 1);
+            if (l.length >= 3) simp.push(l);
+          }
+          if (simp.length) path = loopsToOpentypePath(simp, r.ox, r.oy, img.height);
+        }
+      }
+    }
+    if (pathHasContent(path)) good++;
+    const og = new opentype.Glyph({
+      name: uni !== undefined ? cpName(uni) : ("gid" + gid),
+      unicode: uni,
+      unicodes: cps.slice(),
+      advanceWidth: Math.max(0, adv || Math.round(upm / 2)),
+      path: path
+    });
+    og.unicodes = cps.slice();
+    og.unicode = uni;
+    glyphs.push(og);
+    if ((gid & 15) === 15) {
+      if (opts.onProgress) opts.onProgress(gid + 1, numGlyphs);
+      await new Promise((r2) => setTimeout(r2, 0));
+    }
+  }
+  if (!glyphs.length) throw new Error("لم يتم استخراج أي حروف من sbix");
+  glyphs.forEach((gg, i) => { gg.index = i; });
+
+  const f = new opentype.Font({
+    familyName: family,
+    styleName: "Regular",
+    unitsPerEm: upm,
+    ascender: asc,
+    descender: desc,
+    glyphs: glyphs
+  });
+  f.names = { fontFamily: { en: family }, fontSubfamily: { en: "Regular" } };
+  if (Array.isArray(f.glyphs) && typeof f.glyphs.get !== "function") {
+    f.glyphs.get = function (i) { return this[i]; };
+  }
+  f.glyphIndexMap = Object.create(null);
+  glyphs.forEach((gg) => {
+    (gg.unicodes || []).forEach((uu) => {
+      if (f.glyphIndexMap[uu] === undefined) f.glyphIndexMap[uu] = gg.index;
+    });
+  });
+  f.numGlyphs = glyphs.length;
+  f.outlinesFormat = "truetype";
+  registerWordLigatures(f, {});
+  return { font: f, good: good, total: glyphs.length };
+}
+
+/* رسالة خطأ مفهومة للمستخدم + تشخيص الجداول في الكونسول */
+function friendlyFontError(msg, dir) {
+  let m = msg || "سبب غير معروف";
+  let tables = null;
+  if (dir && dir.tables && dir.tables.size) tables = [...dir.tables.keys()].join("، ");
+  if (dir && dir.collection) tables = "مجموعة خطوط (TTC)" + (tables ? " — " + tables : "");
+  if (tables && typeof console !== "undefined") {
+    console.warn("تشخيص — جداول الخط المكتشفة:", tables);
+  }
+  if (/TrueType or CFF outlines/i.test(m)) {
+    m += " — التحليل: الملف مفيهوش جداول مسارات متجهة (glyf/CFF). يا إما خط ألوان نقطي مش مدعوم، يا إما ملف تالف أو ناقص. لو خط إيموجي/ألوان جرّب نسخة متجهة منه";
+  } else if (/لم يتم استخراج أي حروف/.test(m)) {
+    m += " — التحليل: المحركات فتحت هيكل الخط بس مقدرتش تستخرج مسارات الحروف (غالبًا خط نقطي/ألوان أو بنية غير قياسية)";
+  } else if (/ttcf|Collection/i.test(m)) {
+    m += " — التحليل: الملف مجموعة خطوط (TTC) والخطوط جوّاها تالفة";
+  }
+  if (tables) m += " [الجداول: " + tables + "]";
+  return m;
+}
+
+/* fontkit 2 مخصوص للخطوط المتغيرة CFF2 — تحميل منفصل عن getFontkit
+   لأن أول إصدار يتحمّل ممكن يكون قديم ما يعرفش CFF2 */
+let fontkit2Lib = null;
+let fontkit2Tried = false;
+async function getFontkitFresh() {
+  if (fontkit2Lib) return fontkit2Lib;
+  if (fontkit2Tried) return null;
+  fontkit2Tried = true;
+  const urls = [
+    "https://esm.sh/fontkit@2.0.4",
+    "https://cdn.jsdelivr.net/npm/fontkit@2.0.4/+esm",
+    "https://esm.sh/fontkit@2.0.2",
+    "https://cdn.skypack.dev/fontkit"
+  ];
+  for (const url of urls) {
+    try {
+      const mod = await withTimeout(import(url), 15000);
+      const lib = (mod && mod.default) ? mod.default : mod;
+      if (lib && typeof lib.create === "function") {
+        fontkit2Lib = lib;
+        /* نرجّع نستخدم النسخة الجديدة في الخطوط الجاية كمان */
+        fontkitLib = lib;
+        return lib;
+      }
+    } catch (e) { /* التجربة اللي بعدها */ }
+  }
+  return null;
+}
+
+/* استخراج خط فرعي من مجموعة TTC: جداول الخط داخل المجموعة إزاحتها
+   مطلقة على الملف كله (وبتتشارك بين الخطوط) — فما نقدرش نقص بايتات
+   الخط لوحده؛ لازم نعيد بناء SFNT مستقل بجداول منسوخة (نفس منطق
+   إعادة بناء unwrapWoff1) */
+function extractTtcSubfont(u8, subfontOffset) {
+  try {
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    const num = dv.getUint16(subfontOffset + 4);
+    if (!num || num > 600) return null;
+    const tables = [];
+    for (let i = 0; i < num; i++) {
+      const off = subfontOffset + 12 + i * 16;
+      if (off + 16 > u8.length) return null;
+      let tag = "";
+      for (let j = 0; j < 4; j++) tag += String.fromCharCode(u8[off + j]);
+      const toff = dv.getUint32(off + 8), tlen = dv.getUint32(off + 12);
+      if (!tlen || toff + tlen > u8.length) return null;
+      tables.push({ tag: tag, data: u8.slice(toff, toff + tlen) });
+    }
+    if (!tables.length) return null;
+    /* إعادة بناء SFNT خام مستقل */
+    tables.sort((a, b) => (a.tag < b.tag ? -1 : a.tag > b.tag ? 1 : 0));
+    const n = tables.length;
+    const pow2 = Math.pow(2, Math.floor(Math.log2(n)));
+    const searchRange = pow2 * 16;
+    const entrySelector = Math.floor(Math.log2(pow2 || 1));
+    const rangeShift = n * 16 - searchRange;
+    const u32Bytes = (v) => [(v >>> 24) & 255, (v >>> 16) & 255, (v >>> 8) & 255, v & 255];
+    const u16Bytes = (v) => [(v >>> 8) & 255, v & 255];
+    let offset = 12 + n * 16;
+    const dirBytes = [];
+    const chunks = [];
+    for (const t of tables) {
+      dirBytes.push(t.tag.charCodeAt(0), t.tag.charCodeAt(1), t.tag.charCodeAt(2), t.tag.charCodeAt(3),
+        0, 0, 0, 0);
+      dirBytes.push(...u32Bytes(offset), ...u32Bytes(t.data.length));
+      chunks.push({ offset: offset, data: t.data });
+      offset += t.data.length;
+      while (offset % 4 !== 0) offset++;
+    }
+    const out = new Uint8Array(offset);
+    out.set([0, 1, 0, 0], 0);
+    out.set(u16Bytes(n), 4);
+    out.set(u16Bytes(searchRange), 6);
+    out.set(u16Bytes(entrySelector), 8);
+    out.set(u16Bytes(rangeShift), 10);
+    out.set(dirBytes, 12);
+    for (const c of chunks) out.set(c.data, c.offset);
+    return out;
+  } catch (e) { return null; }
+}
+
+/* فك تشفير الخط — محاولات متعددة واختيار الأفضل */
+async function decodeFont(raw, fileName) {
+  const sig = readSignature(raw);
+  let source = raw;
+  let note = "";
+
+  if (sig === "wOF2") {
+    try {
+      const lib = await getWoff2Lib();
+      const out = await lib.decompress(new Uint8Array(raw));
+      source = (out instanceof ArrayBuffer)
+        ? out
+        : out.buffer.slice(out.byteOffset, out.byteOffset + out.byteLength);
+      note = "+woff2";
+    } catch (e) {
+      console.warn("فك WOFF2 فشل:", e.message);
+    }
+  } else if (sig === "wOFF") {
+    /* ⚠ إصلاح جذري: من غير فك WOFF1 هنا، ttfSource كان بيتخزّن كبايتات
+       WOFF خام. extractTable/sfntEntries (بيتستخدموا وقت التصدير لقراءة
+       GSUB الأصلي) بيفترضوا ترويسة SFNT عادية فكانوا يفشلوا بصمت
+       ويرجّعوا null، فالكود يظن إن الخط "مفيهوش GSUB" ويصنّع لام-ألف
+       وأشكال init/medi/fina بنفسه — وده السبب في اختفاء/تشوّه اللام
+       حتى من غير أي تعديل من المستخدم. */
+    try {
+      source = await unwrapWoff1(raw);
+      note = "+woff1";
+    } catch (e) {
+      console.warn("فك WOFF1 فشل:", e.message);
+    }
+  }
+
+  const candidates = [];
+  const errs = [];
+
+  /* ⚠ جديد: تحليل بنية الملف قبل المحركات — للتعامل مع:
+     1) مجموعات الخطوط (ttcf): نختار أكبر خط جوّاها ونكمل بيه
+     2) الخطوط اللي مفيهاش مسارات متجهة (sbix نقطي زي إيموجي iOS):
+        نحوّل صورها لمسارات متجهة مباشرة ببدل ما نفشل
+     3) خطوط CFF2 المتغيرة: نحاول بـ fontkit 2 لو المحرك القديم فشل */
+  let dir = sfntTableDir(new Uint8Array(source));
+  if (dir && dir.collection && dir.subfonts.length) {
+    /* نختار الخط الفرعي صاحب أكبر عدد حروف (قراءة maxp بإزاحات مطلقة) */
+    const u8all = new Uint8Array(source);
+    let bestIdx = -1, bestCount = -1;
+    dir.subfonts.forEach((sf, i) => {
+      try {
+        const sdv = new DataView(u8all.buffer, u8all.byteOffset, u8all.byteLength);
+        const nT = sdv.getUint16(sf.offset + 4);
+        for (let k = 0; k < nT && k < 600; k++) {
+          const eOff = sf.offset + 12 + k * 16;
+          let tag = "";
+          for (let j = 0; j < 4; j++) tag += String.fromCharCode(u8all[eOff + j]);
+          if (tag === "maxp") {
+            const cnt = sdv.getUint16(sdv.getUint32(eOff + 8) + 4);
+            if (cnt > bestCount) { bestCount = cnt; bestIdx = i; }
+            break;
+          }
+        }
+      } catch (eM) { /* تجاهل */ }
+    });
+    if (bestIdx >= 0) {
+      try {
+        const sub = extractTtcSubfont(u8all, dir.subfonts[bestIdx].offset);
+        const subDir = sub ? sfntTableDir(sub) : null;
+        if (subDir && !subDir.collection && subDir.tables.size) {
+          source = sub.buffer;
+          note += "+ttc";
+          dir = subDir;
+        }
+      } catch (eT) { dir = sfntTableDir(new Uint8Array(source)); }
+    }
+  }
+  const hasT = (t) => !!(dir && dir.tables && dir.tables.has(t));
+  const noVector = !!dir && !hasT("glyf") && !hasT("CFF ") && !hasT("CFF2");
+
+  if (noVector && hasT("sbix")) {
+    /* خط نقطي sbix (زي إيموجي iOS/Apple Color Emoji) — تحويل الصور
+       لمسارات متجهة قابلة للتحرير والتصدير بدل رسالة الفشل */
+    statusEl.textContent = "الخط نقطي (صور جوّه الخط) — جارٍ تحويله لمسارات متجهة…";
+    try {
+      const resS = await buildFontFromSbix(new Uint8Array(source), dir, {
+        fallbackName: String(fileName || "").replace(/\.[^.]+$/, ""),
+        onProgress: (d, t) => {
+          statusEl.textContent = "تحويل الخط النقطي لمسارات متجهة… " +
+            Math.round((d / t) * 100) + "% (" + d + "/" + t + ")";
+        }
+      });
+      if (resS && resS.font) {
+        /* ملحوظة: من غير defaultStatus هنا — الخط العام لسه مش متنشط
+           (activateSlot هيحدّث الحالة بعد الإضافة) */
+        return {
+          font: resS.font,
+          engine: "sbix→مسارات" + note,
+          empties: Math.max(0, resS.total - resS.good),
+          ttfBytes: source
+        };
+      }
+    } catch (eS) {
+      errs.push("sbix: " + eS.message);
+      console.warn("تحويل sbix فشل:", eS);
+    }
+  } else if (noVector && (hasT("CBDT") || hasT("EBDT") || hasT("bloc") || hasT("EBLC"))) {
+    /* خط ألوان نقطي بصيغ جوجل (CBDT/EBDT) — مفيش مسارات نحوّلها */
+    throw new Error("الخط ده خط ألوان نقطي (صور إيموجي جوّه الخط بصيغة CBDT/EBDT) — محبر بيشتغل بالمسارات المتجهة بس. جرّب نسخة متجهة (vector) من الخط");
+  }
+
+  /* fontkit اختياري — لو رجع null نكمل بـ opentype.js مباشرة */
+  try {
+    const fk = await getFontkit();
+    if (fk && typeof fk.create === "function") {
+      const f = fontkitToOpentype(fk, new Uint8Array(source));
+      const q = countGoodGlyphs(f);
+      candidates.push({ font: f, engine: "fontkit" + note, good: q.good, total: q.total });
+    }
+  } catch (e1) {
+    errs.push("fontkit: " + e1.message);
+    /* مش بنحذّر — getFontkit بتتعامل مع الفشل بنفسها */
+  }
+
+  /* خطوط CFF2 (خطوط متغيرة بمسارات PostScript): fontkit القديم مش
+     بيعرف يقرأها — نجرب fontkit 2 الجديد لو المحرك الأول ما جابش حروف */
+  if (hasT("CFF2") && !candidates.some((c) => c.good > 0)) {
+    try {
+      const fk2 = await getFontkitFresh();
+      if (fk2) {
+        const f2 = fontkitToOpentype(fk2, new Uint8Array(source));
+        const q2 = countGoodGlyphs(f2);
+        candidates.push({ font: f2, engine: "fontkit2" + note, good: q2.good, total: q2.total });
+      }
+    } catch (e3) {
+      errs.push("fontkit2: " + e3.message);
+    }
+  }
+
+  try {
+    const f = opentype.parse(source);
+    const q = countGoodGlyphs(f);
+    candidates.push({ font: f, engine: "opentype.js", good: q.good, total: q.total });
+  } catch (e2) {
+    errs.push("opentype.js: " + e2.message);
+    console.warn("opentype.js فشل:", e2.message);
+  }
+
+  if (!candidates.length) {
+    throw new Error(friendlyFontError(errs.join(" | ") || "سبب غير معروف", dir));
+  }
+  candidates.sort((a, b) =>
+    (b.good / Math.max(b.total, 1)) - (a.good / Math.max(a.total, 1)));
+  const best = candidates[0];
+
+  /* كلمات المصمم + بدائلها من GSUB مهما كان المحرك الفائز:
+     مسار fontkit بيعيد بناء الخط بدون جداول خام — فلو فاز،
+     ناخد استخراج GSUB من مرشح opentype.js (بيقرأ الجدول الأصلي)
+     وندمجه مع اللي fontkit لقاه — مش بنفقد حاجة */
+  if (best && best.engine && String(best.engine).indexOf("opentype.js") !== 0) {
+    const otCand = candidates.find((c) =>
+      c.engine && String(c.engine).indexOf("opentype.js") === 0 &&
+      c.font && c.font.tables && c.font.tables.gsub);
+    if (otCand) {
+      try {
+        const ligRes = extractFromOpentypeGsub(otCand.font);
+        const hasNew = ligRes.words && Object.keys(ligRes.words).length;
+        const hasOld = best.font.wordLigatures &&
+          Object.keys(best.font.wordLigatures).length;
+        if (hasNew || hasOld) {
+          const mergedWords = Object.assign({}, best.font.wordLigatures || {},
+            ligRes.words || {});
+          const mergedAlts = Object.assign({}, best.font.wordLigatureAlts || {},
+            ligRes.alts || {});
+          registerWordLigatures(best.font, mergedWords, mergedAlts);
+        }
+      } catch (eG) {
+        console.warn("استخراج GSUB من opentype.js فشل:", eG && eG.message);
+      }
+    }
+  }
+  return {
+    font: best.font,
+    engine: best.engine,
+    empties: Math.max(0, best.total - best.good),
+    /* بايتات TTF الأصلية (بعد فك WOFF2 إن وجد) — تُستخدم لاسترجاع
+       GSUB/GPOS/GDEF عند التصدير لأن opentype.js لا يكتبها */
+    ttfBytes: source
+  };
+}
+
+/* تطبيع المصفوفة بعد فك التشفير */
+function normalizeGlyphs(f) {
+  let arr = null;
+  if (Array.isArray(f.glyphs)) {
+    arr = f.glyphs;
+  } else if (f.glyphs && Array.isArray(f.glyphs.glyphs)) {
+    arr = f.glyphs.glyphs;
+  } else if (f.glyphs && typeof f.glyphs.get === "function") {
+    const n = (typeof f.numGlyphs === "number") ? f.numGlyphs : 0;
+    arr = [];
+    for (let i = 0; i < n; i++) {
+      let g = null;
+      try { g = f.glyphs.get(i); } catch (e) { /* تجاهل */ }
+      arr.push(g);
+    }
+  }
+  if (!arr) arr = [];
+
+  for (let i = 0; i < arr.length; i++) {
+    if (!arr[i]) {
+      arr[i] = new opentype.Glyph({
+        name: "glyph" + i,
+        advanceWidth: Math.round((f.unitsPerEm || 1000) / 2),
+        path: new opentype.Path()
+      });
+    }
+    const g = arr[i];
+    if (typeof g.index !== "number") g.index = i;
+    /* ⚠ g.path قد تكون getter كسول (lazy) بيحلل جدول glyf أول ما
+       يتقرا — رسمة تالفة (بيانات contour غير سليمة، إزاحة خارج
+       حدود الملف) كانت بترمي استثناء هنا يوقف تحميل الخط بالكامل.
+       نلتقطه ونستبدل الرسمة الفاسدة برسمة notdef فاضية بدل الفشل. */
+    let hasPath = false;
+    try { hasPath = !!g.path; } catch (e) {
+      console.warn("استبدال رسمة تالفة برسمة فاضية (GID " + i + "):", e.message);
+      hasPath = false;
+    }
+    if (!hasPath) {
+      try { g.path = new opentype.Path(); } catch (e2) { /* تجاهل */ }
+    }
+    if (!g.name) {
+      const us = (g.unicodes && g.unicodes.length)
+        ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+      g.name = us.length ? cpName(us[0]) : ("glyph" + i);
+    }
+  }
+
+  if (typeof arr.get !== "function") {
+    arr.get = function (i) { return this[i]; };
+  }
+  f.glyphs = arr;
+  f.numGlyphs = arr.length;
+
+  if (!f.glyphIndexMap) f.glyphIndexMap = {};
+  for (let i = 0; i < arr.length; i++) {
+    const g = arr[i];
+    const us = (g.unicodes && g.unicodes.length)
+      ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+    us.forEach((u) => {
+      if (f.glyphIndexMap[u] === undefined) f.glyphIndexMap[u] = i;
+    });
+  }
+
+  if (!f.wordByGid) {
+    try {
+      const ligRes = extractFromOpentypeGsub(f);
+      registerWordLigatures(f, ligRes.words, ligRes.alts);
+    } catch (e) {
+      registerWordLigatures(f, {});
+    }
+  }
+
+  /* إصلاح الحروف الخام العربية: الخطوط اللي cmap فيها أشكال عرض بس
+     (FE70-FEFF) بقت تستقبل الكتابة الخام 0621-064A مباشرة */
+  if (typeof repairArabicCmap === "function") repairArabicCmap(f);
+
+  loadLabelsByGid(f);
+}
+
+/* ================================================================
+   § 8 — كلمات القاموس المدمجة (استخراج GSUB)
+   ================================================================ */
+function coverageGlyphs(cov) {
+  if (!cov) return null;
+  if (Array.isArray(cov.glyphs)) return cov.glyphs;
+  if (Array.isArray(cov.ranges)) {
+    const out = [];
+    cov.ranges.forEach((r) => {
+      for (let g = r.start; g <= r.end; g++) out.push(g);
+    });
+    return out;
+  }
+  return null;
+}
+
+function seqToWord(seq, gidToChar) {
+  let word = "";
+  for (const gid of seq) {
+    const ch = gidToChar[gid];
+    if (!ch) return null;
+    word += ch;
+  }
+  return word.length >= 2 ? word : null;
+}
+
+/* ================================================================
+   § 8-ب — أسماء مرجعية حرة (labelByGid)
+   لرسمة موجودة في الخط بس مالهاش لا كود Unicode ولا كلمة مدمجة
+   (زي ﷺ / ﷽ في بعض الخطوط الدينية) — طبقة تخزين مستقلة تمامًا عن
+   cmap و GSUB، بتُستخدم بس للتعرّف/البحث/الفهرسة جوه المحرر.
+   محفوظة في localStorage تحت مفتاح مبني على اسم الخط، عشان تفضل
+   موجودة بين الجلسات من غير ما تأثر على ملف الخط نفسه أبدًا. */
+function __mhLabelStoreKey(f) {
+  const fam = (f && f.getEnglishName && f.getEnglishName("fontFamily")) || "font";
+  const sub = (f && f.getEnglishName && f.getEnglishName("fontSubfamily")) || "";
+  return "mihabarLabels::" + fam + "::" + sub;
+}
+function loadLabelsByGid(f) {
+  f.labelByGid = f.labelByGid || {};
+  try {
+    const raw = localStorage.getItem(__mhLabelStoreKey(f));
+    if (raw) Object.assign(f.labelByGid, JSON.parse(raw));
+  } catch (e) {}
+}
+function saveLabelForGid(f, gid, label) {
+  f.labelByGid = f.labelByGid || {};
+  const key = __mhLabelStoreKey(f);
+  if (label) f.labelByGid[gid] = label;
+  else delete f.labelByGid[gid];
+  try { localStorage.setItem(key, JSON.stringify(f.labelByGid)); } catch (e) {}
+}
+
+function registerWordLigatures(f, words, alts) {
+  f.wordLigatures = words || {};
+  /* بدائل المصمم: كل رسمة ليجاتشر تانية بتفك لنفس الكلمة
+     (خطوط الرسمات القرآنية بتضم 3-6 رسمات لنفس الكلمة) */
+  f.wordLigatureAlts = alts || {};
+  const byGid = {};
+  for (const w in f.wordLigatures) {
+    byGid[f.wordLigatures[w]] = w;
+  }
+  f.wordByGid = byGid;
+}
+
+function extractFromOpentypeGsub(f) {
+  const words = {};
+  const seenByWord = {};
+  const gsub = f.tables && f.tables.gsub;
+  if (!gsub || !Array.isArray(gsub.lookups)) return { words: words, alts: {} };
+
+  /* فهرس GID→حرف: f.glyphIndexMap (بيتبني في مسار fontkit/التطبيع)
+     أو cmap الأصلي من opentype.js (font.tables.cmap.glyphIndexMap) —
+     من غير كده الاستخراج بيفشل بصمت على الخطوط المحللة بـopentype.js الخام */
+  const gidSrcMap = (f.glyphIndexMap && Object.keys(f.glyphIndexMap).length)
+    ? f.glyphIndexMap
+    : ((f.tables && f.tables.cmap && f.tables.cmap.glyphIndexMap) || {});
+  const gidToChar = {};
+  Object.keys(gidSrcMap).forEach((u) => {
+    const gid = gidSrcMap[u];
+    if (gidToChar[gid] === undefined) {
+      gidToChar[gid] = String.fromCodePoint(+u);
+    }
+  });
+
+  const best = {};
+  gsub.lookups.forEach((lookup) => {
+    if (!lookup || lookup.lookupType !== 4) return;
+    (lookup.subtables || []).forEach((st) => {
+      const cov = coverageGlyphs(st.coverage);
+      if (!cov) return;
+      (st.ligatureSets || []).forEach((set, si) => {
+        const first = cov[si];
+        (set || []).forEach((lig) => {
+          if (!lig || lig.ligGlyph === undefined) return;
+          const seq = [first].concat(lig.components || []);
+          const word = seqToWord(seq, gidToChar);
+          if (word) {
+            if (!best[lig.ligGlyph] || seq.length > best[lig.ligGlyph].length) {
+              best[lig.ligGlyph] = seq;
+            }
+            /* فهرسة كل الرسمات اللي بتفك لنفس الكلمة — عشان البدائل */
+            if (seenByWord[word] === undefined) seenByWord[word] = [];
+            if (seenByWord[word].indexOf(lig.ligGlyph) === -1) {
+              seenByWord[word].push(lig.ligGlyph);
+            }
+            words[word] = lig.ligGlyph;
+          }
+        });
+      });
+    });
+  });
+
+  const altsByWord = {};
+  for (const w in seenByWord) {
+    const others = seenByWord[w].filter((g) => g !== words[w]);
+    if (others.length) altsByWord[w] = others;
+  }
+  return { words: words, alts: altsByWord };
+}
+
+function extractFromFontkitGsub(fkFont, f) {
+  const words = {};
+  const seenByWord = {};
+  let gsub = null;
+  try { gsub = fkFont.GSUB; } catch (e) { gsub = null; }
+
+  if (gsub) {
+    let lookups = null;
+    try { lookups = gsub.lookups; } catch (e) { lookups = null; }
+
+    if (Array.isArray(lookups)) {
+      /* نفس ملاحظة extractFromOpentypeGsub — مصدرا الفهرس */
+      const gidSrcMap = (f.glyphIndexMap && Object.keys(f.glyphIndexMap).length)
+        ? f.glyphIndexMap
+        : ((f.tables && f.tables.cmap && f.tables.cmap.glyphIndexMap) || {});
+      const gidToChar = {};
+      Object.keys(gidSrcMap).forEach((u) => {
+        const gid = gidSrcMap[u];
+        if (gidToChar[gid] === undefined) {
+          gidToChar[gid] = String.fromCodePoint(+u);
+        }
+      });
+
+      const best = {};
+      const handleSubtable = (st) => {
+        if (!st) return;
+        const cov = coverageGlyphs(st.coverage);
+        const sets = st.ligatureSets;
+        if (!cov || !Array.isArray(sets)) return;
+        sets.forEach((set, si) => {
+          const first = cov[si];
+          if (first === undefined) return;
+          (set || []).forEach((lig) => {
+            const ligGid = (lig && (lig.glyph !== undefined ? lig.glyph : lig.ligGlyph));
+            const comps = (lig && lig.components) || [];
+            if (ligGid === undefined) return;
+            const seq = [first].concat(Array.isArray(comps) ? comps : []);
+            const word = seqToWord(seq, gidToChar);
+            if (word) {
+              if (!best[ligGid] || seq.length > best[ligGid].length) {
+                best[ligGid] = seq;
+              }
+              if (seenByWord[word] === undefined) seenByWord[word] = [];
+              if (seenByWord[word].indexOf(ligGid) === -1) {
+                seenByWord[word].push(ligGid);
+              }
+              words[word] = ligGid;
+            }
+          });
+        });
+      };
+
+      lookups.forEach((lookup) => {
+        const type = (lookup.lookupType !== undefined) ? lookup.lookupType : lookup.type;
+        if (type !== 4) return;
+        (lookup.subtables || []).forEach(handleSubtable);
+      });
+    }
+  }
+
+  const altsByWord = {};
+  for (const w in seenByWord) {
+    const others = seenByWord[w].filter((g) => g !== words[w]);
+    if (others.length) altsByWord[w] = others;
+  }
+  registerWordLigatures(f, words, altsByWord);
+}
+
+function isRenderable(gid) {
+  if (gid === undefined || gid === null) return false;
+  let g = null;
+  try { g = font.glyphs.get(gid); } catch (e) { g = null; }
+  if (!g) return false;
+  return pathHasContent(g.path);
+}
+
+function combinedDict() {
+  /* توكيل إلى النسخة المطورة في جزء القاموس (تدعم النطاق) */
+  const o = (typeof combinedDict2 === "function") ? combinedDict2() : {};
+  const out = {};
+  for (const w in o) out[w] = o[w].gid;
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   مِحْبَر — الجزء الثاني:
+   التبويبات والملفات ← عمليات الحروف ← الرسم والشبكة ← نوافذ الحروف
+   ════════════════════════════════════════════════════════════════ */
+
+/* ================================================================
+   § 9 — التبويبات والملفات
+   ================================================================ */
+function updateEmptyState() {
+  emptyEl.classList.toggle("show", slots.length === 0);
+  gridEl.style.display = slots.length ? "" : "none";
+  if (!font) searchEl.value = "";
+}
+
+
+function snapshotOriginalGlyphs(f) {
+  if (!f || !f.glyphs) return;
+  const arr = Array.isArray(f.glyphs) ? f.glyphs : (f.glyphs.glyphs || []);
+  f._mhOriginalGlyphs = arr.map((g) => ({
+    advanceWidth: g && g.advanceWidth != null ? g.advanceWidth : 0,
+    commands: JSON.parse(JSON.stringify(g && g.path && g.path.commands ? g.path.commands : []))
+  }));
+}
+
+async function loadFontFiles(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+  let lastSuccessSlot = -1;
+
+  for (const file of files) {
+    statusEl.classList.remove("err");
+    statusEl.textContent = "جارٍ قراءة: " + file.name + " …";
+    try {
+      const raw = await file.arrayBuffer();
+      if (!raw || raw.byteLength < 100) {
+        throw new Error("الملف فاضي أو تالف (" + (raw ? raw.byteLength : 0) + " بايت)");
+      }
+      const res = await decodeFont(raw, file.name);
+      normalizeGlyphs(res.font);
+      snapshotOriginalGlyphs(res.font);
+      res.font._mhColorDisabled = res.font._mhColorDisabled || {};
+      slots.push({
+        name: file.name,
+        font: res.font,
+        engine: res.engine,
+        empties: res.empties || 0,
+        fileName: file.name,
+        fileSize: file.size || 0,
+        dict: loadSavedDictFor(file.name),
+        pairs: loadSavedPairsFor(file.name),
+        embed: loadSavedEmbedFor(file.name),
+        ttfSource: res.ttfBytes || null,
+        structChanged: false,
+        undo: []
+      });
+      lastSuccessSlot = slots.length - 1;
+      toast("تم فتح: " + file.name);
+    } catch (e) {
+      console.error(e);
+      await uiAlert(
+        "الملف: " + file.name +
+        "\nالحجم: " + fmtSize(file.size || 0) +
+        "\nالسبب: " + (e && e.message ? e.message : String(e)),
+        "تعذر فتح الملف"
+      );
+    }
+  }
+
+  if (lastSuccessSlot >= 0) {
+    activateSlot(lastSuccessSlot);
+  } else {
+    statusEl.textContent = "لم يُفتح أي ملف — جرّب ملفًا آخر";
+  }
+  updateEmptyState();
+  document.body.classList.remove("sb-open");
+}
+
+function activateSlot(index) {
+  if (index < 0 || index >= slots.length) return;
+
+  if (activeSlot >= 0 && activeSlot < slots.length && activeSlot !== index) {
+    slots[activeSlot].undo = undoStack.slice();
+  }
+
+  activeSlot = index;
+  const slot = slots[index];
+
+  font = slot.font;
+  /* كلمات الخط المدمجة: طبقة الإضافة/الحذف/التعديل بتتطبق على كل خط لما يتنشط */
+  if (typeof applyEmbedOverlay === "function") applyEmbedOverlay(font);
+  /* خط جديد نشط → كاش عرض الحبر يتبني من جديد + شفاء عرض رسمات
+     الكلمات المربوطة (إصلاح «الروسمات دخلة في بعض») قبل أول رسم */
+  if (typeof __mhInkWCacheClear === "function") __mhInkWCacheClear();
+  /* استوديو المسافة: إعادة تطبيق عرض المسافة المحفوظ لهذا الخط
+     (إصلاح «الفراغ يختلف بين خط و خط» — الإعداد بيعيش مع الخط مش مع الجلسة) */
+  if (typeof __mhApplySavedSpaceOnActivate === "function") __mhApplySavedSpaceOnActivate(slot);
+  fileBase = baseName(slot.name);
+  fileName = slot.fileName || slot.name;
+  fileSize = slot.fileSize || 0;
+  fontLabel = fileBase;
+
+  selMode = false;
+  selSet.clear();
+  selBarEl.classList.remove("show");
+
+  undoStack.length = 0;
+  (slot.undo || []).forEach((s) => undoStack.push(s));
+
+  curIndex = null;
+  gridPage = 0;
+  gridCatPages = {};
+  setUIReady(true);
+  renderTabs();
+  renderAll();
+  updateUndoBtn();
+  updateEmptyState();
+}
+
+async function closeSlot(index) {
+  const slot = slots[index];
+  if (!slot) return;
+  const ok = await uiConfirm(
+    'إغلاق "' + slot.name + '"؟\nالتعديلات غير المصدَّرة ستضيع.',
+    { title: "إغلاق ملف", okText: "إغلاق", danger: true }
+  );
+  if (!ok) return;
+
+  if (index === activeSlot) activeSlot = -1;
+  slots.splice(index, 1);
+
+  if (importSlotIndex === index) importSlotIndex = -1;
+  else if (importSlotIndex > index) importSlotIndex--;
+
+  if (activeSlot === -1) {
+    if (!slots.length) {
+      font = null;
+      undoStack.length = 0;
+      gridEl.innerHTML = "";
+      tabsEl.innerHTML = "";
+      setUIReady(false);
+      statusEl.classList.remove("err");
+      statusEl.textContent = "افتح ملف خط للبدء";
+      updateEmptyState();
+      return;
+    }
+    activateSlot(Math.min(index, slots.length - 1));
+    return;
+  }
+
+  if (activeSlot > index) activeSlot--;
+  renderTabs();
+}
+
+function renderTabs() {
+  tabsEl.innerHTML = "";
+  slots.forEach((slot, i) => {
+    const tab = document.createElement("div");
+    tab.className = "tab" + (i === activeSlot ? " active" : "");
+    tab.dataset.tab = i;
+
+    const label = document.createElement("span");
+    label.className = "tlbl";
+    label.textContent = slot.name;
+    const cnt = document.createElement("span");
+    cnt.className = "cnt";
+    cnt.textContent = liveGlyphCountOf(slot.font);
+    const x = document.createElement("span");
+    x.className = "tx";
+    x.textContent = "✕";
+    x.dataset.close = i;
+    x.title = "إغلاق";
+
+    tab.appendChild(label);
+    tab.appendChild(cnt);
+    tab.appendChild(x);
+    tabsEl.appendChild(tab);
+  });
+  /* التاب النشط يتنادى للواجهة جوه الشريط — الاسم الطويل يتحرك مع الشريط */
+  try{
+    const act = tabsEl.querySelector(".tab.active");
+    if (act && act.scrollIntoView) act.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }catch(err){}
+}
+
+tabsEl.addEventListener("click", (e) => {
+  const x = e.target.closest("[data-close]");
+  if (x) {
+    e.stopPropagation();
+    closeSlot(+x.dataset.close);
+    return;
+  }
+  const tab = e.target.closest("[data-tab]");
+  if (tab && +tab.dataset.tab !== activeSlot) activateSlot(+tab.dataset.tab);
+});
+
+/* السحب والإفلات */
+let dragDepth = 0;
+window.addEventListener("dragenter", (e) => {
+  e.preventDefault();
+  dragDepth++;
+  document.body.classList.add("dragging");
+});
+window.addEventListener("dragleave", (e) => {
+  e.preventDefault();
+  dragDepth--;
+  if (dragDepth <= 0) {
+    dragDepth = 0;
+    document.body.classList.remove("dragging");
+  }
+});
+window.addEventListener("dragover", (e) => e.preventDefault());
+window.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dragDepth = 0;
+  document.body.classList.remove("dragging");
+  if (e.dataTransfer && e.dataTransfer.files.length) {
+    loadFontFiles(e.dataTransfer.files);
+  }
+});
+
+/* ================================================================
+   § 10 — إدخال الأكواد
+   ================================================================ */
+function parseCharInput(str) {
+  str = (str || "").trim();
+  if (!str) return undefined;
+
+  let cp = null;
+  if (/^(?:u\+|0x|\\u)/i.test(str)) {
+    cp = parseInt(str.replace(/^(?:u\+|0x|\\u)/i, ""), 16);
+  } else if (/^[0-9a-f]{2,6}$/i.test(str)) {
+    cp = parseInt(str, 16);
+  } else {
+    cp = [...str][0].codePointAt(0);
+  }
+
+  const bad = (cp == null || Number.isNaN(cp) || cp < 1 ||
+    cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF));
+  return bad ? null : cp;
+}
+
+function parseSourceIndex(str) {
+  str = (str || "").trim();
+  if (!str) return null;
+  if (/^\d+$/.test(str)) {
+    const n = parseInt(str, 10);
+    return (n >= 0 && n < glyphsArr().length) ? n : null;
+  }
+  const cp = parseCharInput(str);
+  if (cp === undefined || cp === null) return null;
+  const idx = (font.glyphIndexMap || {})[cp];
+  return idx === undefined ? null : idx;
+}
+
+/* فك مدخل الحرف الجديد: حرف واحد أو حرفين متتاليين (لا / من).
+   undefined = فاضي، null = غير صالح،
+   {cp} = حرف مفرد، {seq:[c1,c2]} = حرف مركب */
+function parseSeqInput(str) {
+  str = (str || "").trim();
+  if (!str) return undefined;
+  /* الأكواد (U+… / 0x… / hex) مفردة دايمًا */
+  if (/^(?:u\+|0x|\\u)/i.test(str) || /^[0-9a-f]{2,6}$/i.test(str)) {
+    const cp = parseCharInput(str);
+    if (cp === undefined || cp === null) return null;
+    return { cp: cp };
+  }
+  const chars = [...str];
+  const badCp = (cp) => (cp < 1 || cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF));
+  if (chars.length === 1) {
+    const cp = chars[0].codePointAt(0);
+    return badCp(cp) ? null : { cp: cp };
+  }
+  if (chars.length === 2) {
+    const seq = chars.map((c) => c.codePointAt(0));
+    return seq.some(badCp) ? null : { seq: seq };
+  }
+  return null; /* أكتر من حرفين — غير مدعوم في الإضافة */
+}
+
+/* أول كود حر في منطقة الاستخدام الخاص (PUA) — للحروف المركبة
+   اللي ملهاش كود يونيكود رسمي (زي «من» المرسومة كرسمة واحدة) */
+function findFreePuaCp(exclude) {
+  const used = (font && font.glyphIndexMap) ? font.glyphIndexMap : {};
+  const skip = exclude instanceof Set ? exclude : null;
+  for (let cp = 0xF100; cp <= 0xF8FF; cp++) {
+    if (used[cp] === undefined && !(skip && skip.has(cp))) return cp;
+  }
+  for (let cp = 0xE000; cp < 0xF100; cp++) {
+    if (used[cp] === undefined && !(skip && skip.has(cp))) return cp;
+  }
+  return null;
+}
+
+/* ================================================================
+   § 11 — عمليات الحروف
+   ================================================================ */
+function glyphsArr() {
+  if (!font) return []; /* مفيش خط متحمل لسه — إصلاح انهيار defaultStatus وقت أول فتح */
+  if (Array.isArray(font.glyphs)) return font.glyphs;
+  if (font.glyphs && Array.isArray(font.glyphs.glyphs)) return font.glyphs.glyphs;
+  /* GlyphSet كائن مفهرس (الخط النضيف المبني برمجيًا عبر opentype.js) */
+  if (font.glyphs && font.glyphs.glyphs && typeof font.glyphs.glyphs === "object") {
+    const src = font.glyphs.glyphs;
+    const out = [];
+    for (const k in src) out[+k] = src[k];
+    return out;
+  }
+  return [];
+}
+
+/* عدد الحروف الفعلي المعروض للمستخدم — بيستبعد المحذوف (soft-delete)
+   بعكس glyphsArr().length اللي بترجع الطول الخام شامل المحذوف عشان
+   عمليات الـ GID الداخلية (النقل، إعادة بناء الخريطة، التصدير) محتاجة
+   الطول الكامل عشان تفضل الأرقام صحيحة */
+function liveGlyphCount() {
+  return glyphsArr().filter((g) => g && !g.deleted).length;
+}
+
+/* نفس فكرة liveGlyphCount بس لأي font بذاته (مش بالضرورة النشط حاليًا) —
+   بتُستخدم في شارات شريط الخطوط (Tabs) وقوائم المقارنة اللي بترسم
+   كل الـ slots مرة واحدة، مش بس الـ slot المفتوح دلوقتي */
+function liveGlyphCountOf(f) {
+  if (!f) return 0;
+  let arr = null;
+  if (Array.isArray(f.glyphs)) arr = f.glyphs;
+  else if (f.glyphs && Array.isArray(f.glyphs.glyphs)) arr = f.glyphs.glyphs;
+  else if (f.glyphs && f.glyphs.glyphs && typeof f.glyphs.glyphs === "object") {
+    const src = f.glyphs.glyphs;
+    arr = [];
+    for (const k in src) arr[+k] = src[k];
+  }
+  if (!arr) return (typeof f.numGlyphs === "number") ? f.numGlyphs : 0;
+  let n = 0;
+  for (let i = 0; i < arr.length; i++) {
+    const g = arr[i];
+    if (g && !g.deleted) n++;
+  }
+  return n;
+}
+
+function rebuildGlyphIndexMap() {
+  const arr = glyphsArr();
+  const map = font.glyphIndexMap = (font.glyphIndexMap || {});
+
+  /* بعض الخطوط تحمل نفس الرسمة على أكثر من Unicode داخل cmap،
+     بينما opentype.js قد يضع كودًا واحدًا فقط داخل glyph.unicodes.
+     قبل إعادة البناء نحفظ كل aliases الموجودة في cmap داخل الـGlyph نفسه. */
+  const oldMap = Object.assign({}, map);
+  for (const k in oldMap) {
+    const cp = +k, gid = oldMap[k];
+    if (!Number.isFinite(cp) || !Number.isFinite(gid)) continue;
+    const g = arr[gid];
+    if (!g || g.deleted) continue;
+    if (!Array.isArray(g.unicodes)) {
+      g.unicodes = g.unicode !== undefined ? [g.unicode] : [];
+    }
+    if (!g.unicodes.includes(cp)) g.unicodes.push(cp);
+  }
+
+  for (const k in map) delete map[k];
+  for (let i = 0; i < arr.length; i++) {
+    const g = arr[i];
+    const us = (g.unicodes && g.unicodes.length)
+      ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+    us.forEach((u) => { if (map[u] === undefined) map[u] = i; });
+  }
+}
+
+function setGlyphUnicode(g, cp) {
+  const map = font.glyphIndexMap = (font.glyphIndexMap || {});
+  (g.unicodes || []).forEach((u) => { if (map[u] === g.index) delete map[u]; });
+  if (g.unicode !== undefined && map[g.unicode] === g.index) delete map[g.unicode];
+  g.unicode = cp;
+  g.unicodes = cp === undefined ? [] : [cp];
+  if (cp !== undefined) map[cp] = g.index;
+  /* ⚠ إصلاح «الرموز بتختفي في التصدير»: التعيين على رسمة أصلية
+     = تخصيص من صنع المستخدم — لازم يعيش في التصدير النضيف.
+     من غير العلامة دي الرسمة المعيّنة كانت بتتساقط من buildPureFont
+     لأنها مالهاش userInk، فيطلع الرمز فاضي في أي برنامج بره */
+  markUserInk(g);
+}
+
+function deleteGlyphAt(index) {
+  const arr = glyphsArr();
+  const g = font.glyphs.get(index);
+  if (!g) return;
+  const map = font.glyphIndexMap = (font.glyphIndexMap || {});
+  /* امسح الكود من cmap — الكتابة بره مش هتطلع الحرف ده */
+  ((g && g.unicodes) || []).forEach((u) => { if (map[u] === index) delete map[u]; });
+  if (g.unicode !== undefined && map[g.unicode] === index) delete map[g.unicode];
+
+  /* ⚠ إصلاح «الحروف بتتحرك بعد الحذف»: بدل ما نعمل splice (اللي بيشيل
+     العنصر ويعمل shift لباقي الحروف)، بنعمل soft delete — الرسمة تفضل
+     في مكانها بس متعلّمة كمحذوفة ومخفية من الشبكة. كده:
+     ١) الحروف اللي بعدها تفضل في أماكنها (مفيش reindex)
+     ٢) مفيش gidsShifted — GSUB الأصلي يفضل موثوق
+     ٣) أرقام GID تفضل ثابتة فالقاموس والكلمات المدمجة ما بتأثرش
+     ٤) الكتابة بره مش هتطلع الحرف (cmap اتشال منه الكود) */
+  g.deleted = true;
+  g.userInk = false;
+  g.unicodes = [];
+  g.unicode = undefined;
+  g.path = new opentype.Path();
+  g.advanceWidth = 0;
+  g.xMin = 0; g.xMax = 0; g.yMin = 0; g.yMax = 0;
+
+  /* مفيش splice — مفيش reindex — مفيش gidsShifted */
+  markStructChanged();
+}
+
+function moveGlyph(from, to) {
+  const arr = glyphsArr();
+  const n = arr.length;
+  if (from < 0 || from >= n || to < 0 || to >= n || from === to) return false;
+  const g = arr[from];
+  arr.splice(from, 1);
+  arr.splice(to, 0, g);
+  for (let k = 0; k < arr.length; k++) {
+    if (arr[k]) arr[k].index = k;
+  }
+  font.numGlyphs = arr.length;
+  rebuildGlyphIndexMap();
+  slots[activeSlot] && (slots[activeSlot].gidsShifted = true); /* أرقام GID اتزحلقت — GSUB الأصلي مش موثوق */
+  markStructChanged();
+  return true;
+}
+
+/* علامة «حبر المستخدم» — الرسمة دي من صنع صاحبها
+   بتحدد اللي يدخل في التصدير النضيف (بدون الخط الأصلي) */
+function markUserInk(g) {
+  if (g) g.userInk = true;
+  return g;
+}
+
+/* تسجيل الكود الخام للحروف العربية المضافة:
+   الرسمة بتتسجل عند شكل العرض المختار (مثال: FEE5 للنون مقطوع)،
+   لكن الكتابة بره بالكود الخام (0646) وقواعد الأزواج/القاموس محتاجين
+   الكود الخام نفسه.
+   الشكل المقطوع/الخام = هوية الحرف كاملة → بياخد الكود الخام دايمًا
+   (أولوية رسمة المستخدم زي المعاينة بالظبط — حتى لو الخط عليه رمّام
+   قديم من repairArabicCmap على رسمة أصلية).
+   أشكال المواضع (أول/وسط/آخر) → بترمّم الخام بس لو ناقص */
+function registerLetterRawCp(g) {
+  try {
+    if (!g || !font || g.index === undefined) return;
+    const us = (g.unicodes && g.unicodes.length)
+      ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+    for (let k = 0; k < us.length; k++) {
+      const u = us[k];
+      let base = null, fi = 0, force = false;
+      if (typeof AR_FORMS === "object" && AR_FORMS && AR_FORMS[u]) {
+        base = u; fi = 0; force = true; /* الحرف الخام نفسه */
+      } else if (typeof FORM_TO_BASE === "object" && FORM_TO_BASE && FORM_TO_BASE[u]) {
+        /* روابط لام-ألف (FEF5-FEFC) مش «شكل لأم» بمعنى الكود الخام —
+           ممنوع إضافة ﻼ تسرق كود الألف الخام (كانت علّة: أ بتظهر ﻼ) */
+        if (u >= 0xFEF5 && u <= 0xFEFC) continue;
+        base = FORM_TO_BASE[u].base;
+        fi = FORM_TO_BASE[u].form;
+      }
+      if (base === null) continue; /* مش حرف عربي */
+      const map = font.glyphIndexMap = (font.glyphIndexMap || {});
+      if ((force && fi === 0) || map[base] === undefined) {
+        map[base] = g.index;
+        if (Array.isArray(g.unicodes)) {
+          if (g.unicodes.indexOf(base) === -1) g.unicodes.push(base);
+        } else if (g.unicode !== undefined) {
+          g.unicodes = [g.unicode, base];
+        }
+      }
+      break; /* أول كود عربي يحدد هوية الحرف — كفاية */
+    }
+  } catch (e) { /* تجاهل — التسجيل الإضافي مش لازم يوقف الإضافة */ }
+}
+
+function appendGlyph(g) {
+  const arr = glyphsArr();
+  arr.push(g);
+  g.index = arr.length - 1;
+  markUserInk(g); /* كل إضافة = رسمة بتاعت المستخدم */
+  if (!g.font) g.font = font;
+  if (g.path && g.path.getBoundingBox) {
+    const bb = g.path.getBoundingBox();
+    if (isFinite(bb.x1)) {
+      g.xMin = bb.x1; g.xMax = bb.x2;
+      g.yMin = bb.y1; g.yMax = bb.y2;
+    }
+  }
+  if (g.unicode !== undefined) {
+    font.glyphIndexMap = (font.glyphIndexMap || {});
+    font.glyphIndexMap[g.unicode] = g.index;
+  }
+  registerLetterRawCp(g); /* الكود الخام للحروف العربية المضافة */
+  font.numGlyphs = arr.length;
+  markStructChanged(); /* عدد الجليفات اتغير — بايتات المصدر بقت قديمة */
+  return g.index;
+}
+
+function makeGlyphFromCopy(srcIndex, cp) {
+  const src = font.glyphs.get(srcIndex);
+  const path = new opentype.Path();
+  path.commands = (src.path ? src.path.commands : []).map((c) => Object.assign({}, c));
+  return new opentype.Glyph({
+    name: cpName(cp), unicode: cp, unicodes: [cp],
+    advanceWidth: src.advanceWidth || Math.round(font.unitsPerEm / 2),
+    path: path, font: font
+  });
+}
+
+function makeEmptyGlyph(cp) {
+  return new opentype.Glyph({
+    name: cpName(cp), unicode: cp, unicodes: [cp],
+    /* الحركات/العلامات عرضها صفر تلقائيًا — دي متاخدةش مساحة في الكتابة */
+    advanceWidth: isMarkCp(cp) ? 0 : Math.round(font.unitsPerEm / 2),
+    path: new opentype.Path(), font: font
+  });
+}
+
+function scaleCommands(commands, scale) {
+  const keys = ["x", "y", "x1", "y1", "x2", "y2"];
+  return (commands || []).map((c) => {
+    const n = Object.assign({}, c);
+    keys.forEach((k) => { if (n[k] !== undefined) n[k] = Math.round(n[k] * scale); });
+    return n;
+  });
+}
+
+function makeGlyphFromImport(srcGlyph, cp, srcFont) {
+  const scale = font.unitsPerEm / (srcFont.unitsPerEm || font.unitsPerEm);
+  const path = new opentype.Path();
+  path.commands = scaleCommands(srcGlyph.path ? srcGlyph.path.commands : [], scale);
+  return new opentype.Glyph({
+    name: cpName(cp), unicode: cp, unicodes: [cp],
+    advanceWidth: Math.max(1, Math.round((srcGlyph.advanceWidth || 500) * scale)),
+    path: path, font: font
+  });
+}
+
+function replaceGlyphAt(index, srcGlyph, srcFont) {
+  const g = font.glyphs.get(index);
+  if (!g) return;
+  const scale = font.unitsPerEm / (srcFont.unitsPerEm || font.unitsPerEm);
+  g.path = new opentype.Path();
+  g.path.commands = scaleCommands(srcGlyph.path ? srcGlyph.path.commands : [], scale);
+  g.advanceWidth = Math.max(1, Math.round((srcGlyph.advanceWidth || 500) * scale));
+  markUserInk(g); /* الرسمة الجديدة من صنع المستخدم */
+  const bb = g.path.getBoundingBox();
+  if (isFinite(bb.x1)) {
+    g.xMin = bb.x1; g.xMax = bb.x2;
+    g.yMin = bb.y1; g.yMax = bb.y2;
+  }
+  markStructChanged(); /* الرسمة اتغيرت — بايتات glyf في المصدر بقت قديمة */
+}
+
+function applySvgToGlyph(index, fontPath, advance) {
+  const g = font.glyphs.get(index);
+  if (!g) return;
+  g.path = fontPath;
+  /* حرف حركات → العرض صفر مهما كانت قيمة المسافة المُمررة */
+  g.advanceWidth = isAllMarksGlyph(g) ? 0 : advance;
+  markUserInk(g); /* رسمة المستخدم — تدخل في التصدير النضيف */
+  const bb = fontPath.getBoundingBox();
+  if (isFinite(bb.x1)) {
+    g.xMin = bb.x1; g.xMax = bb.x2;
+    g.yMin = bb.y1; g.yMax = bb.y2;
+  }
+  markStructChanged(); /* الرسمة اتغيرت — بايتات glyf في المصدر بقت قديمة */
+}
+
+/* ================================================================
+   § 12 — توليد "شكل الحرف نفسه" من نص مرسوم
+   ================================================================ */
+function smoothChaikin(points, iterations) {
+  let pts = points;
+  for (let it = 0; it < iterations; it++) {
+    const next = [];
+    const n = pts.length;
+    for (let i = 0; i < n; i++) {
+      const prev = pts[(i - 1 + n) % n];
+      const cur = pts[i];
+      const nextPt = pts[(i + 1) % n];
+      const ax = prev[0] - cur[0], ay = prev[1] - cur[1];
+      const bx = nextPt[0] - cur[0], by = nextPt[1] - cur[1];
+      const cross = ax * by - ay * bx;
+      const dot = ax * bx + ay * by;
+      const lenA = Math.hypot(ax, ay);
+      const lenB = Math.hypot(bx, by);
+      const isStraight = (lenA * lenB > 1e-9) &&
+        (Math.abs(cross) / (lenA * lenB) < 0.15) && dot > 0;
+      if (isStraight) {
+        next.push(cur);
+      } else {
+        next.push([cur[0] * 0.75 + nextPt[0] * 0.25, cur[1] * 0.75 + nextPt[1] * 0.25]);
+        next.push([cur[0] * 0.25 + nextPt[0] * 0.75, cur[1] * 0.25 + nextPt[1] * 0.75]);
+      }
+    }
+    pts = next;
+  }
+  return pts;
+}
+
+function traceBitmapToPaths(pixels, width, height) {
+  const W = width + 2;
+  const H = height + 2;
+  const grid = new Uint8Array(W * H);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      grid[(y + 1) * W + (x + 1)] = pixels[y * width + x] ? 1 : 0;
+    }
+  }
+  const filled = (x, y) => {
+    if (x < 0 || x >= W || y < 0 || y >= H) return 0;
+    return grid[y * W + x];
+  };
+
+  const segments = [];
+  for (let y = -1; y <= height; y++) {
+    for (let x = -1; x <= width; x++) {
+      if (!filled(x + 1, y + 1)) continue;
+      const top = filled(x + 1, y);
+      const right = filled(x + 2, y + 1);
+      const bottom = filled(x + 1, y + 2);
+      const left = filled(x, y + 1);
+      const x0 = x, y0 = y, x1 = x + 1, y1 = y + 1;
+      if (!top) segments.push([x0, y0, x1, y0]);
+      if (!right) segments.push([x1, y0, x1, y1]);
+      if (!bottom) segments.push([x1, y1, x0, y1]);
+      if (!left) segments.push([x0, y1, x0, y0]);
+    }
+  }
+
+  const segMap = new Map();
+  segments.forEach((s, i) => {
+    const key = s[0] + "," + s[1];
+    if (!segMap.has(key)) segMap.set(key, []);
+    segMap.get(key).push(i);
+  });
+
+  const used = new Array(segments.length).fill(false);
+  const paths = [];
+  for (let start = 0; start < segments.length; start++) {
+    if (used[start]) continue;
+    const contour = [];
+    let current = start;
+    let guard = 0;
+    const maxSteps = segments.length + 4;
+    while (guard++ < maxSteps) {
+      used[current] = true;
+      const s = segments[current];
+      contour.push([s[0], s[1]]);
+      contour.push([s[2], s[3]]);
+      const endKey = s[2] + "," + s[3];
+      const candidates = segMap.get(endKey) || [];
+      let next = -1;
+      for (const ci of candidates) {
+        if (!used[ci]) { next = ci; break; }
+      }
+      if (next === -1 || next === start) break;
+      current = next;
+    }
+    if (contour.length >= 4) paths.push(contour);
+  }
+  return paths;
+}
+
+/* خطوط رسم «شكل الحرف نفسه» — خط الجهاز الافتراضي مباشرة،
+   مفيش أي خطويب محمّل من النت — الحرف بيتعرّض بخط الجهاز العادي */
+const SELF_DRAW_FONT = "system-ui,-apple-system,'Segoe UI',Tahoma,Arial,sans-serif";
+
+function renderTextToPixels(char, fontSize) {
+  const size = Math.max(96, Math.min(256, fontSize));
+
+  /* نقرأ أبعاد الحبّة الحقيقية أولًا عشان الكانفاس يلفّها كلها
+     (الطريقة القديمة كانت بتقص رؤوس الحروف الطويلة زي لا وﭑ) */
+  const probe = document.createElement("canvas").getContext("2d");
+  probe.font = size + "px " + SELF_DRAW_FONT;
+  const m = probe.measureText(char);
+  const aL = Math.ceil(m.actualBoundingBoxLeft || 0);
+  const aR = Math.ceil(m.actualBoundingBoxRight || m.width || size);
+  const aA = Math.ceil(m.actualBoundingBoxAscent || size * 0.85);
+  const aD = Math.ceil(m.actualBoundingBoxDescent || size * 0.3);
+
+  const pad = Math.ceil(size * 0.2);
+  const cv = document.createElement("canvas");
+  const ctx = cv.getContext("2d");
+  cv.width = Math.max(8, aL + aR + pad * 2);
+  cv.height = Math.max(8, aA + aD + pad * 2);
+
+  /* ⚠ إصلاح باج موروث من المحرر القديم: كانت بترسم خلفية سوداء معتمة
+     وبعدين تعمل threshold على alpha — فالكانفاس كله بيبقى حبر
+     والحرف يطلع مكعّب أبيض مصمت. هنا الخلفية شفافة والحبر أبيض،
+     والـ alpha بيفصل الحبّة من الفراغ فعليًا. */
+  ctx.fillStyle = "#fff";
+  ctx.font = probe.font;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(char, pad + aL, pad + aA);
+
+  const imgData = ctx.getImageData(0, 0, cv.width, cv.height);
+  const pixels = new Uint8Array(cv.width * cv.height);
+  for (let i = 0; i < pixels.length; i++) {
+    pixels[i] = imgData.data[i * 4 + 3] > 127 ? 1 : 0;
+  }
+  return {
+    pixels: pixels, width: cv.width, height: cv.height,
+    penX: pad + aL, baselineRow: pad + aA,
+    size: size, advW: (m.width || aL + aR)
+  };
+}
+
+/* ================================================================
+   § 12-ب — التتبع HD (مكتبة imagetracerjs المدمجة)
+   «الرموز اللي بتتاخد من صورة — الجودة بتاعتها بكسلات»:
+   التتبع القديم كان بيرسم الحبّة على 160px بس ويقفّي ألفا،
+   وطلوع الشكل يبقى خطوط مكسّرة (بوليجون) على شبكة البكسل.
+   الجديد: رسم بدقة كبيرة (ارتفاع الحبّة ≈ 420px) + مكتبة
+   imagetracerjs (مجال عام، مدمجة في الملف) بتطلّع منحنيات Q ناعمة،
+   + تصحيح اتجاه الكونتورات (خارجي/ثقب) عشان تعبئة nonzero تطلع صح.
+   ================================================================ */
+
+/* رسم الحرف على كانفاس كبير وإرجاع ImageData أسود على أبيض */
+function renderTextToImageDataHD(char, fontSize) {
+  const base = Math.max(96, Math.min(512, fontSize || 240));
+  const probe = document.createElement("canvas").getContext("2d");
+  probe.font = base + "px " + SELF_DRAW_FONT;
+  const m = probe.measureText(char);
+  const inkH = Math.max(1,
+    (m.actualBoundingBoxAscent || base * 0.85) +
+    (m.actualBoundingBoxDescent || base * 0.3));
+  /* ⚠ رفعنا الهدف من 900px إلى 1400px وسقف الزوم من 12 إلى 18:
+     كل بكسل زيادة في دقة الرسم = تفاصيل أدق يقدر التتبع يمسكها،
+     فالمنحنيات بعد التتبع تطلع أنعم (أقرب لفيكتور حقيقي) بدل
+     ما تبان «مبكسلة» في الحروف الصغيرة أو رفيعة الأطراف */
+  const zoom = Math.min(18, Math.max(1, 1400 / inkH));
+  const size = Math.round(base * zoom);
+
+  probe.font = size + "px " + SELF_DRAW_FONT;
+  const m2 = probe.measureText(char);
+  const aL = Math.ceil(m2.actualBoundingBoxLeft || 0);
+  const aR = Math.ceil(m2.actualBoundingBoxRight || m2.width || size);
+  const aA = Math.ceil(m2.actualBoundingBoxAscent || size * 0.85);
+  const aD = Math.ceil(m2.actualBoundingBoxDescent || size * 0.3);
+  const pad = Math.ceil(size * 0.08);
+  const W = Math.min(6400, Math.max(8, aL + aR + pad * 2));
+  const H = Math.min(6400, Math.max(8, aA + aD + pad * 2));
+
+  const cv = document.createElement("canvas");
+  const ctx = cv.getContext("2d");
+  cv.width = W; cv.height = H;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, W, H); /* خلفية بيضاء معتمة — التتبع بيفرّق بين لونين */
+  ctx.fillStyle = "#000";
+  ctx.font = probe.font;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(char, pad + aL, pad + aA);
+  /* مرساة القياس: موضع القلم وسطر الأساس ومقاس الرسم —
+     عشان التحويل لخط يحافظ على نسب الحرف الطبيعية ويحطه على الأساس
+     (إصلاح «الب كبيرة والن اصغر» و«التشكيل عملاق زي /» و«ب في نص مش تحت») */
+  return {
+    imgd: ctx.getImageData(0, 0, W, H),
+    penX: pad + aL,
+    baselineRow: pad + aA,
+    size: size,
+    base: base, /* الحجم الأصلي قبل الزووم — لحساب نسبة التكبير الفعلية بدقة */
+    advW: (m2.width || aL + aR)
+  };
+}
+
+/* مساحة موجهة (shoelace) لمضلع مغلق [[x,y],...] */
+function polySignedArea(pts) {
+  let a = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i], q = pts[(i + 1) % pts.length];
+    a += p[0] * q[1] - q[0] * p[1];
+  }
+  return a / 2;
+}
+
+/* نقطة جوه مضلع؟ (ray casting) */
+function pointInPoly(pt, poly) {
+  let c = false;
+  const n = poly.length;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1];
+    const xj = poly[j][0], yj = poly[j][1];
+    if (((yi > pt[1]) !== (yj > pt[1])) &&
+        (pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi)) c = !c;
+  }
+  return c;
+}
+
+/* tracedata بتاع imagetracerjs → مسار opentype بمنحنيات Q:
+   بنية tracedata: layers[k] = [{segments, isholepath, holechildren}]
+   القطعة Q: (x1,y1) بداية — (x2,y2) تحكم — (x3,y3) نهاية.
+   قلب Y (الخط y لأعلى) + تصحيح اتجاه كل كونتور حسب عمق تداخله
+   (عمق محسوب من علاقات holechildren نفسها) — تعبئة nonzero سليمة:
+   الخارجي مع عقارب الساعة (مساحة سالبة في y-up) والثقوب عكسه */
+function tracedataToFontPath(td, upm, anchor) {
+  const allLayers = (td && td.layers) || [];
+  /* الطبقة المطلوبة = طبقة الحبر الأغمق (بنرسم أسود على أبيض دايمًا).
+   * الطبقات الفاتحة = عكس الصورة (خلفية وثقوبها كأشكال) — تطلّع أشباح
+   * بتلغي الشكل نفسه في تعبئة nonzero — فنتجاهلها كلها */
+  let inkLayer = 0, bestLum = Infinity;
+  (td && td.palette || []).forEach((c, k) => {
+    const lum = 0.299 * (c.r || 0) + 0.587 * (c.g || 0) + 0.114 * (c.b || 0);
+    if (lum < bestLum) { bestLum = lum; inkLayer = k; }
+  });
+  const layers = [allLayers[inkLayer]].filter(Boolean);
+  const W = td && td.width ? td.width : 0;
+  const H = td && td.height ? td.height : 0;
+  const polys = [];
+  layers.forEach((paths) => {
+    const pi = paths || [];
+    const parentOf = new Map();
+    pi.forEach((p, i) => {
+      ((p && p.holechildren) || []).forEach((ci) => { parentOf.set(ci, i); });
+    });
+    pi.forEach((p, i) => {
+      const segs = p && p.segments;
+      if (!segs || segs.length < 3) return;
+      const verts = [], ends = [], ctrl = [];
+      segs.forEach((s) => {
+        verts.push([s.x1, s.y1]);
+        if (s.type === "Q" && s.x3 !== undefined) {
+          ctrl.push([s.x2, s.y2]); ends.push([s.x3, s.y3]);
+        } else {
+          ctrl.push(null); ends.push([s.x2, s.y2]);
+        }
+      });
+      /* عمق التداخل: 0 خارجي، 1 ثقب، 2 جزيرة جوه ثقب… */
+      let depth = 0, g = parentOf.get(i);
+      while (g !== undefined) { depth++; g = parentOf.get(g); }
+      polys.push({ verts: verts, ends: ends, ctrl: ctrl, depth: depth });
+    });
+  });
+  if (!polys.length) throw new Error("التتبع ما طلّعش شكلًا");
+
+  /* استبعاد خلفية الكانفاس (احتياط — طبقة الحبر مش بتشمل الخلفية أصلًا):
+   * مستطيل يغطي معظم المساحة أو بتحوي زواياه */
+  polys.forEach((P) => {
+    P.area = Math.abs(polySignedArea(P.verts));
+    P.bgish = P.area >= 0.9 * Math.max(1, W * H) ||
+      (pointInPoly([1, 1], P.verts) && pointInPoly([W - 2, H - 2], P.verts));
+  });
+  const shapes = polys.filter((P) => !P.bgish);
+  if (!shapes.length) throw new Error("التتبع طلّع الخلفية بس");
+
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  shapes.forEach((P) => {
+    P.verts.forEach((pt) => {
+      if (pt[0] < minX) minX = pt[0];
+      if (pt[0] > maxX) maxX = pt[0];
+      if (pt[1] < minY) minY = pt[1];
+      if (pt[1] > maxY) maxY = pt[1];
+    });
+    P.ends.forEach((pt) => {
+      if (pt[0] < minX) minX = pt[0];
+      if (pt[0] > maxX) maxX = pt[0];
+      if (pt[1] < minY) minY = pt[1];
+      if (pt[1] > maxY) maxY = pt[1];
+    });
+  });
+  const bw = maxX - minX, bh = maxY - minY;
+  if (!isFinite(bw) || !isFinite(bh) || bw <= 0 || bh <= 0) {
+    throw new Error("أبعاد الحرف غير صالحة");
+  }
+  /* وضع المرساة (نص مرسوم): مقياس حقيقي upm/مقاس الرسم — النسب الطبيعية
+     للحرف محفوظة (ب أصغر من ا) والأساس في مكانه (النقط تحت الأساس تحت).
+     بدون مرساة (صورة): ملاءمة الصندوق القديمة زي ما هي */
+  let scale, mx, my, advance;
+  if (anchor && anchor.size > 0) {
+    scale = upm / anchor.size;
+    const ox = anchor.penX || 0, oy = anchor.baselineRow || 0;
+    mx = (x) => (x - ox) * scale;
+    my = (y) => (oy - y) * scale;
+    advance = Math.max(1, Math.round((anchor.advW || bw) * scale));
+  } else {
+    scale = (upm * 0.75) / bh;
+    advance = Math.max(1, Math.round(bw * scale + upm * 0.06));
+    mx = (x) => (x - minX) * scale;
+    my = (y) => (maxY - y) * scale;
+  }
+
+  const path = new opentype.Path();
+  shapes.forEach((P) => {
+    const n = P.verts.length;
+    const mv = P.verts.map((pt) => [mx(pt[0]), my(pt[1])]);
+    const me = P.ends.map((pt) => [mx(pt[0]), my(pt[1])]);
+    const mc = P.ctrl.map((c) => (c ? [mx(c[0]), my(c[1])] : null));
+    /* TrueType: الخارجي مع عقارب الساعة (مساحة سالبة في y-up)، الثقب عكسه */
+    const aFont = polySignedArea(mv);
+    const wantNeg = (P.depth % 2 === 0);
+    const rev = wantNeg ? aFont > 0 : aFont < 0;
+
+    const edge = (c, to) => {
+      if (c) {
+        path.quadraticCurveTo(
+          Math.round(c[0]), Math.round(c[1]),
+          Math.round(to[0]), Math.round(to[1]));
+      } else {
+        path.lineTo(Math.round(to[0]), Math.round(to[1]));
+      }
+    };
+
+    if (!rev) {
+      path.moveTo(Math.round(mv[0][0]), Math.round(mv[0][1]));
+      for (let i = 0; i < n; i++) edge(mc[i], me[i]);
+    } else {
+      /* معكوس: نبدأ من نهاية آخر قطعة ونرجع بنقاط التحكم نفسها */
+      path.moveTo(Math.round(me[n - 1][0]), Math.round(me[n - 1][1]));
+      for (let i = n - 1; i >= 0; i--) edge(mc[i], mv[i]);
+    }
+    path.close();
+  });
+  return { path: path, advance: advance };
+}
+
+/* استنساخ الحرف كفيكتور من الخط المفتوح نفسه — أولوية أولى لـ«شكل الحرف نفسه»:
+   الشكل يطلع من خط المستخدم نفسه (نقي 100% من أي خط مركّب على الموقع)
+   وبجودة فيكتور حقيقية من غير أي بكسل. لو الحرف مش في الخط نهائيًا
+   نرجع لتتبّع نص المتصفح كحل أخير */
+function ownFontGlyphPath(char, upm) {
+  const gid = (typeof resolveCharGid === "function") ? resolveCharGid(char) : undefined;
+  if (gid === undefined) return null;
+  let src = null;
+  try { src = font.glyphs.get(gid); } catch (e) { src = null; }
+  if (!src || !src.path || !src.path.commands || !src.path.commands.length) return null;
+
+  const path = new opentype.Path();
+  path.commands = src.path.commands.map((c) => Object.assign({}, c));
+  const bb = path.getBoundingBox();
+  const bw = bb.x2 - bb.x1, bh = bb.y2 - bb.y1;
+  if (!isFinite(bw) || !isFinite(bh) || bw <= 0 || bh <= 0) return null;
+
+  /* نحافظ على مسار الحرف ومسافته الأصلية زي ما هي — بلا أي تحويل */
+  const advance = Math.max(1, Math.round(src.advanceWidth || bw));
+  return { path: path, advance: advance, cloned: true };
+}
+
+async function textCharToFontPath(char, upm, options) {
+  /* ١ — من الخط المفتوح نفسه: فيكتور نقي بلا متصفح وبلا بكسل */
+  const own = !(options && options.skipOwn) ? ownFontGlyphPath(char, upm) : null;
+  if (own) return own;
+
+  /* ٢ — التتبع HD: رسم بدقة كبيرة + منحنيات Q ناعمة من imagetracerjs
+     (المكتبة مدمجة في الملف — شغل بلا نت وبلا بكسل) */
+  const IT = (typeof ImageTracer !== "undefined") ? ImageTracer
+    : (typeof window !== "undefined" && window.ImageTracer) ? window.ImageTracer : null;
+  if (IT && typeof IT.imagedataToTracedata === "function") {
+    try {
+      const shot = renderTextToImageDataHD(char);
+      /* ⚠ إصلاح «الحرف مبكسل»: ltres كان 0.01 — قيمة قريبة من صفر
+        كانت بتخلي التتبع يعتبر كل بكسل حافة نقطة مستقلة في المسار
+        (بدل خط مستقيم واحد)، فالمنحنيات كانت بتطلع «سلم» متكسّر
+        مش خط ناعم. ltres:1 يسمح بدمج البكسلات المتقاربة في خط
+        مستقيم واحد قبل التقويس، وqtres أعلى شوية يدّي التقوّس مجال
+        أوسع يلتقط فيه الانحناء الحقيقي بدل نقاط زيادة.
+        بلور أخف (1 بدل 3) يقلل تسنين الحواف بلا ما يدوّب التفاصيل
+        الدقيقة (نقط، أطراف رفيعة). */
+      const td = IT.imagedataToTracedata(shot.imgd, {
+        ltres: 1, qtres: 1, pathomit: 6, roundcoords: 2,
+        rightangleenhance: false, blurradius: 1, bluredges: true,
+        colorsampling: 0, numberofcolors: 2, mincolorratio: 0,
+        colorquantcycles: 1, strokewidth: 0, linefilter: false,
+        scale: 1, desc: false, viewbox: false, bottomright: false,
+        pal: [{ r: 0, g: 0, b: 0, a: 255 }, { r: 255, g: 255, b: 255, a: 255 }]
+      });
+      /* tol بيتناسب مع نسبة تكبير الرسم الفعلية (size/base) — كده لو
+         حرف صغير احتاج زووم أعلى، التنعيم بعده بيفضل بنفس النسبة
+         البصرية بالظبط، بدل رقم ثابت يبقى ضيق قوي على زووم عالي
+         (تفاصيل زيادة/تسنين) أو واسع قوي على زووم واطي (تفلطح) */
+      const zoomRatio = Math.max(1, (shot.size || 1) / (shot.base || 240));
+      return tracedataToFontPath(__smoothTracedata(td, 1.3 * zoomRatio), upm, shot);
+    } catch (e) {
+      console.warn("التتبع HD فشل — نرجع للتتبع القديم:", e && e.message);
+    }
+  }
+
+  /* ٣ — احتياطي: التتبع القديم (شبكة الحواف) لو المكتبة مش متاحة */
+  const fontSize = 160;
+  const bitmap = renderTextToPixels(char, fontSize);
+  const contours = traceBitmapToPaths(bitmap.pixels, bitmap.width, bitmap.height);
+  if (!contours.length) throw new Error("تعذّر رسم الحرف");
+
+  const smoothed = contours.map((c) => smoothChaikin(c, 2));
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+  smoothed.forEach((contour) => {
+    contour.forEach((pt) => {
+      if (pt[0] < minX) minX = pt[0];
+      if (pt[0] > maxX) maxX = pt[0];
+      if (pt[1] < minY) minY = pt[1];
+      if (pt[1] > maxY) maxY = pt[1];
+    });
+  });
+
+  const bw = maxX - minX;
+  const bh = maxY - minY;
+  if (!isFinite(bw) || !isFinite(bh) || bw <= 0 || bh <= 0) {
+    throw new Error("أبعاد الحرف غير صالحة");
+  }
+
+  /* نفس مرساة الأساس: مقياس حقيقي + الأساس في مكانه (زي الوضع HD) */
+  const scale = upm / bitmap.size;
+  const ox = bitmap.penX || 0, oy = bitmap.baselineRow || 0;
+  const advance = Math.max(1, Math.round((bitmap.advW || bw) * scale));
+
+  const path = new opentype.Path();
+  let first = true;
+  smoothed.forEach((contour) => {
+    contour.forEach((pt) => {
+      const x = Math.round((pt[0] - ox) * scale);
+      const y = Math.round((oy - pt[1]) * scale);
+      if (first) { path.moveTo(x, y); first = false; }
+      else path.lineTo(x, y);
+    });
+    path.close();
+    first = true;
+  });
+
+  return { path: path, advance: advance };
+}
+
+/* ================================================================
+   § 12-ج — أشكال الحركات الجاهزة (فيكتور مولّد برمجيًا)
+   التشكيل (فتحة/ضمة/كسرة/شدة/سكون/تنوين) محتاج رسمات —
+   ورسم الحركة بالنص المرسوم بيفشل في بعض المتصفحات (دائرة منقطة
+   بتترسم معها). الحل: أشكال هندسية ناضية تولد كفيكتور نقي
+   — عرض صفر، وبتدخل التصدير زي أي رسمة مستخدم.
+   ================================================================ */
+
+/* نقاط قوس من زاوية لزاوية (بالدرجات) */
+function __arcPts(cx, cy, r, a0, a1, n) {
+  const pts = [];
+  const rad = (d) => d * Math.PI / 180;
+  for (let k = 0; k <= n; k++) {
+    const a = rad(a0 + (a1 - a0) * k / n);
+    pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  }
+  return pts;
+}
+
+/* مستطيل سميك بين نقطتين (شرطة الحركة) */
+function __quadPts(x1, y1, x2, y2, w) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len * w / 2, ny = dx / len * w / 2;
+  return [
+    [x1 + nx, y1 + ny], [x2 + nx, y2 + ny],
+    [x2 - nx, y2 - ny], [x1 - nx, y1 - ny]
+  ];
+}
+
+/* نقاط متعددة → مسار مغلق باتجاه صحيح:
+   الكونتور الخارجي (المساحة السالبة في y-up) والثقوب معكوسة —
+   تعبئة nonzero سليمة زي ما tracedataToFontPath بتعمل */
+function __polysToPath(lists) {
+  const path = new opentype.Path();
+  lists.forEach((pts, i) => {
+    let p = pts;
+    const a = polySignedArea(p);
+    const wantNeg = (i === 0);
+    if ((wantNeg && a > 0) || (!wantNeg && a < 0)) p = p.slice().reverse();
+    p.forEach((pt, k) => {
+      const x = Math.round(pt[0]), y = Math.round(pt[1]);
+      if (k === 0) path.moveTo(x, y); else path.lineTo(x, y);
+    });
+    path.close();
+  });
+  return path;
+}
+
+/* حلقة دائرية (دونات) — خارجي + ثقب */
+function __donutPts(cx, cy, rOut, rIn, n) {
+  return [__arcPts(cx, cy, rOut, 0, 359.99, n || 36),
+          __arcPts(cx, cy, rIn, 0, 359.99, n || 36)];
+}
+
+/* نص حلقة (نص دونات) — كونتور واحد: قوس خارجي + قوس داخلي مرجّع */
+function __halfRingPts(cx, cy, rOut, rIn, a0, a1, n) {
+  return __arcPts(cx, cy, rOut, a0, a1, n || 24)
+    .concat(__arcPts(cx, cy, rIn, a1, a0, n || 24));
+}
+
+/* رسمة الحركة الجاهزة — بترجع {path, advance:0} أو null لو مش حركة معروفة */
+function builtinMarkPath(cp, upm) {
+  const u = (upm || 1000) / 1000;
+  const lists = [];
+  const S = (x1, y1, x2, y2, w) => lists.push(__quadPts(x1 * u, y1 * u, x2 * u, y2 * u, w * u));
+
+  switch (cp) {
+    case 0x064E: /* فتحة */
+      S(150, 600, 390, 730, 62);
+      break;
+    case 0x0650: /* كسرة — نفس شكل الفتحة، الموضع بيتحدد تحت الأساس */
+      S(150, 610, 390, 740, 62);
+      break;
+    case 0x064B: /* تنوين فتح = فتحتين */
+      S(60, 600, 230, 715, 55);
+      S(270, 600, 440, 715, 55);
+      break;
+    case 0x064D: /* تنوين كسر */
+      S(60, 610, 230, 725, 55);
+      S(270, 610, 440, 725, 55);
+      break;
+    case 0x064F: /* ضمة = نص حلقة */
+      lists.push(__halfRingPts(300 * u, 660 * u, 175 * u, 95 * u, 200, 340, 26));
+      break;
+    case 0x064C: /* تنوين ضم = نصف حلقتين */
+      lists.push(__halfRingPts(195 * u, 660 * u, 135 * u, 72 * u, 200, 340, 22));
+      lists.push(__halfRingPts(430 * u, 660 * u, 135 * u, 72 * u, 200, 340, 22));
+      break;
+    case 0x0651: /* شدة = سقف + ذيل يمين */
+      S(100, 640, 300, 760, 58);
+      S(300, 760, 500, 640, 58);
+      S(452, 660, 482, 500, 52);
+      break;
+    case 0x0652: /* سكون = حلقة صغيرة + رأس مائل */
+      __donutPts(300 * u, 660 * u, 110 * u, 52 * u, 30).forEach((p) => lists.push(p));
+      S(360, 730, 440, 810, 46);
+      break;
+    case 0x0670: /* ألف خنجرية */
+      S(285, 140, 340, 780, 68);
+      break;
+    default:
+      return null;
+  }
+  return { path: __polysToPath(lists), advance: 0 };
+}
+
+/* هل كل أكواد الحرف كلها حركات؟ (الحركات عرضها صفر دايمًا) */
+function isAllMarksGlyph(g) {
+  if (!g) return false;
+  const us = (g.unicodes && g.unicodes.length)
+    ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+  if (!us.length) return false;
+  return us.every((u) => isMarkCp(u));
+}
+
+/* ================================================================
+   § 12-د — استيراد صورة للتتبع (من صورة)
+   «أرفع صورة أو سكشن ويتحول لحرف فيكتور» — الصورة بتترسم على
+   كانفاس كبير، ولو الخلفية غامقة بتتعكس تلقائيًا، وبعدين
+   مكتبة التتبع المدمجة بتطلّع منحنيات Q ناعمة.
+   ================================================================ */
+
+/* كشف لون الخلفية: متوسط إضاءة الإطار من حول الصورة —
+   لو الإطار أغمق من الوسط → الصورة معكوسة (حرف فاتح على غامق) */
+function __imageNeedsInvert(ctx, w, h) {
+  try {
+    const edge = ctx.getImageData(0, 0, w, h);
+    const d = edge.data;
+    const lum = (i) => 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+    let eSum = 0, eN = 0, cSum = 0, cN = 0;
+    const band = Math.max(2, Math.round(Math.min(w, h) * 0.04));
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        const isEdge = (x < band || y < band || x >= w - band || y >= h - band);
+        if (isEdge) { eSum += lum(i); eN++; }
+        else if ((x > w * 0.35 && x < w * 0.65 && y > h * 0.35 && y < h * 0.65)) { cSum += lum(i); cN++; }
+      }
+    }
+    if (!eN || !cN) return false;
+    return (eSum / eN) < (cSum / cN) - 18;
+  } catch (e) { return false; }
+}
+
+async function imageFileToFontPath(file, upm) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = () => rej(new Error("الصورة غير صالحة أو تالفة"));
+      im.src = url;
+    });
+
+    const MAXD = 1400;
+    let w = img.naturalWidth || img.width || 0;
+    let h = img.naturalHeight || img.height || 0;
+    if (w < 2 || h < 2) throw new Error("أبعاد الصورة غير صالحة");
+    const sc = Math.min(1, MAXD / Math.max(w, h));
+    w = Math.max(2, Math.round(w * sc));
+    h = Math.max(2, Math.round(h * sc));
+
+    const cv = document.createElement("canvas");
+    const ctx = cv.getContext("2d");
+    cv.width = w; cv.height = h;
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0, w, h);
+
+    /* حرف فاتح على خلفية غامقة → نعكس الألوان عشان التتبع يمشي */
+    if (__imageNeedsInvert(ctx, w, h)) {
+      const im2 = ctx.getImageData(0, 0, w, h);
+      const d2 = im2.data;
+      for (let k = 0; k < d2.length; k += 4) {
+        d2[k] = 255 - d2[k]; d2[k + 1] = 255 - d2[k + 1]; d2[k + 2] = 255 - d2[k + 2];
+      }
+      ctx.putImageData(im2, 0, 0);
+    }
+
+    const IT = (typeof ImageTracer !== "undefined") ? ImageTracer
+      : (typeof window !== "undefined" && window.ImageTracer) ? window.ImageTracer : null;
+    if (!IT || typeof IT.imagedataToTracedata !== "function") {
+      throw new Error("مكتبة التتبع غير متاحة");
+    }
+    const imgd = ctx.getImageData(0, 0, w, h);
+    const td = IT.imagedataToTracedata(imgd, {
+      ltres: 0.01, qtres: 0.6, pathomit: 6, roundcoords: 1,
+      rightangleenhance: false, blurradius: 3, bluredges: true,
+      colorsampling: 0, numberofcolors: 2, mincolorratio: 0,
+      colorquantcycles: 1, strokewidth: 0, linefilter: false,
+      scale: 1, desc: false, viewbox: false, bottomright: false,
+      pal: [{ r: 0, g: 0, b: 0, a: 255 }, { r: 255, g: 255, b: 255, a: 255 }]
+    });
+    /* عتبة التنعيم نسبية لمقاس الصورة (لو الصورة صغيرة نتركها خشنة شوية) */
+    return tracedataToFontPath(
+      __smoothTracedata(td, Math.max(0.9, Math.min(w, h) * 0.0011)), upm);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/* ================================================================
+   § 12-هـ — تنعيم المنحنيات الحقيقي (قلب علاج «الحرف معمول بكسل»)
+   المشكلة المقيسة: imagetracerjs بيفضّل قطع L مستقيمة (٩٥٪ من الإخراج!)
+   فالحرف بيطلع مضلع ماشي ورا خطوات البكسل = حواف مكسّرة زي المنشار.
+   الحل: ملاءمة منحنيات تربيعية بأقل مربعات (Schneider المعدّل للكواد):
+     ١ — رؤوس الزوايا الحادة (التفاف > ٦٢°) تفضل مفاصل خطوط
+     ٢ — كل مدى ناعم بين رأسين بيتلاءم بكواد واحدة/متعددة بالتجزيء
+         التعاودي لحد ما الخطأ ≤ عتبة (≈ ١.١ بكسل عند دقة الرسم)
+   النتيجة: بضعة عشرات منحنيات Q ناعمة بدل مئات L مكسّرة —
+   نفس تقنية Potrace/Adobe بالظبط لكن مخصصة للكواد (TrueType).
+   ================================================================ */
+
+/* زاوية الالتفاف عند نقطة بنافذة k (درجات) */
+function __turnAngleDeg(pts, i, k) {
+  const n = pts.length;
+  const a = pts[(i - k + n) % n], b = pts[i], c = pts[(i + k) % n];
+  const ax = b[0] - a[0], ay = b[1] - a[1];
+  const bx = c[0] - b[0], by = c[1] - b[1];
+  const la = Math.hypot(ax, ay), lb = Math.hypot(bx, by);
+  if (la < 1e-9 || lb < 1e-9) return 0;
+  const cosv = (ax * bx + ay * by) / (la * lb);
+  return Math.acos(Math.max(-1, Math.min(1, cosv))) * 180 / Math.PI;
+}
+
+/* ملاءمة كواد واحدة لنطاق [s..e] — أقل مربعات + أخطاء (كواد/خط) */
+function __quadFitErr(pts, s, e) {
+  const P0 = pts[s], P1 = pts[e];
+  const dx = P1[0] - P0[0], dy = P1[1] - P0[1];
+  let total = 0;
+  const t = [0];
+  for (let i = s + 1; i <= e; i++) {
+    total += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+    t.push(total);
+  }
+  if (total < 1e-9) return null;
+  for (let i = 0; i < t.length; i++) t[i] /= total;
+  let nx = 0, ny = 0, den = 0;
+  for (let i = s; i <= e; i++) {
+    const ti = t[i - s], u = 1 - ti, w = 2 * u * ti;
+    if (w === 0) continue;
+    nx += w * (pts[i][0] - (u * u * P0[0] + ti * ti * P1[0]));
+    ny += w * (pts[i][1] - (u * u * P0[1] + ti * ti * P1[1]));
+    den += w * w;
+  }
+  if (den < 1e-9) return null;
+  const C = [nx / den, ny / den];
+  /* تجنب تحكم بعيد جدًا عن المدى (كواد منفلتة) */
+  const midx = P0[0] + dx * 0.5, midy = P0[1] + dy * 0.5;
+  if (Math.hypot(C[0] - midx, C[1] - midy) > total * 1.6) return null;
+  let maxErr = 0, maxErrL = 0, iSplit = -1;
+  for (let i = s; i <= e; i++) {
+    const ti = t[i - s], u = 1 - ti;
+    const bx = u * u * P0[0] + 2 * u * ti * C[0] + ti * ti * P1[0];
+    const by = u * u * P0[1] + 2 * u * ti * C[1] + ti * ti * P1[1];
+    const err = Math.hypot(bx - pts[i][0], by - pts[i][1]);
+    if (err > maxErr) { maxErr = err; iSplit = i; }
+    const lx = P0[0] + dx * ti, ly = P0[1] + dy * ti;
+    const errL = Math.hypot(lx - pts[i][0], ly - pts[i][1]);
+    if (errL > maxErrL) maxErrL = errL;
+  }
+  return { c: C, maxErr: maxErr, maxErrL: maxErrL, iSplit: iSplit };
+}
+
+/* ملاءمة حلقة مغلقة كاملة → قطع L/Q ناعمة (تعاودي بالتجزيء) */
+function __fitQuadLoop(pts, tol) {
+  const n = pts.length;
+  if (n < 6) return null;
+  /* ١ — رؤوس الزوايا الحادة */
+  const K = Math.max(2, Math.round(n / 72));
+  const cs = [];
+  for (let i = 0; i < n; i++) {
+    if (__turnAngleDeg(pts, i, K) > 62) {
+      if (!cs.length || i - cs[cs.length - 1] > K) cs.push(i);
+    }
+  }
+  if (cs.length && n - cs[cs.length - 1] <= K) cs.pop(); /* لا زاوية عند نقطة الإغلاق */
+  /* ٢ — النقاط خطية مع نقطة إغلاق مكررة (L2 تتبدل لو لزم تدوير) */
+  let L2 = pts.concat([pts[0]]);
+  const out = [];
+  const emitSpan = (s, e) => {
+    if (e - s < 2) return;
+    const fit = __quadFitErr(L2, s, e);
+    if (!fit) { out.push({ k: "L", p: L2[e] }); return; }
+    if (fit.maxErr <= tol || e - s < 8) {
+      /* خط حقيقي مستقيم؟ خليه خط — البساطة أدق هنا */
+      if (fit.maxErrL <= Math.max(0.4, tol * 0.45)) out.push({ k: "L", p: L2[e] });
+      else out.push({ k: "Q", c: fit.c, p: L2[e] });
+      return;
+    }
+    const mid = fit.iSplit;
+    if (mid - s < 3 || e - mid < 3) {
+      /* الانقسام عند الحافة = ملاءمة منفلتة (حلقة مغلقة مشكّلة) —
+         المدى الطويل ينقسم من المنتصف بدل كواد واحدة تغطي كل حاجة */
+      if (e - s >= 16) {
+        const m2 = s + ((e - s) >> 1);
+        emitSpan(s, m2);
+        emitSpan(m2, e);
+      } else {
+        out.push({ k: "Q", c: fit.c, p: L2[e] });
+      }
+      return;
+    }
+    emitSpan(s, mid);
+    emitSpan(mid, e);
+  };
+  if (!cs.length) {
+    /* حلقة بدون زوايا حادة: أول نقطة مفصل عشوائي — نقسم من أبعد نقطة
+       عنها (قطر الحلقة) عشان النصين يتصرفوا كأقواس سليمة قابلة للملاءمة */
+    let far = 0, fd = -1;
+    for (let i = 1; i < n; i++) {
+      const d = (pts[i][0] - pts[0][0]) * (pts[i][0] - pts[0][0]) +
+                (pts[i][1] - pts[0][1]) * (pts[i][1] - pts[0][1]);
+      if (d > fd) { fd = d; far = i; }
+    }
+    if (far >= 8 && n - far >= 8) {
+      emitSpan(0, far);
+      emitSpan(far, n);
+    } else {
+      emitSpan(0, n);
+    }
+  } else {
+    /* ⚠ في زوايا: ندوّر السلسلة لتبدأ من أول رأس — كل المدى تتقدم
+       للأمام في المصفوفة المكررة (المدى الملتف من آخر رأس لأول رأس
+       كان بيمشي بالعكس فيتم تجاهله صامتًا وتسقط معظم الحلقة!) */
+    const c0 = cs[0];
+    const rot = pts.slice(c0).concat(pts.slice(0, c0));
+    L2 = rot.concat([rot[0]]);
+    const marks = [];
+    for (let ci = 1; ci < cs.length; ci++) {
+      const rel = cs[ci] - c0;
+      if (rel > 3 && rel < rot.length - 3) marks.push(rel);
+    }
+    marks.push(rot.length);
+    let from = 0;
+    for (let mi = 0; mi < marks.length; mi++) {
+      emitSpan(from, marks[mi]);
+      from = marks[mi];
+    }
+  }
+  return out.length >= 2 ? out : null;
+}
+
+/* تنعيم tracedata بعد التتبع مباشرة — يستبدل سلاسل L المكسّرة بمنحنيات Q
+   tol بالبكسل (نطاق الرسم). بيفشل بأمان = يرجّع td زي ما هو */
+function __smoothTracedata(td, tol) {
+  try {
+    if (!td || !td.layers) return td;
+    const T = (typeof tol === "number" && tol > 0) ? tol : 1.15;
+    td.layers.forEach((paths) => {
+      (paths || []).forEach((p) => {
+        if (!p || !p.segments || p.segments.length < 8) return;
+        /* سلسلة رؤوس موحدة — Q الأصلية تتفرع لعينات كثيفة */
+        const pts = [];
+        p.segments.forEach((s) => {
+          if (!s) return;
+          if (s.type === "Q" && s.x3 !== undefined) {
+            const last = pts[pts.length - 1];
+            const sx = last ? last[0] : s.x1, sy = last ? last[1] : s.y1;
+            for (let k2 = 1; k2 <= 10; k2++) {
+              const t = k2 / 10, u = 1 - t;
+              pts.push([u * u * sx + 2 * u * t * s.x2 + t * t * s.x3,
+                        u * u * sy + 2 * u * t * s.y2 + t * t * s.y3]);
+            }
+          } else {
+            pts.push([s.x2, s.y2]);
+          }
+        });
+        if (pts.length < 8) return;
+        const fitted = __fitQuadLoop(pts, T);
+        if (!fitted) return;
+        const segs = [];
+        let from = pts[0];
+        fitted.forEach((sg) => {
+          if (sg.k === "L") {
+            segs.push({ type: "L", x1: from[0], y1: from[1], x2: sg.p[0], y2: sg.p[1] });
+          } else {
+            segs.push({ type: "Q", x1: from[0], y1: from[1], x2: sg.c[0], y2: sg.c[1],
+                        x3: sg.p[0], y3: sg.p[1] });
+          }
+          from = sg.p;
+        });
+        if (segs.length >= 2 && segs.length <= p.segments.length * 12) {
+          p.segments = segs;
+        }
+      });
+    });
+    return td;
+  } catch (e) { return td; }
+}
+
+/* ================================================================
+   § 13 — SVG
+   ================================================================ */
+function glyphPathToSvg(glyph) {
+  if (!glyph || !glyph.path || !glyph.path.commands.length) return null;
+  const fx = (v) => Math.round(v * 100) / 100;
+  const fy = (v) => Math.round(-v * 100) / 100;
+  let d = "";
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+  const track = (x, y) => {
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (-y < minY) minY = -y;
+    if (-y > maxY) maxY = -y;
+  };
+  for (const c of glyph.path.commands) {
+    switch (c.type) {
+      case "M":
+        d += "M" + fx(c.x) + " " + fy(c.y) + " ";
+        track(c.x, c.y);
+        break;
+      case "L":
+        d += "L" + fx(c.x) + " " + fy(c.y) + " ";
+        track(c.x, c.y);
+        break;
+      case "C":
+        d += "C" + fx(c.x1) + " " + fy(c.y1) + " " + fx(c.x2) + " " + fy(c.y2) + " " +
+          fx(c.x) + " " + fy(c.y) + " ";
+        track(c.x1, c.y1); track(c.x2, c.y2); track(c.x, c.y);
+        break;
+      case "Q":
+        d += "Q" + fx(c.x1) + " " + fy(c.y1) + " " + fx(c.x) + " " + fy(c.y) + " ";
+        track(c.x1, c.y1); track(c.x, c.y);
+        break;
+      case "Z":
+        d += "Z ";
+        break;
+    }
+  }
+  if (!d) return null;
+  return {
+    d: d.trim(),
+    width: Math.ceil(maxX - minX),
+    height: Math.ceil(maxY - minY),
+    minX: Math.round(minX),
+    minY: Math.round(minY),
+    maxX: Math.round(maxX),
+    maxY: Math.round(maxY)
+  };
+}
+
+/* بناء مستند SVG كامل (بنفس هيكل Twemoji: XML + namespaces + metadata + defs + clipPath + g)
+   عشان الناتج يستجيب للاستيراد/التصدير في محررات الخطوط والمستعرضات */
+function glyphToFullSvgDocument(glyph) {
+  const info = glyphPathToSvg(glyph);
+  if (!info || !info.d) return null;
+
+  const pad = Math.max(2, Math.round((info.width + info.height) / 40));
+  const minX = info.minX - pad;
+  const minY = info.minY - pad;
+  const w = info.width + pad * 2;
+  const h = info.height + pad * 2;
+  const viewBox = minX + " " + minY + " " + w + " " + h;
+
+  const escAttr = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const gName = escAttr(glyph.name || ("glyph" + (glyph.index != null ? glyph.index : "")));
+  const u = glyph.unicode;
+  const uniAttr = (u !== undefined && u !== null)
+    ? " glyphName=\"" + gName + "\" unicode=\"&#x" + u.toString(16).toUpperCase().padStart(4, "0") + ";\""
+    : " glyphName=\"" + gName + "\"";
+
+  return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' +
+    '<svg xmlns:dc="http://purl.org/dc/elements/1.1/"\n' +
+    '     xmlns:cc="http://creativecommons.org/ns#"\n' +
+    '     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"\n' +
+    '     xmlns:svg="http://www.w3.org/2000/svg"\n' +
+    '     xmlns="http://www.w3.org/2000/svg"\n' +
+    '     viewBox="' + viewBox + '"\n' +
+    '     style="enable-background:new ' + viewBox + ';"\n' +
+    '     xml:space="preserve"\n' +
+    '     version="1.1"\n' +
+    '     id="svg2"' + uniAttr + '>\n' +
+    '     <metadata id="metadata8">\n' +
+    '          <rdf:RDF>\n' +
+    '               <cc:Work rdf:about="">\n' +
+    '                    <dc:format>image/svg+xml</dc:format>\n' +
+    '                    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />\n' +
+    '                    <dc:title>' + gName + '</dc:title>\n' +
+    '               </cc:Work>\n' +
+    '          </rdf:RDF>\n' +
+    '     </metadata>\n' +
+    '     <defs id="defs6">\n' +
+    '          <clipPath\n' +
+    '               id="clipPath16"\n' +
+    '               clipPathUnits="userSpaceOnUse">\n' +
+    '               <rect\n' +
+    '                    id="rect18"\n' +
+    '                    x="' + minX + '"\n' +
+    '                    y="' + minY + '"\n' +
+    '                    width="' + w + '"\n' +
+    '                    height="' + h + '" />\n' +
+    '          </clipPath>\n' +
+    '     </defs>\n' +
+    '     <g\n' +
+    '          clip-path="url(#clipPath16)"\n' +
+    '          id="g10">\n' +
+    '          <path\n' +
+    '               id="path22"\n' +
+    '               style="fill:currentColor;fill-opacity:1;fill-rule:nonzero;stroke:none"\n' +
+    '               d="' + info.d + '" />\n' +
+    '     </g>\n' +
+    '</svg>\n';
+}
+
+/* تحويل قوس SVG إلى منحنيات تكعيبية */
+function arcToCubics(x1, y1, rx, ry, ang, laf, sf, x2, y2) {
+  if (!rx || !ry || (x1 === x2 && y1 === y2)) {
+    return [{ type: "L", x: x2, y: y2 }];
+  }
+  const phi = ang * Math.PI / 180;
+  const cp = Math.cos(phi), sp = Math.sin(phi);
+  const dx = (x1 - x2) / 2, dy = (y1 - y2) / 2;
+  const x1p = cp * dx + sp * dy, y1p = -sp * dx + cp * dy;
+  rx = Math.abs(rx); ry = Math.abs(ry);
+  const lam = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
+  if (lam > 1) { const s = Math.sqrt(lam); rx *= s; ry *= s; }
+  const sgn = (laf !== sf) ? 1 : -1;
+  const num = rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p;
+  const den = rx * rx * y1p * y1p + ry * ry * x1p * x1p;
+  const co = sgn * Math.sqrt(Math.max(num, 0) / Math.max(den, 1e-12));
+  const cxp = co * rx * y1p / ry, cyp = -co * ry * x1p / rx;
+  const CX = cp * cxp - sp * cyp + (x1 + x2) / 2;
+  const CY = sp * cxp + cp * cyp + (y1 + y2) / 2;
+
+  const angv = (ux, uy, vx, vy) => {
+    const d = Math.max(-1, Math.min(1,
+      (ux * vx + uy * vy) / ((Math.hypot(ux, uy) * Math.hypot(vx, vy)) || 1e-12)));
+    let a = Math.acos(d);
+    if (ux * vy - uy * vx < 0) a = -a;
+    return a;
+  };
+
+  const t1 = angv(1, 0, (x1p - cxp) / rx, (y1p - cyp) / ry);
+  let dt = angv((x1p - cxp) / rx, (y1p - cyp) / ry, (-x1p - cxp) / rx, (-y1p - cyp) / ry);
+  if (!sf && dt > 0) dt -= 2 * Math.PI;
+  if (sf && dt < 0) dt += 2 * Math.PI;
+
+  const n = Math.max(1, Math.ceil(Math.abs(dt) / (Math.PI / 2)));
+  const del = dt / n, t = 4 / 3 * Math.tan(del / 4);
+  const segs = [];
+  let th = t1;
+
+  for (let k = 0; k < n; k++) {
+    const th2 = th + del;
+    const e1x = cp * rx * Math.cos(th) - sp * ry * Math.sin(th);
+    const e1y = sp * rx * Math.cos(th) + cp * ry * Math.sin(th);
+    const d1x = -cp * rx * Math.sin(th) - sp * ry * Math.cos(th);
+    const d1y = -sp * rx * Math.sin(th) + cp * ry * Math.cos(th);
+    const e2x = cp * rx * Math.cos(th2) - sp * ry * Math.sin(th2);
+    const e2y = sp * rx * Math.cos(th2) + cp * ry * Math.sin(th2);
+    const d2x = -cp * rx * Math.sin(th2) - sp * ry * Math.cos(th2);
+    const d2y = -sp * rx * Math.sin(th2) + cp * ry * Math.cos(th2);
+    segs.push({
+      type: "C",
+      x1: CX + e1x + t * d1x, y1: CY + e1y + t * d1y,
+      x2: CX + e2x - t * d2x, y2: CY + e2y - t * d2y,
+      x: CX + e2x, y: CY + e2y
+    });
+    th = th2;
+  }
+  return segs;
+}
+
+/* محلل مسار SVG الكامل */
+function parseSvgD(d) {
+  const toks = [];
+  const re = /([MmLlHhVvCcSsQqTtAaZz])|(-?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?)/g;
+  let m;
+  while ((m = re.exec(d))) toks.push(m[1] || parseFloat(m[2]));
+
+  const out = [];
+  let i = 0, cmd = null;
+  let cx = 0, cy = 0, sx = 0, sy = 0, px = null, py = null;
+  const next = () => toks[i++];
+  const hasNum = () => i < toks.length && typeof toks[i] === "number";
+
+  while (i < toks.length) {
+    if (typeof toks[i] === "string") cmd = toks[i++];
+    if (!cmd) { i++; continue; }
+    const rel = (cmd === cmd.toLowerCase());
+    const C = cmd.toUpperCase();
+    let first = true;
+
+    while (true) {
+      const isF = first;
+      first = false;
+      if (C !== "Z" && !hasNum()) break;
+
+      if (C === "M") {
+        let x = next(), y = next();
+        if (rel) { x += cx; y += cy; }
+        out.push({ type: isF ? "M" : "L", x: x, y: y });
+        if (isF) { sx = x; sy = y; }
+        cx = x; cy = y; px = py = null;
+      } else if (C === "L") {
+        let x = next(), y = next();
+        if (rel) { x += cx; y += cy; }
+        out.push({ type: "L", x: x, y: y });
+        cx = x; cy = y; px = py = null;
+      } else if (C === "H") {
+        let x = next();
+        if (rel) x += cx;
+        out.push({ type: "L", x: x, y: cy });
+        cx = x; px = py = null;
+      } else if (C === "V") {
+        let y = next();
+        if (rel) y += cy;
+        out.push({ type: "L", x: cx, y: y });
+        cy = y; px = py = null;
+      } else if (C === "C") {
+        let x1 = next(), y1 = next(), x2 = next(), y2 = next(), x = next(), y = next();
+        if (rel) { x1 += cx; y1 += cy; x2 += cx; y2 += cy; x += cx; y += cy; }
+        out.push({ type: "C", x1: x1, y1: y1, x2: x2, y2: y2, x: x, y: y });
+        px = x2; py = y2; cx = x; cy = y;
+      } else if (C === "S") {
+        let x2 = next(), y2 = next(), x = next(), y = next();
+        if (rel) { x2 += cx; y2 += cy; x += cx; y += cy; }
+        const x1 = px === null ? cx : 2 * cx - px;
+        const y1 = py === null ? cy : 2 * cy - py;
+        out.push({ type: "C", x1: x1, y1: y1, x2: x2, y2: y2, x: x, y: y });
+        px = x2; py = y2; cx = x; cy = y;
+      } else if (C === "Q") {
+        let x1 = next(), y1 = next(), x = next(), y = next();
+        if (rel) { x1 += cx; y1 += cy; x += cx; y += cy; }
+        out.push({ type: "Q", x1: x1, y1: y1, x: x, y: y });
+        px = x1; py = y1; cx = x; cy = y;
+      } else if (C === "T") {
+        let x = next(), y = next();
+        if (rel) { x += cx; y += cy; }
+        const x1 = px === null ? cx : 2 * cx - px;
+        const y1 = py === null ? cy : 2 * cy - py;
+        out.push({ type: "Q", x1: x1, y1: y1, x: x, y: y });
+        px = x1; py = y1; cx = x; cy = y;
+      } else if (C === "A") {
+        const r1 = next(), r2 = next(), rot = next(), laf = next(), sf = next();
+        let x = next(), y = next();
+        if (rel) { x += cx; y += cy; }
+        arcToCubics(cx, cy, r1, r2, rot, laf, sf, x, y).forEach((c) => out.push(c));
+        cx = x; cy = y; px = py = null;
+      } else if (C === "Z") {
+        out.push({ type: "Z" });
+        cx = sx; cy = sy; px = py = null;
+        break;
+      } else break;
+    }
+  }
+  return out;
+}
+
+function _mhMul(a, b) {
+  return {
+    a: a.a*b.a + a.c*b.b,
+    b: a.b*b.a + a.d*b.b,
+    c: a.a*b.c + a.c*b.d,
+    d: a.b*b.c + a.d*b.d,
+    e: a.a*b.e + a.c*b.f + a.e,
+    f: a.b*b.e + a.d*b.f + a.f
+  };
+}
+
+function _mhApplyM(m, x, y) {
+  return { x: m.a*x + m.c*y + m.e, y: m.b*x + m.d*y + m.f };
+}
+
+function _mhParseTransform(str) {
+  let out = {a:1,b:0,c:0,d:1,e:0,f:0};
+  const re = /([a-zA-Z]+)\s*\(([^)]*)\)/g;
+  let m;
+  while ((m = re.exec(str || ""))) {
+    const name = m[1].toLowerCase();
+    const v = (m[2].match(/[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/g) || []).map(Number);
+    let t = {a:1,b:0,c:0,d:1,e:0,f:0};
+    if (name === "matrix" && v.length >= 6) t = {a:v[0],b:v[1],c:v[2],d:v[3],e:v[4],f:v[5]};
+    else if (name === "translate") t.e=v[0]||0, t.f=v.length>1?v[1]||0:0;
+    else if (name === "scale") t.a=v[0]??1, t.d=v.length>1?(v[1]??v[0]):(v[0]??1);
+    else if (name === "rotate") {
+      const a=(v[0]||0)*Math.PI/180, c=Math.cos(a), si=Math.sin(a);
+      t={a:c,b:si,c:-si,d:c,e:0,f:0};
+      if (v.length >= 3) {
+        const cx=v[1], cy=v[2];
+        t=_mhMul(_mhMul({a:1,b:0,c:0,d:1,e:cx,f:cy},t),{a:1,b:0,c:0,d:1,e:-cx,f:-cy});
+      }
+    } else if (name === "skewx") { t.c=Math.tan((v[0]||0)*Math.PI/180); }
+    else if (name === "skewy") { t.b=Math.tan((v[0]||0)*Math.PI/180); }
+    out = _mhMul(out, t);
+  }
+  return out;
+}
+
+function _mhTransformCommands(commands, m) {
+  return commands.map(c => {
+    const n = {type:c.type};
+    ["x","y","x1","y1","x2","y2"].forEach(k => {
+      if (c[k] !== undefined && isFinite(c[k])) {
+        if (k === "x" || k === "y") return;
+      }
+    });
+    if (c.x !== undefined && c.y !== undefined) {
+      const p=_mhApplyM(m,c.x,c.y); n.x=p.x; n.y=p.y;
+    }
+    if (c.x1 !== undefined && c.y1 !== undefined) {
+      const p=_mhApplyM(m,c.x1,c.y1); n.x1=p.x; n.y1=p.y;
+    }
+    if (c.x2 !== undefined && c.y2 !== undefined) {
+      const p=_mhApplyM(m,c.x2,c.y2); n.x2=p.x; n.y2=p.y;
+    }
+    return n;
+  });
+}
+
+function _mhSvgPathsWithTransforms(svgText) {
+  const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
+  const root = doc.documentElement;
+  if (!root || root.nodeName.toLowerCase() !== "svg") throw new Error("مستند SVG غير صالح");
+  const paths=[];
+  const walk=(el,parentM)=>{
+    if (el.nodeType !== 1) return;
+    const tag=el.tagName.toLowerCase();
+    const local=_mhParseTransform(el.getAttribute("transform")||"");
+    const M=_mhMul(parentM,local);
+    if (tag === "path") {
+      const d=el.getAttribute("d");
+      if (d) paths.push({d, m:M, fill:el.getAttribute("fill")||"", style:el.getAttribute("style")||""});
+    }
+    for (const ch of el.children) walk(ch,M);
+  };
+  walk(root,{a:1,b:0,c:0,d:1,e:0,f:0});
+  return {root,paths};
+}
+
+function svgDToFontPath(d, upm) {
+  let dRaw=(d||"").trim();
+  const isDoc=/<svg\b/i.test(dRaw) || /<path\b/i.test(dRaw);
+  let transformed=[];
+
+  if (isDoc) {
+    const parsed=_mhSvgPathsWithTransforms(dRaw);
+    if (!parsed.paths.length) throw new Error("فيه SVG بس مفيش path صالح");
+    for (const item of parsed.paths) {
+      const raw=parseSvgD(item.d);
+      const valid=raw.filter(c=>c.type==="Z" || (c.x!==undefined && isFinite(c.x) && isFinite(c.y)));
+      if (valid.length) transformed.push(..._mhTransformCommands(valid,item.m));
+    }
+  } else {
+    const raw=parseSvgD(dRaw);
+    transformed=raw.filter(c=>c.type==="Z" || (c.x!==undefined && isFinite(c.x) && isFinite(c.y)));
+  }
+
+  if (!transformed.length) throw new Error("مسار SVG فاضي");
+
+  /* SVG عنده محور Y لأسفل، والخط عنده Y لأعلى. التحويل هنا بعد
+     تطبيق كل transform الأصلي، عشان matrix/translate ما تتكسرش. */
+  const flipped=transformed.map(c=>{
+    const n=Object.assign({},c);
+    if(n.y!==undefined) n.y=-n.y;
+    if(n.y1!==undefined) n.y1=-n.y1;
+    if(n.y2!==undefined) n.y2=-n.y2;
+    return n;
+  });
+
+  const p1=new opentype.Path(); p1.commands=flipped;
+  const bb=p1.getBoundingBox();
+  const bw=bb.x2-bb.x1, bh=bb.y2-bb.y1;
+  if(!isFinite(bw)||!isFinite(bh)||bw<=0||bh<=0) throw new Error("أبعاد المسار غير صالحة");
+
+  /* نحافظ على نسبة العرض/الارتفاع الأصلية بدون تشويه. */
+  const s=(upm*0.75)/bh;
+  const p2=new opentype.Path();
+  p2.commands=p1.commands.map(c=>{
+    const n={type:c.type};
+    ["x","x1","x2"].forEach(k=>{if(c[k]!==undefined)n[k]=Math.round((c[k]-bb.x1)*s);});
+    ["y","y1","y2"].forEach(k=>{if(c[k]!==undefined)n[k]=Math.round((c[k]-bb.y1)*s);});
+    return n;
+  });
+
+  return {path:p2, advance:Math.max(1,Math.round(bw*s+upm*0.04))};
+}
+
+/* ================================================================
+   § 14 — الرسم
+   ================================================================ */
+function drawGlyphRaw(glyph, x, y, fontSize, ctx) {
+  if (!glyph || !glyph.path || !glyph.path.commands) return;
+
+  /* دعم الخطوط الملونة (COLR/CPAL): لو الحرف الحالي عنده طبقات
+     ملونة مسجّلة، نرسم كل طبقة برسمتها ولونها الخاص بدل رسمة
+     واحدة بلون موحّد. أي خط عادي (الأغلبية الساحقة) مالوش هذا
+     الإدخال فيمر مباشرة على المسار الأصلي زي ما هو. */
+  if (font && font._mhColorGlyphs && glyph.index !== undefined && !__mhIsColorDisabled(glyph.index, font)) {
+    const layers = font._mhColorGlyphs[glyph.index];
+    if (layers && layers.length) {
+      const palette = font._mhPalette || [];
+      layers.forEach((layer) => {
+        try {
+          const layerGlyph = font.glyphs.get(layer.glyphIndex);
+          const color = palette[layer.paletteIndex] || INK;
+          drawGlyphLayerRaw(layerGlyph, x, y, fontSize, ctx, color);
+        } catch (eLayer) { /* طبقة واحدة فشلت لا توقف البقية */ }
+      });
+      return;
+    }
+  }
+
+  drawGlyphLayerRaw(glyph, x, y, fontSize, ctx, INK);
+}
+
+/* رسم رسمة واحدة بلون محدد — المنطق الأصلي لـ drawGlyphRaw بدون تغيير،
+   فقط اللون بقى بارامتر بدل ثابت INK */
+function drawGlyphLayerRaw(glyph, x, y, fontSize, ctx, fillColor) {
+  if (!glyph || !glyph.path || !glyph.path.commands) return;
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+  const track = (px, py) => {
+    if (px < minX) minX = px;
+    if (px > maxX) maxX = px;
+    if (py < minY) minY = py;
+    if (py > maxY) maxY = py;
+  };
+  glyph.path.commands.forEach((c) => {
+    if (c.x !== undefined) track(c.x, c.y);
+    if (c.x1 !== undefined) track(c.x1, c.y1);
+    if (c.x2 !== undefined) track(c.x2, c.y2);
+  });
+  if (!isFinite(minX) || !isFinite(minY)) return;
+
+  const gw = maxX - minX;
+  const gh = maxY - minY;
+  if (gw <= 0 || gh <= 0) return;
+
+  const scale = fontSize / (font.unitsPerEm || 1000);
+
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scale, -scale);
+  ctx.translate(-minX, -minY);
+  ctx.beginPath();
+
+  let started = false;
+  glyph.path.commands.forEach((c) => {
+    switch (c.type) {
+      case "M":
+        ctx.moveTo(c.x, c.y); started = true;
+        break;
+      case "L":
+        if (!started) { ctx.moveTo(c.x, c.y); started = true; }
+        else ctx.lineTo(c.x, c.y);
+        break;
+      case "C":
+        if (!started) { ctx.moveTo(c.x1, c.y1); started = true; }
+        ctx.bezierCurveTo(c.x1, c.y1, c.x2, c.y2, c.x, c.y);
+        break;
+      case "Q":
+        if (!started) { ctx.moveTo(c.x1, c.y1); started = true; }
+        ctx.quadraticCurveTo(c.x1, c.y1, c.x, c.y);
+        break;
+      case "Z":
+        if (started) ctx.closePath();
+        break;
+    }
+  });
+
+  ctx.fillStyle = fillColor;
+  ctx.fill();
+  ctx.restore();
+}
+
+function __mhGetColorLayers(glyph, f) {
+  if (!glyph || !f || !f._mhColorGlyphs) return null;
+  const gid = (glyph._mhOriginalGID !== undefined) ? glyph._mhOriginalGID : glyph.index;
+  if (gid === undefined || gid === null) return null;
+  if (__mhIsColorDisabled(gid, f)) return null;
+  const layers = f._mhColorGlyphs[gid];
+  if (!layers || !layers.length) return null;
+  const palette = f._mhPalette || [];
+  const out = [];
+  for (const layer of layers) {
+    try {
+      const lg = f.glyphs.get(layer.glyphIndex);
+      if (!lg) continue;
+      const path = lg.getPath(0, 0, PREVIEW, null, f);
+      const bb = path.getBoundingBox();
+      if (!isFinite(bb.x1) || !isFinite(bb.y1) || !isFinite(bb.x2) || !isFinite(bb.y2)) continue;
+      if ((bb.x2 - bb.x1) <= 0.001 || (bb.y2 - bb.y1) <= 0.001) continue;
+      out.push({ path, bb, color: palette[layer.paletteIndex] || INK });
+    } catch (e) {}
+  }
+  return out.length ? out : null;
+}
+
+/* رسم حرف ملون في بطاقة الـGlyph بنفس نظام الإحداثيات الطبيعي للخط.
+   مهم: ممنوع استخدام drawGlyphLayerRaw هنا لأنه يقلب محور Y ويضع الرسمة
+   بالنسبة لصندوقها، وده كان سبب ظهور الألوان تحت الحرف ومقلوبة. */
+const __mhSvgCache = new Map();
+function __mhSvgForGlyph(gid,f){return f&&f._mhSvgGlyphs ? f._mhSvgGlyphs[gid] : null;}
+function __mhDrawSvgGlyphToCanvas(glyph,canvas,f){
+  const gid=(glyph&&glyph._mhOriginalGID!==undefined)?glyph._mhOriginalGID:(glyph?glyph.index:undefined);
+  if(gid===undefined||__mhIsColorDisabled(gid,f))return false;
+  const svg=__mhSvgForGlyph(gid,f); if(!svg)return false;
+  const key=(f._mhSvgFontKey||f.familyName||"")+"|"+gid;
+  const cached=__mhSvgCache.get(key);
+  const paint=(img)=>{
+    const ctx=canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const iw=img.naturalWidth||img.width||1, ih=img.naturalHeight||img.height||1;
+    const pad=canvas.width*0.08, sc=Math.min((canvas.width-pad*2)/iw,(canvas.height-pad*2)/ih);
+    const w=iw*sc,h=ih*sc;
+    ctx.drawImage(img,(canvas.width-w)/2,(canvas.height-h)/2,w,h);
+  };
+  if(cached&&cached.img&&cached.img.complete){paint(cached.img);return true;}
+  if(cached&&cached.loading)return true;
+  try{
+    const blob=new Blob([svg],{type:"image/svg+xml"}); const url=URL.createObjectURL(blob); const img=new Image();
+    __mhSvgCache.set(key,{loading:true});
+    img.onload=()=>{__mhSvgCache.set(key,{img:img});paint(img);};
+    img.onerror=()=>__mhSvgCache.delete(key); img.src=url;
+    setTimeout(()=>URL.revokeObjectURL(url),30000);
+    return true;
+  }catch(e){return false;}
+}
+
+function drawColorGlyphToCanvas(glyph, canvas, f) {
+  if (__mhDrawSvgGlyphToCanvas(glyph, canvas, f)) return true;
+  const layers = __mhGetColorLayers(glyph, f);
+  if (!layers) return false;
+
+  let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+  for (const layer of layers) {
+    x1 = Math.min(x1, layer.bb.x1); y1 = Math.min(y1, layer.bb.y1);
+    x2 = Math.max(x2, layer.bb.x2); y2 = Math.max(y2, layer.bb.y2);
+  }
+  const gw = x2 - x1, gh = y2 - y1;
+  if (!(gw > 0) || !(gh > 0)) return false;
+
+  const pad = canvas.width * 0.12;
+  const scale = Math.min(
+    (canvas.width - pad * 2) / gw,
+    (canvas.height - pad * 2) / gh
+  );
+
+  ctx = canvas.getContext("2d");
+  ctx.save();
+  ctx.translate(
+    canvas.width / 2 - (x1 + x2) / 2 * scale,
+    canvas.height / 2 - (y1 + y2) / 2 * scale
+  );
+  ctx.scale(scale, scale);
+  for (const layer of layers) {
+    layer.path.fill = layer.color;
+    layer.path.draw(ctx);
+  }
+  ctx.restore();
+  return true;
+}
+
+function drawGlyphToCanvas(glyph, canvas, fontRef) {
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!glyph) return;
+
+  const f = fontRef || font;
+
+  /* Color Font: ارسم COLR/CPAL أولًا، حتى لو كان الـbase glyph نفسه
+     بدون outline. ده يمنع fallback القديم من قلب الطبقات 180/360 درجة. */
+  if (drawColorGlyphToCanvas(glyph, canvas, f)) return;
+
+  const path = glyph.getPath(0, 0, PREVIEW, null, f);
+  const bb = path.getBoundingBox();
+  const gw = bb.x2 - bb.x1, gh = bb.y2 - bb.y1;
+  const ok = isFinite(gw) && isFinite(gh) && gw > 0 && gh > 0;
+
+  if (!ok) {
+    /* fallback عادي فقط للخطوط غير الملونة */
+    drawGlyphRaw(glyph, 0, 0, PREVIEW * (canvas.width / (f.unitsPerEm || 1000)), ctx);
+    return;
+  }
+
+  const pad = canvas.width * 0.12;
+  const scale = Math.min(
+    (canvas.width - pad * 2) / gw,
+    (canvas.height - pad * 2) / gh
+  );
+
+  ctx.save();
+  ctx.translate(
+    canvas.width / 2 - (bb.x1 + bb.x2) / 2 * scale,
+    canvas.height / 2 - (bb.y1 + bb.y2) / 2 * scale
+  );
+  ctx.scale(scale, scale);
+  path.fill = INK;
+  path.draw(ctx);
+  ctx.restore();
+}
+function bindCharPreview(input, box) {
+  const cv = box.querySelector("canvas");
+  const lbl = box.querySelector(".cpLabel");
+
+  const update = () => {
+    const ctx = cv.getContext("2d");
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    box.classList.remove("missing");
+
+    const str = input.value;
+    if (!str.trim()) { lbl.textContent = "—"; return; }
+
+    /* ⚠ لازم نتأكد الأول إن المدخل مش حرفين مركبين (زي «لا»)
+       قبل ما نستخدم parseCharInput اللي بتاخد أول حرف بس وتقص الباقي —
+       غير كده معاينة #nPrev كانت بترسم رسمة اللام المفردة بدل لام-ألف
+       وتفضل واقفة كده لحد ما updateSeqUi تصلحها على حدث input تاني */
+    const seq = parseSeqInput(str);
+    if (seq && seq.seq) {
+      /* لام-ألف: اعرض الكودين ومعاينتهم لو الخط مربوط بـ U+FEFB
+         بتطبيع أشكال العرض: FEDD-FEE0 → 0644، FE8D/FE8E → 0627 */
+      const normLam = (cp) => (cp >= 0xFEDD && cp <= 0xFEE0) ? 0x0644 : cp;
+      const normAlef = (cp) => (cp === 0xFE8D || cp === 0xFE8E) ? 0x0627 : cp;
+      const la = (normLam(seq.seq[0]) === 0x0644 && LAM_ALEF[normAlef(seq.seq[1])]) ? LAM_ALEF[normAlef(seq.seq[1])] : null;
+      if (la) {
+        const hex = la.map((c) => "U+" + c.toString(16).toUpperCase().padStart(4, "0")).join(" · ");
+        const idx = (font.glyphIndexMap || {})[la[0]];
+        if (idx !== undefined) {
+          lbl.textContent = hex + " • G" + idx;
+          drawGlyphToCanvas(font.glyphs.get(idx), cv);
+        } else {
+          lbl.textContent = hex + " • جديدة";
+          ctx.fillStyle = INK_SOFT;
+          ctx.font = Math.round(cv.width * 0.66) + "px Amiri, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(seq.seq.map((c) => String.fromCodePoint(c)).join(""), cv.width / 2, cv.height / 2);
+        }
+      } else {
+        /* أي حرفين تانيين (من/ال/سل) → كلمة مدمجة. اعرض الكلمة ومعاينة الرسمة
+           لو هي مربوطة بالفعل برسمة. */
+        const word = seq.seq.map((c) => String.fromCodePoint(c)).join("");
+        const eff = font.wordLigatures || {};
+        const exGid = eff[word];
+        if (exGid !== undefined) {
+          lbl.textContent = "«" + word + "» • G" + exGid + " (مربوطة)";
+          drawGlyphToCanvas(font.glyphs.get(exGid), cv);
+        } else {
+          lbl.textContent = "«" + word + "» • كلمة مدمجة جديدة";
+          ctx.fillStyle = INK_SOFT;
+          ctx.font = Math.round(cv.width * 0.66) + "px Amiri, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(word, cv.width / 2, cv.height / 2);
+        }
+      }
+      return;
+    }
+
+    const cp = parseCharInput(str);
+    if (cp === null) {
+      lbl.textContent = "كود غير صالح";
+      box.classList.add("missing");
+      return;
+    }
+    if (cp === undefined) { lbl.textContent = "—"; return; }
+
+    const hex = "U+" + cp.toString(16).toUpperCase().padStart(4, "0");
+    const idx = (font.glyphIndexMap || {})[cp];
+
+    if (idx === undefined) {
+      lbl.textContent = hex + " • غير موجودة";
+      box.classList.add("missing");
+      ctx.fillStyle = INK_SOFT;
+      ctx.font = Math.round(cv.width * 0.34) + "px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String.fromCodePoint(cp), cv.width / 2, cv.height / 2);
+      return;
+    }
+
+    lbl.textContent = hex + " • G" + idx;
+    drawGlyphToCanvas(font.glyphs.get(idx), cv);
+  };
+
+  input.addEventListener("input", update);
+  update();
+}
+
+function bindSourcePreview(input, box) {
+  const cv = box.querySelector("canvas");
+  const lbl = box.querySelector(".cpLabel");
+
+  const update = () => {
+    const ctx = cv.getContext("2d");
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    box.classList.remove("missing");
+
+    if (!input.value.trim()) { lbl.textContent = "—"; return; }
+
+    const idx = parseSourceIndex(input.value);
+    if (idx === null) {
+      lbl.textContent = "غير موجود";
+      box.classList.add("missing");
+      return;
+    }
+
+    const g = font.glyphs.get(idx);
+    lbl.textContent = "G" + idx;
+    drawGlyphToCanvas(g, cv);
+  };
+
+  input.addEventListener("input", update);
+  update();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   مِحْبَر — الجزء الثالث:
+   الشبكة والبحث ← التحديد ← نوافذ الحروف والعمليات ← معلومات الملف
+   ════════════════════════════════════════════════════════════════ */
+
+/* ================================================================
+   § 15 — الشبكة
+   ================================================================ */
+/* عكس cmap: رقم الرسمة ← كل أكوادها الحقيقية.
+   opentype.js أحيانًا مبيسجلش glyph.unicode رغم إن cmap فيه الكود —
+   زي رسمة لام-ألف اللي كودها U+FEFB/U+FEFC فكانت بتطلع «—» */
+function invCmap() {
+  const map = font && font.glyphIndexMap;
+  if (!map) return null;
+  const inv = Object.create(null);
+  for (const k in map) {
+    const gid = map[k];
+    if (!Number.isFinite(gid)) continue;
+    (inv[gid] = inv[gid] || []).push(+k);
+  }
+  for (const gid in inv) inv[gid].sort((a, b) => a - b);
+  return inv;
+}
+let _invCmap = null; /* بيتجدد مع كل رسم للشبكة */
+
+function glyphAllCps(g, index) {
+  const seen = [];
+  const push = (v) => {
+    if (Number.isFinite(v) && v >= 0 && seen.indexOf(v) === -1) seen.push(v);
+  };
+  if (g) {
+    if (g.unicodes && g.unicodes.length) g.unicodes.forEach(push);
+    if (g.unicode !== undefined) push(g.unicode);
+  }
+  const inv = _invCmap || invCmap();
+  if (inv && inv[index]) inv[index].forEach(push);
+  seen.sort((a, b) => a - b);
+  return seen;
+}
+
+/* ================================================================
+   § 16-ب — تصنيف الحروف حسب الفئة (عربي/لاتيني/أرقام/...)
+   بيرجع مفتاح الفئة لكل رسمة حسب أول كود يونيكود ليها.
+   الترتيب: عربي → أشكال عرض → أرقام → لاتيني → علامات → رموز → أخرى
+   ================================================================ */
+
+const GLYPH_CATEGORIES = [
+  { key: "arabic",      name: "العربية",            icon: "ع", ranges: [[0x0600,0x06FF],[0x0750,0x077F],[0x08A0,0x08FF],[0x10E60,0x10E7F]] },
+  { key: "arabicForms", name: "أشكال العرض العربية", icon: "ﻊ", ranges: [[0xFB50,0xFDFF],[0xFE70,0xFEFF]] },
+  { key: "numbers",     name: "الأرقام",            icon: "٩", ranges: [[0x0030,0x0039],[0x0660,0x0669],[0x06F0,0x06F9],[0x07C0,0x07C9],[0x0966,0x096F],[0x09E6,0x09EF],[0x0A66,0x0A6F],[0x0AE6,0x0AEF],[0x0B66,0x0B6F],[0x0BE6,0x0BEF],[0x0C66,0x0C6F],[0x0CE6,0x0CEF],[0x0D66,0x0D6F],[0x0DE6,0x0DEF],[0x0E50,0x0E59],[0x0ED0,0x0ED9],[0x0F20,0x0F2B],[0x1040,0x1049],[0x1090,0x1099],[0x17E0,0x17E9],[0x1810,0x1819],[0x1946,0x194F],[0x19D0,0x19D9],[0x1A80,0x1A89],[0x1A90,0x1A99],[0x1B50,0x1B59],[0x1BB0,0x1BB9],[0x1C40,0x1C49],[0x1C50,0x1C59],[0xA620,0xA629],[0xA8D0,0xA8D9],[0xA900,0xA909],[0xA9D0,0xA9D9],[0xA9F0,0xA9F9],[0xAA50,0xAA59],[0xABF0,0xABF9],[0xFF10,0xFF19]] },
+  { key: "latin",       name: "اللاتيني",           icon: "A", ranges: [[0x0020,0x007E],[0x00A0,0x00FF],[0x0100,0x017F],[0x0180,0x024F],[0x0250,0x02AF],[0x1E00,0x1EFF],[0x2C60,0x2C7F],[0xA720,0xA7FF],[0xFF00,0xFFEF]] },
+  { key: "greek",       name: "اليوناني",           icon: "Ω", ranges: [[0x0370,0x03FF],[0x1F00,0x1FFF]] },
+  { key: "cyrillic",    name: "السيريلي",           icon: "Ж", ranges: [[0x0400,0x04FF],[0x0500,0x052F],[0x2DE0,0x2DFF],[0xA640,0xA69F]] },
+  { key: "hebrew",      name: "العبري",             icon: "א", ranges: [[0x0590,0x05FF],[0xFB1D,0xFB4F]] },
+  { key: "punctuation", name: "علامات الترقيم",      icon: "؟", ranges: [[0x2000,0x206F],[0x2E00,0x2E7F],[0x3000,0x303F]] },
+  { key: "symbols",     name: "الرموز",             icon: "★", ranges: [[0x2100,0x214F],[0x2190,0x21FF],[0x2200,0x22FF],[0x2300,0x23FF],[0x2500,0x257F],[0x25A0,0x25FF],[0x2600,0x26FF],[0x2700,0x27BF],[0x2B00,0x2BFF]] },
+  { key: "orphan",      name: "يتيمة (بلا كود/كلمة)",  icon: "؟!", ranges: [] },  /* بلا كود ولا كلمة مدمجة ولا اسم مرجعي */
+  { key: "other",       name: "أخرى",               icon: "•", ranges: [] }  /* كل حاجة تانية */
+];
+
+/* بترجع true لو الرسمة دي "يتيمة" تمامًا: مفيهاش كود Unicode ولا
+   كلمة مدمجة (GSUB) ولا اسم مرجعي — يعني مفيش أي طريقة توصلها
+   غير رقمها الخام في الخط. دي الحالة اللي محتاجة تسمية يدوية. */
+function glyphIsOrphan(g, index) {
+  if (!g) return false;
+  let hasCp = (g.unicodes && g.unicodes.length) || g.unicode !== undefined;
+  if (!hasCp && _invCmap && _invCmap[index] && _invCmap[index].length) hasCp = true;
+  if (hasCp) return false;
+  const hasWord = !!(font.wordByGid && font.wordByGid[index]);
+  const hasLabel = !!(font.labelByGid && font.labelByGid[index]);
+  return !hasWord && !hasLabel;
+}
+
+function cpIsInRanges(cp, ranges) {
+  return ranges.some(([a, b]) => cp >= a && cp <= b);
+}
+
+/* لما نفس الرسمة لها أكثر من كود، ماينفعش أول كود رقمي هو اللي يقرر
+   الفئة. مثال: U+00C0 (À) + U+FB51 (ﭑ) لنفس الـGlyph: الأول لاتيني،
+   لكن الرسمة نفسها عربية ويجب أن تظهر في قسم العربية. */
+function glyphCategoryKey(g, index) {
+  if (!g) return "other";
+  let cps = glyphAllCps(g, index);
+  if (!cps.length) {
+    if (glyphIsOrphan(g, index)) return "orphan";
+    return "other";
+  }
+
+  /* الأولوية هنا مقصودة: عربي/أشكال عرض > أرقام > لاتيني...
+     حتى لا تختفي الرسمة العربية في قسم اللاتيني بسبب alias مثل À/Á. */
+  const priority = [
+    "arabic", "arabicForms", "numbers", "greek", "cyrillic",
+    "hebrew", "punctuation", "symbols", "latin"
+  ];
+  for (const key of priority) {
+    const cat = GLYPH_CATEGORIES.find((c) => c.key === key);
+    if (cat && cps.some((cp) => cpIsInRanges(cp, cat.ranges))) return key;
+  }
+  return "other";
+}
+
+/* بترجع معلومات الفئة من المفتاح */
+function categoryInfo(key) {
+  return GLYPH_CATEGORIES.find((c) => c.key === key) || GLYPH_CATEGORIES[GLYPH_CATEGORIES.length - 1];
+}
+
+/* بترجع خريطة: مفتاح الفئة → مصفوفة أرقام الرسمات
+   مرتبة حسب ترتيب الفئات في GLYPH_CATEGORIES */
+function groupGlyphsByCategory() {
+  const arr = glyphsArr();
+  const groups = {};
+  GLYPH_CATEGORIES.forEach((c) => { groups[c.key] = []; });
+  for (let i = 0; i < arr.length; i++) {
+    const g = arr[i];
+    if (!g || g.deleted) continue;
+    const key = glyphCategoryKey(g, i);
+    groups[key].push(i);
+  }
+  return groups;
+}
+
+/* تفضيل المستخدم: تقسيم الشبكة لأقسام أم لا.
+   ⚠ الافتراضي بقى عرض مسطح (من غير تقسيم) — التقسيم اختياري بزر «أقسام» */
+function groupedViewEnabled() {
+  try { return localStorage.getItem("mihabarGroupedView") === "1"; }
+  catch (e) { return false; }
+}
+function setGroupedView(on) {
+  try { localStorage.setItem("mihabarGroupedView", on ? "1" : "0"); } catch (e) {}
+}
+
+function preferredGlyphCp(cps) {
+  if (!cps || !cps.length) return undefined;
+  const arabic = GLYPH_CATEGORIES.find((c) => c.key === "arabic");
+  const forms = GLYPH_CATEGORIES.find((c) => c.key === "arabicForms");
+  const a = cps.find((cp) => arabic && cpIsInRanges(cp, arabic.ranges));
+  if (a !== undefined) return a;
+  const f = cps.find((cp) => forms && cpIsInRanges(cp, forms.ranges));
+  if (f !== undefined) return f;
+  return cps[0];
+}
+
+function cpDisplayChar(cp) {
+  try {
+    const ch = String.fromCodePoint(cp);
+    /* لا نعرض محارف التحكم/الفواصل كأنها رمز حقيقي */
+    if (/^[\u0000-\u001F\u007F-\u009F]$/.test(ch)) return "";
+    return ch;
+  } catch (e) { return ""; }
+}
+
+function cpIsArabic(cp) {
+  const a = GLYPH_CATEGORIES.find((c) => c.key === "arabic");
+  const f = GLYPH_CATEGORIES.find((c) => c.key === "arabicForms");
+  return !!((a && cpIsInRanges(cp, a.ranges)) || (f && cpIsInRanges(cp, f.ranges)));
+}
+
+function makeAliasChip(cp, compact) {
+  const chip = document.createElement("span");
+  chip.className = "gAlias" + (cpIsArabic(cp) ? " arabic" : " latin");
+  const ch = cpDisplayChar(cp);
+  if (ch) {
+    const cs = document.createElement("span");
+    cs.className = "gAliasChar";
+    cs.textContent = ch;
+    chip.appendChild(cs);
+  }
+  const hs = document.createElement("span");
+  hs.className = "gAliasCode";
+  hs.textContent = "U+" + cp.toString(16).toUpperCase().padStart(4, "0");
+  chip.appendChild(hs);
+  chip.title = (ch ? ch + " — " : "") + "U+" + cp.toString(16).toUpperCase().padStart(4, "0");
+  return chip;
+}
+
+function buildGlyphItem(i) {
+  let g;
+  try { g = font.glyphs.get(i); } catch (e) { return null; }
+  if (!g) return null;
+  /* الحروف المحذوفة (soft delete) مخفية من الشبكة — بس تفضل في مكانها
+     عشان أرقام باقي الحروف ما تتحركش */
+  if (g.deleted) return null;
+  const item = document.createElement("div");
+  item.className = "glyph" + (selSet.has(i) ? " selected" : "") +
+    (i === curIndex ? " cur" : "");
+
+  const cps = glyphAllCps(g, i);
+  const u = preferredGlyphCp(cps);
+
+  const word = font.wordByGid ? font.wordByGid[i] : null;
+  const label = font.labelByGid ? font.labelByGid[i] : null;
+
+  item.dataset.i = i;
+  item.dataset.uni = cps.map((cp) => cp.toString(16)).join(",");
+  item.dataset.name = g.name || "";
+  item.dataset.word = word || "";
+  item.dataset.cps = cps.join(",");
+
+  const cv = document.createElement("canvas");
+  cv.width = TILE;
+  cv.height = TILE;
+  drawGlyphToCanvas(g, cv);
+
+  const info = document.createElement("div");
+  info.className = "gmeta";
+
+  const idxSpan = document.createElement("span");
+  idxSpan.textContent = i;
+
+  const titleSpan = document.createElement("span");
+  titleSpan.className = "gword";
+  if (word) {
+    titleSpan.textContent = word;
+  } else if (label) {
+    titleSpan.textContent = label;
+    titleSpan.title = "اسم مرجعي (مش كود ولا كلمة مدمجة) — " + (g.name || ("G" + i));
+  } else if (u !== undefined) {
+    titleSpan.textContent = cpDisplayChar(u) || ("U+" + u.toString(16).toUpperCase().padStart(4, "0"));
+  } else {
+    titleSpan.textContent = "G" + i + (g.name ? " • " + g.name : " • بلا Unicode");
+  }
+
+  info.appendChild(idxSpan);
+  info.appendChild(titleSpan);
+
+  /* أهم تغيير: اعرض كل الأكواد/الرموز التي تشير لنفس الرسم، لا أول كود فقط. */
+  if (cps.length) {
+    const aliases = document.createElement("div");
+    aliases.className = "gAliases";
+    cps.forEach((cp) => aliases.appendChild(makeAliasChip(cp, true)));
+    info.appendChild(aliases);
+  }
+
+  item.appendChild(cv);
+  item.appendChild(info);
+
+  item.addEventListener("click", () => {
+    if (selMode) toggleSelect(i);
+    else openActions(i);
+  });
+
+  return item;
+}
+
+/* بترجع شريط "‹ 1 2 3 ... ›" — تُستخدم للعرض المسطح والمجمّع معًا.
+   onGo(pageIndex) بتتنفذ لما يضغط المستخدم رقم صفحة أو السهم. */
+function buildPagerHTML(totalItems, currentPage, pageSize, idPrefix) {
+  const pages = Math.max(1, Math.ceil(totalItems / pageSize));
+  currentPage = Math.max(0, Math.min(currentPage, pages - 1));
+  /* نعرض أول صفحة، آخر صفحة، والصفحات القريبة من الحالية، وباقي علامة (…) */
+  const shown = new Set([0, pages - 1, currentPage, currentPage - 1, currentPage + 1]);
+  let nums = "";
+  let prevShown = -1;
+  for (let p = 0; p < pages; p++) {
+    if (!shown.has(p)) continue;
+    if (prevShown !== -1 && p - prevShown > 1) nums += '<span class="pgDots">…</span>';
+    nums += '<button class="pgNum' + (p === currentPage ? ' active' : '') +
+      '" data-pager="' + idPrefix + '" data-pagego="' + p + '">' + (p + 1) + '</button>';
+    prevShown = p;
+  }
+  return (
+    '<div class="pager" data-pagerwrap="' + idPrefix + '">' +
+      '<button class="pgArrow" data-pager="' + idPrefix + '" data-pagego="' + (currentPage - 1) + '"' +
+        (currentPage <= 0 ? ' disabled' : '') + ' aria-label="السابق">‹</button>' +
+      '<span class="pgNums">' + nums + '</span>' +
+      '<button class="pgArrow" data-pager="' + idPrefix + '" data-pagego="' + (currentPage + 1) + '"' +
+        (currentPage >= pages - 1 ? ' disabled' : '') + ' aria-label="التالي">›</button>' +
+      '<span class="pgInfo">' + totalItems + ' رمز</span>' +
+    '</div>'
+  );
+}
+
+function renderAll(focusIndex) {
+  if (!font) return;
+  gridEl.innerHTML = "";
+  /* حدّث دقة بكسل التايل حسب حجم الخط الحالي (حماية ذاكرة للخطوط الضخمة) */
+  TILE = __mihabarTileFor(glyphsArr().length);
+  _invCmap = invCmap(); /* فهرس الأكواد العكسي — نسخة جديدة مع كل رسم */
+  if (!selMode) defaultStatus();
+
+  /* ⚠ تقسيم الشبكة لأقسام حسب الفئة (عربي/لاتيني/أرقام/...)
+     لو الميزة مفعّلة. كل قسم ليه رأس + جسم. الرأس قابل للطي. */
+  if ((window.__mihabarGroupedViewEnabled ? window.__mihabarGroupedViewEnabled() : groupedViewEnabled())) {
+    renderGrouped(focusIndex);
+    return;
+  }
+
+  /* بناء قائمة كل الأرقام الصالحة (مش المحذوفة) — القائمة دي خفيفة،
+     المُكلف هو بناء عناصر DOM+canvas لكل رمز، فده اللي بنقسمه لصفحات */
+  const arr = glyphsArr();
+  const allIdx = [];
+  for (let i = 0; i < arr.length; i++) {
+    const g = arr[i];
+    if (g && !g.deleted) allIdx.push(i);
+  }
+
+  const pageSize = __mihabarPageSize();
+  const pages = Math.max(1, Math.ceil(allIdx.length / pageSize));
+
+  /* لو فيه رمز مطلوب نركّز عليه (بعد تعديل/إضافة) — نروح لصفحته تلقائيًا */
+  if (focusIndex !== undefined) {
+    const pos = allIdx.indexOf(focusIndex);
+    if (pos !== -1) gridPage = Math.floor(pos / pageSize);
+  }
+  gridPage = Math.max(0, Math.min(gridPage, pages - 1));
+
+  const start = gridPage * pageSize;
+  const pageIdx = allIdx.slice(start, start + pageSize);
+
+  const pagerTop = document.createElement("div");
+  pagerTop.className = "pagerSlot";
+  pagerTop.innerHTML = buildPagerHTML(allIdx.length, gridPage, pageSize, "flat");
+  gridEl.appendChild(pagerTop);
+
+  const body = document.createElement("div");
+  body.className = "gridBody";
+  gridEl.appendChild(body);
+
+  /* نرسم الصفحة الحالية بس (لسه بدفعات صغيرة عشان سلاسة الرسم) */
+  let i = 0;
+  (function chunk() {
+    const frag = document.createDocumentFragment();
+    const end = Math.min(i + CHUNK, pageIdx.length);
+    for (; i < end; i++) {
+      const it = buildGlyphItem(pageIdx[i]);
+      if (it) frag.appendChild(it);
+    }
+    body.appendChild(frag);
+
+    if (i < pageIdx.length) {
+      requestAnimationFrame(chunk);
+    } else {
+      const pagerBottom = document.createElement("div");
+      pagerBottom.className = "pagerSlot";
+      pagerBottom.innerHTML = buildPagerHTML(allIdx.length, gridPage, pageSize, "flat");
+      gridEl.appendChild(pagerBottom);
+
+      applySearch();
+      if (focusIndex !== undefined) {
+        const el = gridEl.querySelector('.glyph[data-i="' + focusIndex + '"]');
+        if (el) {
+          el.classList.add("justMoved");
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+      }
+    }
+  })();
+}
+
+/* التنقل بين الصفحات — العرض المسطح */
+function gridGoPage(p) {
+  gridPage = p;
+  renderAll();
+}
+
+/* التنقل بين الصفحات — داخل فئة معيّنة في العرض المجمّع */
+function gridGoCatPage(catKey, p) {
+  gridCatPages[catKey] = p;
+  renderAll();
+}
+
+/* تفويض ضغطات أزرار الصفحات (شغالة لأي عدد صفحات تتولد ديناميكيًا) */
+gridEl.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-pagego]");
+  if (!btn || btn.disabled) return;
+  const p = parseInt(btn.dataset.pagego, 10);
+  if (isNaN(p)) return;
+  const prefix = btn.dataset.pager;
+  if (prefix === "flat") gridGoPage(p);
+  else gridGoCatPage(prefix, p);
+});
+
+/* ═══ العرض المجمّع: كل فئة لها رأس قابل للطي + جسم بالحروف (مقسّم لصفحات) ═══ */
+function renderGrouped(focusIndex) {
+  const groups = groupGlyphsByCategory();
+  /* قائمة الفئات اللي فيها حروف (بنخطي الفاضية) */
+  const activeCats = GLYPH_CATEGORIES.filter((c) => groups[c.key].length > 0);
+  const pageSize = __mihabarPageSize();
+
+  /* نحفظ الفئات المطوية عشان نرجّعها بعد إعادة الرسم */
+  const collapsedCats = new Set();
+  try {
+    const saved = localStorage.getItem("mihabarCollapsedCats");
+    if (saved) JSON.parse(saved).forEach((k) => collapsedCats.add(k));
+  } catch (e) {}
+
+  /* لو فيه رمز مطلوب نركّز عليه — نلاقي فئته وصفحته ونفتحها */
+  if (focusIndex !== undefined) {
+    for (const cat of activeCats) {
+      const pos = groups[cat.key].indexOf(focusIndex);
+      if (pos !== -1) {
+        gridCatPages[cat.key] = Math.floor(pos / pageSize);
+        collapsedCats.delete(cat.key);
+        break;
+      }
+    }
+  }
+
+  const frag = document.createDocumentFragment();
+  /* نرسم فئة فئة — كل فئة فيها صفحة واحدة بس معروضة + chunking داخلها */
+  let catIdx = 0;
+
+  (function renderCat() {
+    if (catIdx >= activeCats.length) {
+      gridEl.appendChild(frag);
+      applySearch();
+      if (focusIndex !== undefined) {
+        const el = gridEl.querySelector('.glyph[data-i="' + focusIndex + '"]');
+        if (el) {
+          el.classList.add("justMoved");
+          el.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+      }
+      return;
+    }
+
+    const cat = activeCats[catIdx];
+    const items = groups[cat.key];
+    const isCollapsed = collapsedCats.has(cat.key);
+    const catPages = Math.max(1, Math.ceil(items.length / pageSize));
+    let catPage = Math.max(0, Math.min(gridCatPages[cat.key] || 0, catPages - 1));
+    gridCatPages[cat.key] = catPage;
+
+    /* رأس القسم */
+    const header = document.createElement("div");
+    header.className = "catHeader" + (isCollapsed ? " collapsed" : "");
+    header.dataset.cat = cat.key;
+    header.innerHTML =
+      '<span class="catIcon">' + esc(cat.icon) + '</span>' +
+      '<span class="catName">' + esc(cat.name) + '</span>' +
+      '<span class="catCount">' + items.length + ' رسمة</span>' +
+      '<span class="catArrow">▼</span>';
+    header.addEventListener("click", () => toggleCategory(cat.key));
+    frag.appendChild(header);
+
+    /* جسم القسم */
+    const body = document.createElement("div");
+    body.className = "catBody";
+    body.dataset.cat = cat.key;
+    if (isCollapsed) body.style.display = "none";
+    frag.appendChild(body);
+
+    /* شريط صفحات أعلى القسم (بس لو محتاج فعلًا أكتر من صفحة) */
+    if (catPages > 1) {
+      const pagerTop = document.createElement("div");
+      pagerTop.className = "pagerSlot";
+      pagerTop.innerHTML = buildPagerHTML(items.length, catPage, pageSize, cat.key);
+      body.appendChild(pagerTop);
+    }
+
+    const pageItems = items.slice(catPage * pageSize, catPage * pageSize + pageSize);
+
+    /* نرسم رموز الصفحة الحالية بس، على دفعات عشان ما نحبّش المتصفح */
+    let itemIdx = 0;
+    (function renderItems() {
+      const end = Math.min(itemIdx + CHUNK, pageItems.length);
+      const subFrag = document.createDocumentFragment();
+      for (; itemIdx < end; itemIdx++) {
+        const it = buildGlyphItem(pageItems[itemIdx]);
+        if (it) subFrag.appendChild(it);
+      }
+      body.appendChild(subFrag);
+
+      if (itemIdx < pageItems.length) {
+        requestAnimationFrame(renderItems);
+      } else {
+        if (catPages > 1) {
+          const pagerBottom = document.createElement("div");
+          pagerBottom.className = "pagerSlot";
+          pagerBottom.innerHTML = buildPagerHTML(items.length, catPage, pageSize, cat.key);
+          body.appendChild(pagerBottom);
+        }
+        catIdx++;
+        requestAnimationFrame(renderCat);
+      }
+    })();
+  })();
+}
+
+/* طي/فتح فئة — بيتحفظ في localStorage */
+function toggleCategory(catKey) {
+  const header = gridEl.querySelector('.catHeader[data-cat="' + catKey + '"]');
+  if (!header) return;
+  const isCollapsed = header.classList.toggle("collapsed");
+  const body = gridEl.querySelector('.catBody[data-cat="' + catKey + '"]');
+  if (body) body.style.display = isCollapsed ? "none" : "";
+
+  /* نحفظ الفئات المطوية */
+  const collapsedCats = [];
+  gridEl.querySelectorAll(".catHeader.collapsed").forEach((h) => {
+    collapsedCats.push(h.dataset.cat);
+  });
+  try { localStorage.setItem("mihabarCollapsedCats", JSON.stringify(collapsedCats)); } catch (e) {}
+}
+
+/* بترجع true لو الرمز رقم i مطابق لنص البحث q */
+function __mihabarGlyphMatches(i, q) {
+  const arr = glyphsArr();
+  const g = arr[i];
+  if (!g || g.deleted) return false;
+  const cps = glyphAllCps(g, i);
+  const uniHex = cps.map((cp) => cp.toString(16)).join(" ");
+  const chars = cps.map(cpDisplayChar).filter(Boolean).join(" ");
+  const word = font.wordByGid ? font.wordByGid[i] : null;
+  const label = font.labelByGid ? font.labelByGid[i] : null;
+  const hay = (i + " " + uniHex + " " + chars + " " + (g.name || "") + " " + (word || "") + " " + (label || "")).toLowerCase();
+  let ok = hay.indexOf(q) > -1;
+  if (!ok && q.length === 1) {
+    const qcp = q.codePointAt(0);
+    ok = cps.includes(qcp) || uniHex.indexOf(qcp.toString(16)) > -1;
+  }
+  return ok;
+}
+
+/* بحث حقيقي عبر كل الرموز (مش بس اللي في الصفحة المعروضة) — بيعيد
+   بناء الصفحات على نتائج البحث بدل ما يخفي/يظهر عناصر DOM مش موجودة */
+function applySearch() {
+  const q = (searchEl.value || "").trim().toLowerCase();
+
+  const isGrouped = (window.__mihabarGroupedViewEnabled ? window.__mihabarGroupedViewEnabled() : groupedViewEnabled());
+
+  if (!q) {
+    /* مفيش بحث نشط — رجّع العرض العادي المقسّم صفحات */
+    if (gridEl.dataset.searchActive) {
+      delete gridEl.dataset.searchActive;
+      renderAll();
+    }
+    return;
+  }
+
+  gridEl.dataset.searchActive = "1";
+  const pageSize = __mihabarPageSize();
+
+  if (isGrouped) {
+    const groups = groupGlyphsByCategory();
+    const activeCats = GLYPH_CATEGORIES.filter((c) => groups[c.key].length > 0);
+    gridEl.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    let any = false;
+    activeCats.forEach((cat) => {
+      const matches = groups[cat.key].filter((i) => __mihabarGlyphMatches(i, q));
+      if (!matches.length) return;
+      any = true;
+      const header = document.createElement("div");
+      header.className = "catHeader";
+      header.dataset.cat = cat.key;
+      header.innerHTML =
+        '<span class="catIcon">' + esc(cat.icon) + '</span>' +
+        '<span class="catName">' + esc(cat.name) + '</span>' +
+        '<span class="catCount">' + matches.length + ' نتيجة</span>' +
+        '<span class="catArrow">▼</span>';
+      header.addEventListener("click", () => toggleCategory(cat.key));
+      frag.appendChild(header);
+
+      const body = document.createElement("div");
+      body.className = "catBody";
+      body.dataset.cat = cat.key;
+      /* نتايج البحث بنعرضها لحد أول صفحة (pageSize) — كافية لأي بحث محدد،
+         ولو محتاج أكتر ممكن يظبط كلمة البحث */
+      matches.slice(0, pageSize).forEach((i) => {
+        const it = buildGlyphItem(i);
+        if (it) body.appendChild(it);
+      });
+      frag.appendChild(body);
+    });
+    gridEl.appendChild(frag);
+    if (!any) {
+      const empty = document.createElement("p");
+      empty.className = "hint";
+      empty.style.padding = "20px";
+      empty.textContent = "مفيش نتائج مطابقة.";
+      gridEl.appendChild(empty);
+    }
+    return;
+  }
+
+  /* العرض المسطح — بحث عبر كل الرموز، وعرض النتائج (لحد pageSize) */
+  const arr = glyphsArr();
+  const matches = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (__mihabarGlyphMatches(i, q)) matches.push(i);
+  }
+  gridEl.innerHTML = "";
+  const body = document.createElement("div");
+  body.className = "gridBody";
+  if (!matches.length) {
+    const empty = document.createElement("p");
+    empty.className = "hint";
+    empty.style.padding = "20px";
+    empty.textContent = "مفيش نتائج مطابقة.";
+    gridEl.appendChild(empty);
+    return;
+  }
+  matches.slice(0, pageSize).forEach((i) => {
+    const it = buildGlyphItem(i);
+    if (it) body.appendChild(it);
+  });
+  gridEl.appendChild(body);
+  if (matches.length > pageSize) {
+    const note = document.createElement("p");
+    note.className = "hint";
+    note.style.padding = "10px 20px";
+    note.textContent = "بيظهر أول " + pageSize + " نتيجة من أصل " + matches.length + " — ضيّق كلمة البحث لنتائج أدق.";
+    gridEl.appendChild(note);
+  }
+}
+searchEl.addEventListener("input", applySearch);
+
+document.getElementById("pageSizeSel").addEventListener("change", function () {
+  __mihabarSetPageSize(parseInt(this.value, 10));
+  gridPage = 0;
+  gridCatPages = {};
+  renderAll();
+});
+
+/* Tooltip */
+gridEl.addEventListener("mouseover", (e) => {
+  const it = e.target.closest(".glyph");
+  if (!it) return;
+  tooltipEl.textContent = (it.dataset.name || "Glyph " + it.dataset.i) +
+    " • " + (it.dataset.uni ? "U+" + it.dataset.uni.toUpperCase() : "—") +
+    (it.dataset.word ? " • " + it.dataset.word : "");
+  tooltipEl.style.display = "block";
+});
+gridEl.addEventListener("mousemove", (e) => {
+  if (tooltipEl.style.display !== "block") return;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  const r = tooltipEl.getBoundingClientRect();
+  if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = e.clientY - r.height - 14;
+  tooltipEl.style.left = x + "px";
+  tooltipEl.style.top = y + "px";
+});
+gridEl.addEventListener("mouseout", (e) => {
+  if (e.target.closest(".glyph")) tooltipEl.style.display = "none";
+});
+gridEl.addEventListener("contextmenu", (e) => e.preventDefault());
+
+/* ================================================================
+   § 16 — التحديد الجماعي
+   ================================================================ */
+function updateSelBar() {
+  selCountEl.textContent = selSet.size + " محدد";
+  $("btnSelDel").disabled = !selSet.size;
+  $("btnSelClearCode").disabled = !selSet.size;
+}
+
+function setSelMode(on) {
+  selMode = on;
+  if (!on) selSet.clear();
+  selBarEl.classList.toggle("show", on);
+  updateSelBar();
+  if (on) {
+    statusEl.classList.remove("err");
+    statusEl.textContent = "وضع التحديد: اضغط على الحروف — أو ابحث ثم حدد الكل";
+  } else if (font) {
+    defaultStatus();
+  }
+  renderAll();
+}
+
+function toggleSelect(i) {
+  if (selSet.has(i)) selSet.delete(i);
+  else selSet.add(i);
+  const el = gridEl.querySelector('.glyph[data-i="' + i + '"]');
+  if (el) el.classList.toggle("selected", selSet.has(i));
+  updateSelBar();
+}
+
+function selectAllVisible() {
+  const vis = Array.prototype.filter.call(
+    gridEl.querySelectorAll(".glyph"), (el) => el.style.display !== "none");
+  if (!vis.length) return;
+  const all = vis.every((el) => selSet.has(+el.dataset.i));
+  vis.forEach((el) => {
+    const i = +el.dataset.i;
+    if (all) selSet.delete(i); else selSet.add(i);
+    el.classList.toggle("selected", !all);
+  });
+  updateSelBar();
+}
+
+async function clearSelectedCodes() {
+  if (!selSet.size) return;
+  const ok = await uiConfirm(
+    "تفريغ كود " + selSet.size + " حرف محدد؟ (الرسمة تفضل موجودة، بس الحرف مش هيبقى مرتبط بأي كود)",
+    { title: "تفريغ الكود", okText: "تفريغ الكل", danger: true }
+  );
+  if (!ok) return;
+  pushUndo();
+  Array.from(selSet).forEach((index) => {
+    const g = font.glyphs.get(index);
+    if (g) setGlyphUnicode(g, undefined);
+  });
+  selSet.clear();
+  setSelMode(false);
+  renderAll();
+}
+
+async function deleteSelected() {
+  if (!selSet.size) return;
+  const ok = await uiConfirm(
+    "حذف " + selSet.size + " حرف محدد نهائيًا؟",
+    { title: "حذف المحدد", okText: "حذف الكل", danger: true }
+  );
+  if (!ok) return;
+  pushUndo();
+  Array.from(selSet).sort((a, b) => b - a).forEach(deleteGlyphAt);
+  selSet.clear();
+  setSelMode(false);
+  renderAll();
+}
+
+/* ضغطة مطوّلة للموبايل */
+let lpTimer = null, lpFired = false;
+gridEl.addEventListener("touchstart", (e) => {
+  const it = e.target.closest(".glyph");
+  if (!it) return;
+  lpFired = false;
+  lpTimer = setTimeout(() => {
+    lpFired = true;
+    if (!selMode) setSelMode(true);
+    toggleSelect(+it.dataset.i);
+    if (navigator.vibrate) navigator.vibrate(30);
+  }, 500);
+}, { passive: true });
+gridEl.addEventListener("touchend", () => clearTimeout(lpTimer));
+gridEl.addEventListener("touchmove", () => clearTimeout(lpTimer), { passive: true });
+gridEl.addEventListener("touchcancel", () => clearTimeout(lpTimer));
+gridEl.addEventListener("click", (e) => {
+  if (lpFired) {
+    e.stopPropagation();
+    e.preventDefault();
+    lpFired = false;
+  }
+}, true);
+
+/* ================================================================
+   § 17 — نوافذ الحروف
+   ================================================================ */
+function prettyGlyphName(name) {
+  if (!name) return null;
+  const parts = String(name).split(".");
+  const base = parts[0];
+  const featureMap = {
+    "init": "بداية", "medi": "وسط", "fina": "نهاية", "isol": "منفصل",
+    "isolation": "عزل", "postLamIni": "بعد لام-ألف متصلة",
+    "postLamMedi": "بعد لام-ألف وسطية",
+    "postFatha": "بعد فتحة", "postDamma": "بعد ضمة", "postKasra": "بعد كسرة",
+    "postSukun": "بعد سكون", "postShaddaFatha": "بعد شدة وفتحة",
+    "postShaddaDamma": "بعد شدة وضمة", "postShaddaKasra": "بعد شدة وكسرة",
+    "hamzaabove": "همزة فوق", "hamzabelow": "همزة تحت",
+    "Vabove": "علامة فوق", "Vbelow": "علامة تحت",
+    "aboveMeem": "ميم فوق", "belowMeem": "ميم تحت",
+    "ring": "حلقة", "small": "صغير",
+    "fathatan": "فتحتان", "dammatan": "ضمتان", "kasratan": "كسرتان",
+    "shadda": "شدة", "sukun": "سكون",
+    "fatha": "فتحة", "damma": "ضمة", "kasra": "كسرة",
+    "alef": "ألف", "lam": "لام", "meem": "ميم", "noona": "نون"
+  };
+  const features = [];
+  parts.slice(1).forEach((p) => { features.push(featureMap[p] || p); });
+  return { base: base, features: features };
+}
+
+function openActions(index) {
+  let g;
+  try { g = font.glyphs.get(index); } catch (e) { return; }
+  if (!g) return;
+
+  curIndex = index;
+  const cps = glyphAllCps(g, index);
+  const u = preferredGlyphCp(cps);
+  const hex = cps.length
+    ? cps.map((c) => "U+" + c.toString(16).toUpperCase().padStart(4, "0")).join(" · ")
+    : "—";
+  const ch = u !== undefined ? String.fromCodePoint(u) : "";
+  const hasPath = g.path && g.path.commands && g.path.commands.length;
+  const hasColorDrawing = __mhHasColorDrawing(index, font) && !__mhIsColorDisabled(index, font);
+  const word = font.wordByGid ? font.wordByGid[index] : null;
+  const pretty = prettyGlyphName(g.name);
+  const viaJoining = !cps.length && !!(pretty || word);
+  const upm = font.unitsPerEm || 1000;
+
+  /* القيمة الافتراضية لحقل الكود: الحرف الخام لو موجود، وإلا الكود الأول.
+     المستخدم ممكن يكتب: حرف واحد / كود U+xxxx / حرفين (لا، من) / U+FEFB (ﻻ) */
+  const codeDefault = ch || (cps.length ? ("U+" + cps[0].toString(16).toUpperCase().padStart(4, "0")) : "");
+
+  openModal("الحرف " + index, `
+    <div class="prevWrap"><canvas id="aPrev" width="600" height="600"></canvas></div>
+
+    <div class="roGrid" style="margin-top:14px">
+      <span class="k">الكود</span>
+      <span class="v">
+        <input id="gCode" dir="ltr" value="${esc(codeDefault)}" placeholder="ب أو 0628 أو U+FEA4 أو لا أو من" style="width:100%;font-family:var(--mono);font-size:11px;background:var(--paper);border:1px solid var(--line2);border-radius:6px;padding:5px 8px;color:var(--ink)">
+        ${viaJoining ? '<div style="color:var(--ink3);font-size:10px;margin-top:3px">(عبر الربط — من قواعد الاتصال)</div>' : ""}
+        <div style="color:var(--ink3);font-size:10px;margin-top:3px">حرف واحد = تعيين مباشر · حرفين (لا/من/ال) = ربط كلمة مدمجة · فارغ = فصل التعيين</div>
+      </span>
+      ${word
+        ? '<span class="k">كلمة مدمجة</span>' +
+          '<span class="v"><input id="gWord" dir="rtl" value="' + esc(word) + '" placeholder="مثال: لا أو من أو سلم" style="width:100%;font-weight:700;background:var(--paper);border:1px solid var(--line2);border-radius:6px;padding:5px 8px;color:var(--accent2)"><div style="color:var(--ink3);font-size:10px;margin-top:3px">من قاموس الخط نفسه — غيّر الكلمة أو سيبها فاضية للفصل</div></span>'
+        : '<span class="k">كلمة مدمجة</span>' +
+          '<span class="v"><input id="gWord" dir="rtl" value="" placeholder="مثال: لا أو من أو سلم" style="width:100%;background:var(--paper);border:1px solid var(--line2);border-radius:6px;padding:5px 8px;color:var(--accent2)"><div style="color:var(--ink3);font-size:10px;margin-top:3px">فاضية — اكتب كلمة لربطها برسمة الحرف ده</div></span>'}
+
+      ${cps.length ? '<span class="k">كل الرموز</span><span class="v"><div class="aliasBox" id="gAliasesBox"></div><div class="aliasHint">هذه كلها أكواد Unicode مختلفة تشير لنفس الرسمة G' + index + ' — لذلك قد ترى مثلًا À وﭑ لنفس الرسم.</div></span>' : ''}
+
+      <span class="k">اسم مرجعي</span>
+      <span class="v"><input id="gLabel" dir="rtl" value="${esc((font.labelByGid && font.labelByGid[index]) || "")}" placeholder="مثال: صلعم، بسملة، شعار الدار" style="width:100%;background:var(--paper);border:1px solid var(--line2);border-radius:6px;padding:5px 8px;color:var(--ink)"><div style="color:var(--ink3);font-size:10px;margin-top:3px">${(u === undefined && !word) ? "الرسمة دي مالهاش كود ولا كلمة مدمجة — الاسم ده بيساعدك تلاقيها بالبحث بس، ومش بيخليها تتكتب" : "اسم إضافي للبحث والتعرّف — مش كود ولا كلمة مدمجة، ومبيأثرش على الكتابة"}</div></span>
+
+      <span class="k">الاسم التقني</span>
+      <span class="v"><input class="nameField" data-key="name" dir="ltr" value="${esc(g.name || "")}" style="width:100%;font-family:var(--mono);font-size:11px;background:var(--paper);border:1px solid var(--line2);border-radius:6px;padding:5px 8px;color:var(--ink)"></span>
+
+      <span class="k">العرض (advance)</span>
+      <span class="v"><input id="gAdv" dir="ltr" type="number" value="${g.advanceWidth != null ? g.advanceWidth : Math.round(upm/2)}" style="width:100px;font-family:var(--mono);background:var(--paper);border:1px solid var(--line2);border-radius:6px;padding:5px 8px;color:var(--ink)"> / ${upm} وحدة</span>
+
+      <span class="k">المسار</span>
+      <span class="v">${hasPath ? '<button class="linklike" data-act="g-cmds">' + g.path.commands.length + ' أمر — عرض التفاصيل</button>' : "0 أمر"}</span>
+
+      ${pretty && pretty.features.length
+        ? '<span class="k">المعنى</span><span class="v" style="font-weight:700">' +
+          esc(pretty.base) + " — " + esc(pretty.features.join(" + ")) + "</span>"
+        : ""}
+    </div>
+
+    <div class="copyRow">
+      <button class="btn" data-act="cp-char" ${u === undefined ? "disabled" : ""}>نسخ الحرف${ch ? " " + esc(ch) : ""}</button>
+      <button class="btn" data-act="cp-all-chars" ${cps.length < 2 ? "disabled" : ""}>نسخ كل الرموز</button>
+      <button class="btn" data-act="cp-code" ${u === undefined ? "disabled" : ""}>نسخ الكود</button>
+      <button class="btn" data-act="cp-svg" ${hasPath ? "" : "disabled"}>SVG</button>
+    </div>
+
+    <div class="mbtns">
+      <button class="btn ok" data-act="g-save">حفظ التعديلات</button>
+      <button class="btn" data-act="g-remap">↔ تعيين لحرف آخر</button>
+      <button class="btn" data-act="g-swap">تغيير الرسمة</button>
+      <button class="btn" data-act="g-restore-original">↺ إعادة الرسمة الأصلية</button>
+      ${hasColorDrawing ? '<button class="btn" data-act="g-color-delete">حذف الرسم الملون ← الشكل الطبيعي</button>' : ''}
+      <button class="btn" data-act="g-analyze-usage">🔍 اكتشف استخدام الرسم</button>
+      <button class="btn" data-act="g-move">↕ نقل لمكان آخر</button>
+      <button class="btn" data-act="g-dup">⧉ تكرار لحرف جديد</button>
+      <button class="btn bad" data-act="g-del">حذف</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  drawGlyphToCanvas(g, qs("#aPrev"));
+  const aliasBox = qs("#gAliasesBox");
+  if (aliasBox) cps.forEach((cp) => { aliasBox.appendChild(makeAliasChip(cp)); });
+}
+
+async function deleteColorDrawing(index){
+  if(!font||index===undefined||index===null)return;
+  let g; try{g=font.glyphs.get(index)}catch(e){g=null}
+  if(!g)return;
+  const has=__mhHasColorDrawing(index,font)&&!__mhIsColorDisabled(index,font);
+  if(!has){toast("الحرف مش ملون",true);return;}
+  const cps=glyphAllCps(g,index);
+  const ch=cps.length?String.fromCodePoint(cps[0]):"";
+  const ok=await uiConfirm("حذف الرسم الملون للحرف "+(ch?"«"+ch+"»":"G"+index)+"؟\nهيتحول تلقائيًا للشكل الطبيعي.",{title:"حذف الرسم الملون",okText:"حذف وتحويل",danger:true});
+  if(!ok)return;
+  pushUndo();
+  __mhColorDisabledMap(font)[index]=1;
+  /* لو فيه outline عادي حقيقي في الـbase glyph، نحتفظ به. لو فاضي،
+     نولّد الشكل الطبيعي من خط الجهاز كـvector عالي الدقة بدل مكعب/فراغ. */
+  if(!g.path||!g.path.commands||!g.path.commands.length){
+    try{
+      const converted=await textCharToFontPath(ch||" ",font.unitsPerEm||1000,{skipOwn:true});
+      if(converted&&converted.path){applySvgToGlyph(index,converted.path,converted.advance);}
+    }catch(e){
+      console.warn("Natural fallback failed",e);
+    }
+  }
+  markUserInk(g); markStructChanged(); closeModal(); renderAll(index); toast("اتحذف اللون واتحول الحرف للشكل الطبيعي ✓");
+}
+
+/* حفظ تعديلات الحرف: الكود، الاسم التقني، والعرض. بتتعمل على الرسمة الحالية
+   مباشرة مع markUserInk عشان تدخل في التصدير النضيف.
+   الكود بيدعم: حرف واحد، لام-ألف (لا/لأ/لإ/لآ)، أي حرفين (كلمة مدمجة). */
+
+async function restoreOriginalGlyph(index) {
+  if (!font || index == null) return;
+  const g = font.glyphs.get(index);
+  const original = font._mhOriginalGlyphs && font._mhOriginalGlyphs[index];
+  if (!g || !original) {
+    toast("لا توجد رسمة أصلية محفوظة لهذا الحرف", true);
+    return;
+  }
+
+  const ok = await uiConfirm(
+    "إرجاع الرسمة الأصلية للحرف؟\nسيتم استبدال الرسمة الحالية بالشكل الذي كان موجودًا عند فتح الخط.",
+    { title: "إعادة الرسمة الأصلية", okText: "إرجاع الرسمة" }
+  );
+  if (!ok) return;
+
+  pushUndo();
+  const path = new opentype.Path();
+  path.commands = JSON.parse(JSON.stringify(original.commands || []));
+  g.path = path;
+  g.advanceWidth = original.advanceWidth != null ? original.advanceWidth : g.advanceWidth;
+  g.userInk = false;
+
+  const bb = path.getBoundingBox();
+  if (isFinite(bb.x1) && isFinite(bb.x2) && isFinite(bb.y1) && isFinite(bb.y2)) {
+    g.xMin = bb.x1; g.xMax = bb.x2; g.yMin = bb.y1; g.yMax = bb.y2;
+  } else {
+    g.xMin = g.xMax = g.yMin = g.yMax = 0;
+  }
+
+  if (font._mhColorDisabled) delete font._mhColorDisabled[index];
+  markStructChanged();
+  closeModal();
+  renderAll(index);
+  toast("رجعت الرسمة الأصلية للحرف ✓");
+}
+
+async function saveGlyphInfo() {
+  const g = font.glyphs.get(curIndex);
+  if (!g) return;
+
+  /* ١ — فحص الكود الأول (لو اتغير) قبل ما نعمل pushUndo — عشان نلغي لو فيه خطأ */
+  const codeInput = qs("#gCode");
+  const codeVal = codeInput ? codeInput.value : "";
+  const oldCps = glyphAllCps(g, curIndex);
+  const oldCodeStr = oldCps.length
+    ? (String.fromCodePoint(oldCps[0]) || ("U+" + oldCps[0].toString(16).toUpperCase().padStart(4, "0")))
+    : "";
+
+  let codeChanged = false;
+  if (codeVal.trim() !== oldCodeStr.trim() && codeVal.trim() !== "") {
+    codeChanged = true;
+  } else if (codeVal.trim() === "" && oldCps.length) {
+    codeChanged = true; /* فصل التعيين */
+  }
+
+  if (codeChanged) {
+    /* تطبيع أشكال العرض قبل فحص لام-ألف */
+    const parsed = parseSeqInput(codeVal);
+    if (parsed === null) {
+      await uiAlert("كود غير صالح.");
+      return;
+    }
+
+    const normalizeLam = (cp) => (cp >= 0xFEDD && cp <= 0xFEE0) ? 0x0644 : cp;
+    const normalizeAlef = (cp) => (cp === 0xFE8D || cp === 0xFE8E) ? 0x0627 : cp;
+
+    let laPair = null, ligWord = null, cp = undefined;
+
+    if (parsed === undefined) {
+      cp = undefined; /* فاضي → فصل التعيين */
+    } else if (parsed.seq) {
+      const c0 = normalizeLam(parsed.seq[0]);
+      const c1 = normalizeAlef(parsed.seq[1]);
+      laPair = (c0 === 0x0644 && LAM_ALEF[c1]) ? LAM_ALEF[c1] : null;
+      if (!laPair) {
+        ligWord = parsed.seq.map((c) => String.fromCodePoint(c)).join("");
+      }
+    } else {
+      cp = parsed.cp;
+      if (cp === 0xFEFB || cp === 0xFEFC) { laPair = [0xFEFB, 0xFEFC]; cp = undefined; }
+      else if (cp === 0xFEF5 || cp === 0xFEF6) { laPair = [0xFEF5, 0xFEF6]; cp = undefined; }
+      else if (cp === 0xFEF7 || cp === 0xFEF8) { laPair = [0xFEF7, 0xFEF8]; cp = undefined; }
+      else if (cp === 0xFEF9 || cp === 0xFEFA) { laPair = [0xFEF9, 0xFEFA]; cp = undefined; }
+    }
+
+    /* فحص التضارب */
+    const checkCps = laPair ? laPair : (cp !== undefined ? [cp] : []);
+    const exTxt = [];
+    checkCps.forEach((c) => {
+      const ex = (font.glyphIndexMap || {})[c];
+      if (ex !== undefined && ex !== curIndex) {
+        exTxt.push("U+" + c.toString(16).toUpperCase().padStart(4, "0") + "→G" + ex);
+      }
+    });
+    if (ligWord) {
+      const eff = font.wordLigatures || {};
+      const exGid = eff[ligWord];
+      if (exGid !== undefined && exGid !== curIndex) {
+        exTxt.push("«" + ligWord + "»→G" + exGid);
+      }
+    }
+    if (exTxt.length) {
+      const ok = await uiConfirm(
+        "التعيين مستخدم للحرف " + exTxt.join(" · ") + " — تنقله هنا؟",
+        { okText: "نقل" });
+      if (!ok) return;
+    }
+
+    pushUndo();
+
+    /* طبّق تعيين الكود */
+    if (laPair) {
+      const map = font.glyphIndexMap = (font.glyphIndexMap || {});
+      (g.unicodes || []).forEach((uu) => { if (map[uu] === g.index) delete map[uu]; });
+      if (g.unicode !== undefined && map[g.unicode] === g.index) delete map[g.unicode];
+      g.unicode = laPair[0];
+      g.unicodes = laPair.slice();
+      laPair.forEach((c) => { map[c] = g.index; });
+      markUserInk(g);
+      const ov = activeEmbed();
+      const laWord = "ل" + String.fromCodePoint(
+        laPair[0] === 0xFEF5 ? 0x0622 :
+        laPair[0] === 0xFEF7 ? 0x0623 :
+        laPair[0] === 0xFEF9 ? 0x0625 : 0x0627
+      );
+      ov.add[laWord] = { c: "G" + g.index };
+      saveActiveEmbed(ov);
+      applyEmbedOverlay(font);
+    } else if (ligWord) {
+      markUserInk(g);
+      const ov = activeEmbed();
+      ov.add[ligWord] = { c: "G" + g.index };
+      saveActiveEmbed(ov);
+      applyEmbedOverlay(font);
+    } else {
+      setGlyphUnicode(g, cp);
+    }
+  } else {
+    pushUndo();
+  }
+
+  /* ٢ — الاسم التقني */
+  const nameInput = modalBox.querySelector('.nameField[data-key="name"]');
+  if (nameInput) {
+    const newName = (nameInput.value || "").trim();
+    if (newName && newName !== g.name) {
+      g.name = newName;
+      markUserInk(g);
+    }
+  }
+
+  /* ٣ — العرض (advance width) */
+  const advInput = qs("#gAdv");
+  if (advInput) {
+    const adv = parseInt(advInput.value, 10);
+    if (!Number.isNaN(adv) && adv >= 0 && adv <= 0xFFFF && adv !== g.advanceWidth) {
+      /* حركات/علامات: عرضها صفر دايمًا (مش بياخدوا مساحة في الكتابة) */
+      g.advanceWidth = isMarkCp(g.unicode) ? 0 : adv;
+      markUserInk(g);
+    }
+  }
+
+  /* ٤-ب — الاسم المرجعي (labelByGid) — تخزين مستقل تمامًا، لا يمس
+     الكود ولا الكلمة المدمجة، ومتاح حتى للرسمات اليتيمة تمامًا */
+  const labelInput = qs("#gLabel");
+  if (labelInput) {
+    const newLabel = (labelInput.value || "").trim();
+    saveLabelForGid(font, curIndex, newLabel);
+  }
+
+  /* ٤ — الكلمة المدمجة (word ligature)
+     - لو فيه كلمة جديدة (أو متغيرة): نربطها بالرسمة دي
+     - لو الكلمة فاضية وكان فيه كلمة قبل كده: نفك الربط */
+  const wordInput = qs("#gWord");
+  if (wordInput) {
+    const newWord = (wordInput.value || "").trim();
+    const oldWord = (font.wordByGid && font.wordByGid[curIndex]) || "";
+    if (newWord !== oldWord) {
+      const ov = activeEmbed();
+      const base = font.wordLigaturesBase || {};
+      const e2o = embEffToOrig();
+
+      /* افك الربط القديم */
+      if (oldWord) {
+        const origKey = base[oldWord] !== undefined ? oldWord
+          : (e2o[oldWord] !== undefined ? e2o[oldWord] : null);
+        if (origKey !== null) {
+          /* كلمة من المصمم → حطها في المحذوفات (قابلة للاستعادة) */
+          ov.del[origKey] = 1;
+          delete ov.edit[origKey];
+        } else {
+          /* كلمة مضافة → اشلها خالص */
+          delete ov.add[oldWord];
+        }
+      }
+
+      /* اربط الكلمة الجديدة */
+      if (newWord) {
+        /* فحص التضارب: لو الكلمة مربوطة برسمة تانية */
+        const eff = font.wordLigatures || {};
+        const exGid = eff[newWord];
+        if (exGid !== undefined && exGid !== curIndex) {
+          const okMove = await uiConfirm(
+            "الكلمة «" + newWord + "» مربوطة بالرسمة G" + exGid + " — تنقلها هنا؟",
+            { okText: "نقل" });
+          if (!okMove) {
+            /* المستخدم لغى — نرجّع الحالة القديمة */
+            if (oldWord && base[oldWord] !== undefined) delete ov.del[oldWord];
+            if (oldWord) ov.add[oldWord] = { c: "G" + curIndex };
+          } else {
+            /* انقلها: اشلها من الرسمة القديمة */
+            const origKey2 = base[newWord] !== undefined ? newWord
+              : (e2o[newWord] !== undefined ? e2o[newWord] : null);
+            if (origKey2 !== null) {
+              ov.del[origKey2] = 1;
+              delete ov.edit[origKey2];
+            } else {
+              delete ov.add[newWord];
+            }
+            ov.add[newWord] = { c: "G" + curIndex };
+            markUserInk(g);
+          }
+        } else {
+          ov.add[newWord] = { c: "G" + curIndex };
+          markUserInk(g);
+        }
+      }
+
+      saveActiveEmbed(ov);
+      applyEmbedOverlay(font);
+    }
+  }
+
+  markStructChanged();
+  closeModal();
+  renderAll(curIndex);
+  toast("تم حفظ تعديلات الحرف ✓");
+}
+
+/* عرض تفصيلي لكل أوامر مسار الحرف (M/L/C/Q/Z) بترتيبها — مفيد لفحص
+   جودة الرسم أو تتبع نقطة معينة بالظبط داخل الحرف */
+function openPathCommands(index) {
+  let g;
+  try { g = font.glyphs.get(index); } catch (e) { return; }
+  if (!g || !g.path || !g.path.commands.length) return;
+
+  const cmds = g.path.commands;
+  const typeName = { M: "بداية (M)", L: "خط (L)", C: "منحنى مكعّب (C)", Q: "منحنى تربيعي (Q)", Z: "إغلاق (Z)" };
+  const rows = cmds.map((c, i) => {
+    let coords = "";
+    if (c.type === "M" || c.type === "L") {
+      coords = "x=" + Math.round(c.x) + "&nbsp; y=" + Math.round(c.y);
+    } else if (c.type === "Q") {
+      coords = "x1=" + Math.round(c.x1) + " y1=" + Math.round(c.y1) +
+        "&nbsp;&nbsp; x=" + Math.round(c.x) + " y=" + Math.round(c.y);
+    } else if (c.type === "C") {
+      coords = "x1=" + Math.round(c.x1) + " y1=" + Math.round(c.y1) +
+        "&nbsp;&nbsp; x2=" + Math.round(c.x2) + " y2=" + Math.round(c.y2) +
+        "&nbsp;&nbsp; x=" + Math.round(c.x) + " y=" + Math.round(c.y);
+    }
+    return '<tr><td class="cmdIdx">' + (i + 1) + '</td>' +
+      '<td class="cmdType">' + esc(typeName[c.type] || c.type) + '</td>' +
+      '<td class="cmdCoords mono" dir="ltr">' + coords + '</td></tr>';
+  }).join("");
+
+  openModal("أوامر المسار — الحرف " + index, `
+    <p class="hint">${cmds.length} أمر بالترتيب من بداية الرسمة للنهاية.</p>
+    <div class="cmdTableWrap">
+      <table class="cmdTable">
+        <thead><tr><th>#</th><th>النوع</th><th>الإحداثيات</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="mbtns">
+      <button class="btn" data-act="g-cmds-copy">نسخ كنص</button>
+      <button class="btn ghost" data-act="g-actions-back">↩ رجوع</button>
+    </div>
+  `);
+}
+
+/* ================================================================
+   § 18 — تغيير الرسمة
+   ================================================================ */
+function openSwap(index) {
+  openModal("تغيير رسمة الحرف " + index, `
+    <p class="hint">المكان والكود يفضلان كما هما — الرسمة فقط تتغير.</p>
+    <div class="mbtns">
+      <button class="btn ok" data-act="sw-font">من حرف آخر في نفس الخط</button>
+      <button class="btn" data-act="sw-other">من خط آخر مفتوح</button>
+      <button class="btn" data-act="sw-svg">لصق مسار SVG</button>
+      <button class="btn" data-act="sw-self">شكل الحرف نفسه (نص مرسوم)</button>
+      <button class="btn" data-act="sw-img">من صورة (تتبع HD)</button>
+      <button class="btn ghost" data-act="close-modal">إلغاء</button>
+    </div>
+  `);
+}
+
+/* استيراد صورة وتتبعها → رسمة الحرف الحالي (§ 12-د في p4) */
+let swapImgTarget = null;
+function swapFromImage(index) {
+  swapImgTarget = index;
+  const fi = document.getElementById("imgFileInput");
+  if (fi) fi.click();
+}
+
+async function saveSwapImage(file) {
+  const index = (swapImgTarget !== null && swapImgTarget !== undefined)
+    ? swapImgTarget : curIndex;
+  swapImgTarget = null;
+  if (index === null || index === undefined) return;
+  statusEl.classList.remove("err");
+  statusEl.textContent = "جارٍ تتبّع الصورة…";
+  let converted;
+  try {
+    converted = await imageFileToFontPath(file, font.unitsPerEm);
+  } catch (e) {
+    defaultStatus();
+    await uiAlert("تتبّع الصورة فشل: " + e.message);
+    return;
+  }
+  const ok = await uiConfirm(
+    "استبدال الرسمة بالشكل المُتتبَّع من الصورة؟",
+    { title: "من صورة", okText: "استبدال" }
+  );
+  if (!ok) { defaultStatus(); return; }
+  pushUndo();
+  applySvgToGlyph(index, converted.path, converted.advance);
+  toast("تم التتبع من الصورة ✓");
+  closeModal();
+  renderAll(index);
+  defaultStatus();
+}
+
+function openSwapFromFont(index) {
+  openModal("تغيير الرسمة — من نفس الخط", `
+    <label>الرسمة المصدر (رقم أو حرف أو كود)</label>
+    <div class="charRow">
+      <input id="swSrc" dir="ltr" placeholder="95 أو ب أو FEA4">
+      <div class="charPrevBox" id="swSrcPrev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn ok" data-act="sw-font-save">تغيير الرسمة</button>
+      <button class="btn ghost" data-act="g-swap">↩ رجوع</button>
+    </div>
+  `);
+  bindSourcePreview(qs("#swSrc"), qs("#swSrcPrev"));
+}
+
+async function saveSwapFont() {
+  const srcIdx = parseSourceIndex(qs("#swSrc").value);
+  if (srcIdx === null) {
+    await uiAlert("المصدر غير موجود.");
+    return;
+  }
+  if (srcIdx === curIndex) {
+    await uiAlert("اختر رسمة مختلفة عن الحرف نفسه.");
+    return;
+  }
+  const ok = await uiConfirm(
+    "استبدال الرسمة الحالية برسمة الحرف " + srcIdx + "؟",
+    { title: "تغيير الرسمة", okText: "استبدال" }
+  );
+  if (!ok) return;
+  pushUndo();
+  replaceGlyphAt(curIndex, font.glyphs.get(srcIdx), font);
+  toast("تم تغيير الرسمة");
+  closeModal();
+  renderAll(curIndex);
+}
+
+function openSwapOther() {
+  swapTargetIndex = curIndex;
+  openImport();
+}
+
+function openSwapFromSvg(index) {
+  openModal("تغيير الرسمة — من SVG", `
+    <label>بيانات المسار d="…" أو مستند SVG كامل</label>
+    <textarea id="swSvg" rows="5" dir="ltr" placeholder="M 0 0 L 100 0 C ...&#10;أو الصق مستند SVG كامل من زر «SVG»&#10;<?xml version=\"1.0\"… <svg viewBox=\"…\"> <path d=\"…\"/> </svg>"></textarea>
+    <p class="hint">ممكن تلصق مسار d="…" مباشر، أو مستند SVG كامل (زي اللي بينسخه زر «SVG») — سيُستخرج المسار ويُقلب ويُحجم تلقائيًا ليملأ 75% من الـ em.</p>
+    <div class="mbtns">
+      <button class="btn ok" data-act="sw-svg-save">تغيير الرسمة</button>
+      <button class="btn ghost" data-act="g-swap">↩ رجوع</button>
+    </div>
+  `);
+}
+
+async function saveSwapSvg() {
+  let converted;
+  try {
+    converted = svgDToFontPath(qs("#swSvg").value, font.unitsPerEm);
+  } catch (e) {
+    await uiAlert(e.message);
+    return;
+  }
+  const ok = await uiConfirm("استبدال الرسمة بمسار SVG؟", { okText: "استبدال" });
+  if (!ok) return;
+  pushUndo();
+  applySvgToGlyph(curIndex, converted.path, converted.advance);
+  toast("تم تغيير الرسمة");
+  closeModal();
+  renderAll(curIndex);
+}
+
+async function saveSwapSelf() {
+  const g = font.glyphs.get(curIndex);
+  if (!g) return;
+  const u = g.unicode !== undefined ? g.unicode : (g.unicodes && g.unicodes[0]);
+  if (u === undefined) {
+    await uiAlert("الحرف غير مرتبط بكود — لا يمكن رسمه نصيًا.");
+    return;
+  }
+  let converted;
+  try {
+    converted = await textCharToFontPath(String.fromCodePoint(u), font.unitsPerEm);
+  } catch (e) {
+    await uiAlert(e.message);
+    return;
+  }
+  const ok = await uiConfirm(
+    "استبدال الرسمة بالشكل النصي للحرف؟",
+    { title: "شكل الحرف نفسه", okText: "استبدال" }
+  );
+  if (!ok) return;
+  pushUndo();
+  applySvgToGlyph(curIndex, converted.path, converted.advance);
+  toast("تم رسم الحرف كما هو");
+  closeModal();
+  renderAll(curIndex);
+}
+
+/* ================================================================
+   § 19 — النقل / التعيين / التكرار / الحذف
+   ================================================================ */
+function openMove(index) {
+  const n = glyphsArr().length;
+  openModal("نقل الحرف " + index, `
+    <label>المكان الجديد (0 إلى ${n - 1})</label>
+    <input id="mTo" dir="ltr" type="number" min="0" max="${n - 1}" value="${index}">
+    <p class="hint">الحروف بين المكانين تتزحلق مكانًا واحدًا.</p>
+    <div class="mbtns">
+      <button class="btn ok" data-act="m-save">↕ نقل</button>
+      <button class="btn ghost" data-act="close-modal">إلغاء</button>
+    </div>
+  `);
+  qs("#mTo").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") runActionByName("m-save");
+  });
+}
+
+async function saveMove() {
+  const n = glyphsArr().length;
+  const to = parseInt(qs("#mTo").value, 10);
+  if (Number.isNaN(to) || to < 0 || to >= n) {
+    await uiAlert("اكتب رقمًا من 0 إلى " + (n - 1) + ".");
+    return;
+  }
+  if (to === curIndex) { closeModal(); return; }
+  if (curIndex === 0 || to === 0) {
+    const ok = await uiConfirm("المكان 0 هو .notdef — متأكد؟", { okText: "نقل" });
+    if (!ok) return;
+  }
+  pushUndo();
+  moveGlyph(curIndex, to);
+  closeModal();
+  renderAll(to);
+}
+
+function openRemap(index) {
+  const g = font.glyphs.get(index);
+  openModal("تعيين الحرف " + index, `
+    <label>الحالي: ${uniText(g)}</label>
+    <label>الحرف أو الكود الجديد</label>
+    <div class="charRow">
+      <input id="rChar" dir="ltr" placeholder="ب أو 0628 أو U+FEA4 أو لا أو من">
+      <div class="charPrevBox" id="rPrev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+    <p class="hint">فارغ + حفظ = فصل التعيين. حرف واحد = تعيين مباشر. حرفين (لا/من/ال) = ربط كلمة مدمجة.</p>
+    <div class="mbtns">
+      <button class="btn ok" data-act="r-save">حفظ</button>
+      <button class="btn ghost" data-act="close-modal">إلغاء</button>
+    </div>
+  `);
+  bindCharPreview(qs("#rChar"), qs("#rPrev"));
+}
+
+async function saveRemap() {
+  const g = font.glyphs.get(curIndex);
+  if (!g) return;
+
+  /* ⚠ إصلاح «ﻠﺎ يبقي U+F100»: المستخدم ممكن يكتب لام-ألف بصور مختلفة:
+     - ل + ا (حروف خام: 0644 + 0627)
+     - ﻟ + ﺎ (أشكال عرض: FEDF + FE8E)
+     - ﻠ + ﺎ (أشكال عرض: FEE0 + FE8E)
+     - ﻝ + ﺍ (أشكال عرض: FEDD + FE8D)
+     كلها لازم تتعامل كلام-ألف وتاخد FEFB/FEFC — مش PUA.
+     كمان لأ/لإ/لآ ليها أكوادها الخاصة (FEF5-FEFA).
+     بنطبّع المدخل الأول: أشكال عرض اللام → 0644، أشكال عرض الألف → 0627 */
+  const parsed = parseSeqInput(qs("#rChar").value);
+  if (parsed === null) { await uiAlert("كود غير صالح."); return; }
+
+  /* تطبيع أشكال العرض للحروف الخام */
+  const normalizeLam = (cp) => {
+    /* FEDD=ﻝ FEDF=ﻟ FEDE=ﻞ FEE0=ﻠ → 0644 لام خام */
+    if (cp >= 0xFEDD && cp <= 0xFEE0) return 0x0644;
+    return cp;
+  };
+  const normalizeAlef = (cp) => {
+    /* FE8D=ﺍ FE8E=ﺎ → 0627 ألف خام */
+    if (cp === 0xFE8D || cp === 0xFE8E) return 0x0627;
+    return cp;
+  };
+
+  let laPair = null;       /* [isolated, final] للام-ألف */
+  let ligWord = null;      /* كلمة مدمجة لأي حرفين تانيين */
+  let cp = undefined;      /* كود مفرد */
+
+  if (parsed === undefined) {
+    /* فاضي → فصل التعيين */
+    cp = undefined;
+  } else if (parsed.seq) {
+    /* حرفين → طبّعهم الأول */
+    const c0 = normalizeLam(parsed.seq[0]);
+    const c1 = normalizeAlef(parsed.seq[1]);
+    /* لام-ألف؟ (ل + ا/أ/إ/آ بعد التطبيع) */
+    laPair = (c0 === 0x0644 && LAM_ALEF[c1]) ? LAM_ALEF[c1] : null;
+    if (!laPair) {
+      /* أي حرفين تانيين → ربط كلمة مدمجة (LigatureSubst) على الرسمة دي.
+         الرسمة تفضل على كودها الأصلي لو عندها واحد — مفيش PUA.
+         قاعدة GSUB بتربط الكلمة بالـ GID مباشرة فالكود مش لازم. */
+      ligWord = parsed.seq.map((c) => String.fromCodePoint(c)).join("");
+    }
+  } else {
+    /* حرف مفرد — ممكن يكون U+FEFB / U+FEFC مباشرة (لام-ألف شكل عرض) */
+    cp = parsed.cp;
+    if (cp === 0xFEFB || cp === 0xFEFC) {
+      laPair = [0xFEFB, 0xFEFC];
+      cp = undefined;
+    } else if (cp === 0xFEF5 || cp === 0xFEF6) {
+      laPair = [0xFEF5, 0xFEF6];
+      cp = undefined;
+    } else if (cp === 0xFEF7 || cp === 0xFEF8) {
+      laPair = [0xFEF7, 0xFEF8];
+      cp = undefined;
+    } else if (cp === 0xFEF9 || cp === 0xFEFA) {
+      laPair = [0xFEF9, 0xFEFA];
+      cp = undefined;
+    }
+  }
+
+  /* فحص التضارب — للام-ألف بتفحص الكودين معًا */
+  const checkCps = laPair ? laPair : (cp !== undefined ? [cp] : []);
+  const exTxt = [];
+  checkCps.forEach((c) => {
+    const ex = (font.glyphIndexMap || {})[c];
+    if (ex !== undefined && ex !== curIndex) {
+      exTxt.push("U+" + c.toString(16).toUpperCase().padStart(4, "0") + "→G" + ex);
+    }
+  });
+  /* للكلمة المدمجة: فحص لو الكلمة مربوطة برسمة تانية */
+  if (ligWord) {
+    const ov = activeEmbed();
+    const eff = font.wordLigatures || {};
+    const exGid = eff[ligWord];
+    if (exGid !== undefined && exGid !== curIndex) {
+      exTxt.push("«" + ligWord + "»→G" + exGid);
+    }
+  }
+  if (exTxt.length) {
+    const ok = await uiConfirm(
+      "التعيين مستخدم للحرف " + exTxt.join(" · ") + " — تنقله هنا؟",
+      { okText: "نقل" });
+    if (!ok) return;
+  }
+
+  pushUndo();
+
+  if (laPair) {
+    /* لام-ألف: امسح التعيينات القديمة على الرسمة، وحط الكودين الاتنين */
+    const map = font.glyphIndexMap = (font.glyphIndexMap || {});
+    (g.unicodes || []).forEach((u) => { if (map[u] === g.index) delete map[u]; });
+    if (g.unicode !== undefined && map[g.unicode] === g.index) delete map[g.unicode];
+    g.unicode = laPair[0];
+    g.unicodes = laPair.slice();
+    laPair.forEach((c) => { map[c] = g.index; });
+    markUserInk(g);
+    /* لام-ألف مرتبطة بكلمة مدمجة لو الخط فيها rlig — نضمن إن «لا» المكتوبة
+       تطلع الرسمة دي حتى لو الخط الأصلي بيولّدها من GSUB */
+    const ov = activeEmbed();
+    const laWord = "ل" + String.fromCodePoint(
+      laPair[0] === 0xFEF5 ? 0x0622 :
+      laPair[0] === 0xFEF7 ? 0x0623 :
+      laPair[0] === 0xFEF9 ? 0x0625 : 0x0627
+    );
+    ov.add[laWord] = { c: "G" + g.index };
+    saveActiveEmbed(ov);
+    applyEmbedOverlay(font);
+    toast("تم التعيين: «" + laWord + "» → الرسمة " + curIndex);
+  } else if (ligWord) {
+    /* أي حرفين تانيين: ربط كلمة مدمجة على الرسمة.
+       الرسمة تفضل على كودها الأصلي (لو عندها واحد) — مفيش PUA خالص.
+       قاعدة GSUB بتربط الكلمة بالـ GID مباشرة، فالكود مش لازم.
+       لو الرسمة ملهاش كود أصلاً، دي مش مشكلة — GSUB هيوصّلها. */
+    markUserInk(g);
+    const ov = activeEmbed();
+    ov.add[ligWord] = { c: "G" + g.index };
+    saveActiveEmbed(ov);
+    applyEmbedOverlay(font);
+    toast("تم الربط: «" + ligWord + "» → الرسمة " + curIndex + " (كلمة مدمجة)");
+  } else {
+    setGlyphUnicode(g, cp);
+  }
+
+  closeModal();
+  renderAll();
+}
+
+function openDuplicate(srcIndex) {
+  openModal("تكرار رسمة الحرف " + srcIndex, `
+    <label>المصدر</label>
+    <div class="charRow">
+      <input id="dSrc" dir="ltr" value="${srcIndex}">
+      <div class="charPrevBox" id="dSrcPrev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+    <label>الكود الجديد</label>
+    <div class="charRow">
+      <input id="dChar" dir="ltr" placeholder="ئ أو 0626">
+      <div class="charPrevBox" id="dPrev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn ok" data-act="d-save">إضافة</button>
+      <button class="btn ghost" data-act="close-modal">إلغاء</button>
+    </div>
+  `);
+  bindSourcePreview(qs("#dSrc"), qs("#dSrcPrev"));
+  bindCharPreview(qs("#dChar"), qs("#dPrev"));
+}
+
+async function saveDuplicate() {
+  const src = parseSourceIndex(qs("#dSrc").value);
+  if (src === null) { await uiAlert("المصدر غير موجود."); return; }
+  const cp = parseCharInput(qs("#dChar").value);
+  if (cp === undefined || cp === null) { await uiAlert("اكتب كودًا صالحًا."); return; }
+  const ex = (font.glyphIndexMap || {})[cp];
+  if (ex !== undefined) {
+    const ok = await uiConfirm("الكود مستخدم للحرف " + ex + " — تضيف نسخة؟", { okText: "إضافة" });
+    if (!ok) return;
+  }
+  pushUndo();
+  appendGlyph(makeGlyphFromCopy(src, cp));
+  closeModal();
+  renderAll();
+}
+
+async function doDelete(index) {
+  let g = null;
+  try { g = font.glyphs.get(index); } catch (e) { /* تجاهل */ }
+  const nm = g && g.name ? g.name : "G" + index;
+  let msg = "حذف " + nm + " نهائيًا؟";
+  if (index === 0) msg += "\nتحذير: هذا .notdef.";
+  const ok = await uiConfirm(msg, { title: "حذف", okText: "حذف", danger: true });
+  if (!ok) return;
+  pushUndo();
+  deleteGlyphAt(index);
+  closeModal();
+  renderAll();
+}
+
+/* ================================================================
+   § 20 — إضافة حرف
+   ================================================================ */
+function openAdd() {
+  openModal("إضافة حرف جديد", `
+    <label>الحرف / الكود — أو حرفين مع بعض (مثال: لا)</label>
+    <div class="charRow">
+      <input id="nChar" dir="ltr" placeholder="ب أو لا أو 0628 أو U+FEB3">
+      <div class="charPrevBox" id="nPrev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+    <label>شكل الحرف — مقطوع أول وسط آخر</label>
+    <div class="scopeRow" id="nFormRow">
+      <label class="scopeOpt"><input type="radio" name="nForm" value="0" checked>
+        <span>مقطوع — <b class="formDemo">ب</b></span></label>
+      <label class="scopeOpt"><input type="radio" name="nForm" value="2">
+        <span>أول — <b class="formDemo">بـ</b></span></label>
+      <label class="scopeOpt"><input type="radio" name="nForm" value="3">
+        <span>وسط — <b class="formDemo">ـبـ</b></span></label>
+      <label class="scopeOpt"><input type="radio" name="nForm" value="1">
+        <span>آخر — <b class="formDemo">ـب</b></span></label>
+    </div>
+    <button class="btn" type="button" data-act="n-add-all" style="margin-top:8px;width:100%">
+      الكل — إضافة الأشكال الأربعة (ب بـ ـبـ ـب) دفعة واحدة
+    </button>
+    <p class="hint" id="nFormHint">الحروف العربية بتتحول لأشكالها تلقائيًا — غير العربي بيتضاف زي ما هو.</p>
+    <label>مصدر الرسمة</label>
+    <select id="nMode">
+      <option value="dup">تكرار رسمة موجودة</option>
+      <option value="empty">حرف فارغ</option>
+      <option value="svg">مسار SVG</option>
+      <option value="self">شكل الحرف نفسه (نص مرسوم)</option>
+      <option value="ready">شكل جاهز — للحركات والتشكيل</option>
+      <option value="img">من صورة (تتبع HD)</option>
+    </select>
+    <div id="nImgBox" style="display:none">
+      <div class="mbtns">
+        <button class="btn" data-act="n-pick-img" type="button">اختر صورة…</button>
+        <span class="hint" id="nImgName" style="margin:0">لم تُختر صورة</span>
+      </div>
+      <p class="hint">لو الخلفية غامقة بتنعكس تلقائيًا — والحرف يطلع فيكتور ناعم بمنحنيات Q.</p>
+    </div>
+    <div id="nChipHost"></div>
+    <div id="nDupBox">
+      <label>المصدر</label>
+      <div class="charRow">
+        <input id="nSrc" dir="ltr" placeholder="95 أو ب">
+        <div class="charPrevBox" id="nSrcPrev">
+          <canvas width="192" height="192"></canvas>
+          <div class="cpLabel">—</div>
+        </div>
+      </div>
+    </div>
+    <div id="nSvgBox" style="display:none">
+      <label>المسار d="…"</label>
+      <textarea id="nSvg" rows="4" dir="ltr" placeholder="M 0 0 L 100 0 C ..."></textarea>
+    </div>
+    <div class="mbtns">
+      <button class="btn ok" data-act="n-save">إضافة</button>
+      <button class="btn ghost" data-act="close-modal">إلغاء</button>
+    </div>
+  `);
+
+  bindCharPreview(qs("#nChar"), qs("#nPrev"));
+  bindSourcePreview(qs("#nSrc"), qs("#nSrcPrev"));
+
+  qs("#nMode").addEventListener("change", function () {
+    qs("#nDupBox").style.display = this.value === "dup" ? "" : "none";
+    qs("#nSvgBox").style.display = this.value === "svg" ? "" : "none";
+    qs("#nImgBox").style.display = this.value === "img" ? "" : "none";
+  });
+
+  /* شرائح الحروف السريعة: تشكيل / أرقام / علامات — ضغطة واحدة تلصق
+     الحرف في خانة الكود، والحركات بتتحول لوضع «شكل جاهز» تلقائيًا */
+  const CHIP_GROUPS = [
+    { lbl: "تشكيل — حركات جاهزة", mark: true, cps: [
+      0x064E, 0x064F, 0x0650, 0x0651, 0x0652, 0x064B, 0x064C, 0x064D, 0x0670
+    ] },
+    { lbl: "أرقام", cps: [
+      0x0660, 0x0661, 0x0662, 0x0663, 0x0664, 0x0665, 0x0666, 0x0667, 0x0668, 0x0669,
+      0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039
+    ] },
+    { lbl: "علامات ترقيم", cps: [
+      0x061F, 0x0021, 0x060C, 0x061B, 0x066A, 0x00AB, 0x00BB,
+      0x0028, 0x0029, 0x002E, 0x002C, 0x0640
+    ] }
+  ];
+  const chipHost = qs("#nChipHost");
+  CHIP_GROUPS.forEach((grp) => {
+    const gl = document.createElement("div");
+    gl.className = "chipGroupLbl";
+    gl.textContent = grp.lbl;
+    chipHost.appendChild(gl);
+    const row = document.createElement("div");
+    row.className = "chipRow";
+    grp.cps.forEach((cp) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.innerHTML = esc(String.fromCodePoint(cp)) +
+        '<span class="chipHex">U+' + cp.toString(16).toUpperCase().padStart(4, "0") + "</span>";
+      b.title = "U+" + cp.toString(16).toUpperCase().padStart(4, "0");
+      b.addEventListener("click", () => {
+        qs("#nChar").value = String.fromCodePoint(cp);
+        qs("#nChar").dispatchEvent(new Event("input"));
+        if (grp.mark) {
+          qs("#nMode").value = "ready";
+          qs("#nMode").dispatchEvent(new Event("change"));
+          qs("#nImgBox").style.display = "none";
+        }
+      });
+      row.appendChild(b);
+    });
+    chipHost.appendChild(row);
+  });
+
+  /* اختيار صورة للحرف الجديد — الملف يتخزن مؤقتًا ويُتتبَّع عند الحفظ */
+  window.__nImgFile = null;
+  qs("#nImgBox").querySelector("[data-act='n-pick-img']").addEventListener("click", () => {
+    imgPickInput.click();
+  });
+
+  /* تحديث معاينة الكود النهائي حسب الشكل المختار (مقطوع/أول/وسط/آخر) */
+  const formDemoEls = modalBox.querySelectorAll(".formDemo");
+  const refreshFormDemo = () => {
+    const cp = parseCharInput(qs("#nChar").value);
+    if (cp === undefined || cp === null || !AR_FORMS[cp]) {
+      formDemoEls.forEach((el) => { el.textContent = el.textContent; });
+      return;
+    }
+    const ch = String.fromCodePoint(cp);
+    /* بترتيب الظهور في النافذة: مقطوع / أول / وسط / آخر
+       (ZWJ بيجبر الالتحام في العرض — أما ZWNJ بيفصله) */
+    const ZWJ = "\u200D";
+    const demos = [ch, ch + ZWJ, ZWJ + ch + ZWJ, ZWJ + ch];
+    formDemoEls.forEach((el, i) => { el.textContent = demos[i] || ch; });
+  };
+  qs("#nChar").addEventListener("input", refreshFormDemo);
+  refreshFormDemo();
+
+  /* كشف الحرف المركب (حرفين زي «لا»): الأشكال بتتعطل — الرسمة واحدة —
+     والمعاينة بترسم الحرفين متصلين، ولام-ألف بتوري كودها الحقيقي */
+  const updateSeqUi = () => {
+    const p = parseSeqInput(qs("#nChar").value);
+    const formRow = qs("#nFormRow");
+    const hintEl = qs("#nFormHint");
+    const demoEls = modalBox.querySelectorAll(".formDemo");
+    const radios = modalBox.querySelectorAll('input[name="nForm"]');
+    window.__nSeq = (p && p.seq) ? p.seq : null;
+
+    /* ⚠ إصلاح «بكتب لا بلاقي ﻻ مكانها»: المتصفح بيتحول «لا» لـ «ﻻ» (U+FEFB)
+       تلقائيًا عند الكتابة. بنطبع الحرف المفرد لـ lam-alef pair لو كان
+       U+FEFB/FEFC/FEF5/FEF6/FEF7/FEF8/FEF9/FEFA. كمان بنطبّع أشكال العرض
+       للحرفين (ﻟ+ﺎ → ل+ا). */
+    const normalizeLam = (cp) => (cp >= 0xFEDD && cp <= 0xFEE0) ? 0x0644 : cp;
+    const normalizeAlef = (cp) => (cp === 0xFE8D || cp === 0xFE8E) ? 0x0627 : cp;
+    const singleToLAPair = (cp) => {
+      if (cp === 0xFEFB || cp === 0xFEFC) return [0xFEFB, 0xFEFC];
+      if (cp === 0xFEF5 || cp === 0xFEF6) return [0xFEF5, 0xFEF6];
+      if (cp === 0xFEF7 || cp === 0xFEF8) return [0xFEF7, 0xFEF8];
+      if (cp === 0xFEF9 || cp === 0xFEFA) return [0xFEF9, 0xFEFA];
+      return null;
+    };
+
+    /* لو المدخل حرف مفرد بس هو ﻻ/ﻷ/ﻹ/ﻵ → حوله لـ seq وهمي عشان يتعامل زي lam-alef */
+    let effectiveP = p;
+    if (p && p.cp && !p.seq) {
+      const la = singleToLAPair(p.cp);
+      if (la) {
+        effectiveP = { seq: [0x0644, la[0] === 0xFEF5 ? 0x0622 : la[0] === 0xFEF7 ? 0x0623 : la[0] === 0xFEF9 ? 0x0625 : 0x0627], laPair: la };
+        window.__nSeq = effectiveP.seq;
+      }
+    }
+
+    if (!window.__nSeq) {
+      formRow.style.opacity = "";
+      radios.forEach((r) => { r.disabled = false; });
+      hintEl.textContent = "الحروف العربية بتتحول لأشكالها تلقائيًا — غير العربي بيتضاف زي ما هو.";
+      return;
+    }
+
+    formRow.style.opacity = ".45";
+    radios.forEach((r) => { r.disabled = true; });
+    demoEls.forEach((el, i) => {
+      el.textContent = (i === 0 || i === 1) ? "حرفين" : "—";
+    });
+
+    const cv = qs("#nPrev").querySelector("canvas");
+    const lbl = qs("#nPrev").querySelector(".cpLabel");
+    const ctx = cv.getContext("2d");
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    qs("#nPrev").classList.remove("missing");
+
+    /* طبّع أشكال العرض للحرفين (ﻟ+ﺎ → ل+ا) قبل فحص lam-alef */
+    const c0 = normalizeLam(effectiveP.seq[0]);
+    const c1 = normalizeAlef(effectiveP.seq[1]);
+    const la = (c0 === 0x0644 && LAM_ALEF[c1]) ? LAM_ALEF[c1] : (effectiveP.laPair || null);
+    const txt = effectiveP.seq.map((c) => String.fromCodePoint(c)).join("");
+    const hexOf = (c) => "U+" + c.toString(16).toUpperCase().padStart(4, "0");
+
+    if (la) {
+      /* لام-ألف — بنعرض بس الكود اللي المستخدم هيختاره (مقطوع أو آخر).
+         ⚠ لا و ـلا شكلين مستقلين — كل واحد رسمة لوحده. */
+      const fi = window.__nFormSel || 0;
+      const showCp = (fi === 0) ? la[0] : la[1];
+      const idx = (font.glyphIndexMap || {})[showCp];
+      const showHex = "U+" + showCp.toString(16).toUpperCase().padStart(4, "0");
+      if (idx !== undefined) {
+        drawGlyphToCanvas(font.glyphs.get(idx), cv);
+        lbl.textContent = showHex + " • G" + idx;
+      } else {
+        ctx.fillStyle = INK_SOFT;
+        ctx.font = "84px Amiri, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(txt, cv.width / 2, cv.height / 2);
+        lbl.textContent = showHex + " • غير موجودة";
+      }
+      hintEl.textContent = "لام-ألف — اختار مقطوع (ﻻ) أو آخر (ﻼ). كل شكل رسمة مستقلة بكودها الخاص.";
+    } else {
+      ctx.fillStyle = INK_SOFT;
+      ctx.font = "84px Amiri, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(txt, cv.width / 2, cv.height / 2);
+      lbl.textContent = "حرف مركب — كود تلقائي عند الإضافة";
+      hintEl.textContent = "الحرف المركب هيتضاف كرسمة واحدة بكود خاص، ويتلزم تلقائيًا ككلمة مدمجة — اكتب الحرفين في أي نص تطلع الرسمة.";
+    }
+  };
+  qs("#nChar").addEventListener("input", updateSeqUi);
+  /* ⚠ تتبع تغيير الشكل (مقطوع/آخر) لتحديث معاينة لام-ألف */
+  modalBox.querySelectorAll('input[name="nForm"]').forEach((r) => {
+    r.addEventListener("change", () => {
+      window.__nFormSel = parseInt(r.value, 10);
+      updateSeqUi();
+    });
+  });
+  /* حدّ القيمة الافتراضية */
+  const firstRadio = modalBox.querySelector('input[name="nForm"]:checked');
+  window.__nFormSel = firstRadio ? parseInt(firstRadio.value, 10) : 0;
+  updateSeqUi(); /* ⚠ لازم تتنفذ فورًا عند فتح النافذة، مش بس عند التعديل —
+     غير كده لو القيمة الافتراضية حرف مركب زي «لا» تفضل معاينة #nPrev
+     واقفة على رسمة bindCharPreview الغلط (اللام المفردة فقط) لحد أول تعديل */
+}
+
+/* الكود الفعلي بعد تطبيق اختيار الشكل (مقطوع/أول/وسط/آخر) */
+function effectiveAddCp(rawCp) {
+  if (rawCp === undefined || rawCp === null) return rawCp;
+  const sel = modalBox.querySelector('input[name="nForm"]:checked');
+  if (!sel) return rawCp;
+  const forms = AR_FORMS[rawCp];
+  if (!forms) return rawCp; /* مش حرف عربي متصل — زي ما هو */
+  const fi = parseInt(sel.value, 10);
+  const target = forms[fi >= 0 && fi < 4 ? fi : 0];
+  return (target === null || target === undefined) ? rawCp : target;
+}
+
+function selectedAddFormIndex() {
+  const sel = modalBox.querySelector('input[name="nForm"]:checked');
+  return sel ? parseInt(sel.value, 10) : 0;
+}
+
+async function saveAdd(opts) {
+  opts = opts || {};
+  const skipClose = !!opts.skipClose;
+  const parsed = parseSeqInput(qs("#nChar").value);
+  if (parsed === undefined || parsed === null) {
+    await uiAlert("اكتب حرفًا أو كودًا صالحًا — أو حرفين متتاليين زي «لا».");
+    return;
+  }
+
+  /* حرف مركب: لا/لأ/لإ/لآ ← كود أشكال العرض الحقيقي (FEF5-FEFC)،
+     غيرها ← كود PUA حر + التزام تلقائي ككلمة مدمجة.
+     ⚠ إصلاح «بكتب لا بلاقي ﻻ مكانها»: المتصفح بيتحول «لا» لـ «ﻻ» (U+FEFB)
+     تلقائيًا. بنكشف الحرف المفرد ده ونحوّله لـ lam-alef pair.
+     ⚠ إصلاح «لا و ـلا شكل واحد»: المستخدم اختار شكل واحد (مقطوع أو آخر) —
+     بنربط بس الكود اللي اختاره، مش الكودين. كل شكل رسمة مستقلة. */
+  let ligWord = null, laPair = null, laSingle = false, cp;
+  if (parsed.seq) {
+    /* طبّع أشكال العرض للحرفين (ﻟ+ﺎ → ل+ا) */
+    const normLam = (c) => (c >= 0xFEDD && c <= 0xFEE0) ? 0x0644 : c;
+    const normAlef = (c) => (c === 0xFE8D || c === 0xFE8E) ? 0x0627 : c;
+    const la = (normLam(parsed.seq[0]) === 0x0644 && LAM_ALEF[normAlef(parsed.seq[1])])
+      ? LAM_ALEF[normAlef(parsed.seq[1])] : null;
+    if (la) {
+      /* لام-ألف — بس الكود اللي المستخدم اختاره (مقطوع أو آخر) */
+      const fi = selectedAddFormIndex();
+      cp = (fi === 0) ? la[0] : la[1];
+      laSingle = true;
+      ligWord = "ل" + String.fromCodePoint(
+        la[0] === 0xFEF5 ? 0x0622 :
+        la[0] === 0xFEF7 ? 0x0623 :
+        la[0] === 0xFEF9 ? 0x0625 : 0x0627
+      );
+    } else {
+      cp = findFreePuaCp();
+      if (cp === null) { await uiAlert("مفيش كود PUA حر متاح للحرف المركب."); return; }
+      ligWord = parsed.seq.map((c) => String.fromCodePoint(c)).join("");
+    }
+  } else {
+    /* الشكل المختار (مقطوع/أول/وسط/آخر) بيحدد كود أشكال العرض الهدف */
+    cp = effectiveAddCp(parsed.cp);
+    /* ⚠ كشف الحرف المفرد ﻻ/ﻷ/ﻹ/ﻵ — المتصفح بيتحول «لا» ليهم تلقائيًا */
+    const singleToLA = (c) => {
+      if (c === 0xFEFB) return [0xFEFB, 0xFEFC, 0x0627];
+      if (c === 0xFEFC) return [0xFEFB, 0xFEFC, 0x0627];
+      if (c === 0xFEF5) return [0xFEF5, 0xFEF6, 0x0622];
+      if (c === 0xFEF6) return [0xFEF5, 0xFEF6, 0x0622];
+      if (c === 0xFEF7) return [0xFEF7, 0xFEF8, 0x0623];
+      if (c === 0xFEF8) return [0xFEF7, 0xFEF8, 0x0623];
+      if (c === 0xFEF9) return [0xFEF9, 0xFEFA, 0x0625];
+      if (c === 0xFEFA) return [0xFEF9, 0xFEFA, 0x0625];
+      return null;
+    };
+    const la = singleToLA(cp);
+    if (la) {
+      laSingle = true;
+      ligWord = "ل" + String.fromCodePoint(la[2]);
+      /* cp بفضل زي ما هو — الكود اللي المستخدم اختاره */
+    }
+  }
+
+  /* فحص التكرار — بس الكود اللي المستخدم اختاره (مش الكودين) */
+  let laReplace = false;
+  const checkCps = [cp];
+  const exTxt = [];
+  checkCps.forEach((c) => {
+    const ex = (font.glyphIndexMap || {})[c];
+    if (ex !== undefined) {
+      exTxt.push("U+" + c.toString(16).toUpperCase().padStart(4, "0") + "→G" + ex);
+    }
+  });
+  if (laSingle && exTxt.length) {
+    /* الخط فيه رسمة بنفس الكود — نستبدلها برسمة المستخدم */
+    const ok = await uiConfirm(
+      "الخط فيه رسمة بنفس الكود (" + exTxt.join(" · ") + ") — تستبدلها برسمتك؟",
+      { okText: "استبدال" });
+    if (!ok) return;
+    laReplace = true;
+  } else if (exTxt.length) {
+    const ok = await uiConfirm("الكود مستخدم (" + exTxt.join(" · ") + ") — تضيف كمان؟", { okText: "إضافة" });
+    if (!ok) return;
+  }
+
+  let g;
+  try {
+    const mode = qs("#nMode").value;
+    if (mode === "dup") {
+      const src = parseSourceIndex(qs("#nSrc").value);
+      if (src === null) { await uiAlert("المصدر غير موجود."); return; }
+      g = makeGlyphFromCopy(src, cp);
+    } else if (mode === "svg") {
+      const r = svgDToFontPath(qs("#nSvg").value, font.unitsPerEm);
+      g = makeEmptyGlyph(cp);
+      g.path = r.path;
+      g.advanceWidth = r.advance;
+    } else if (mode === "self") {
+      /* نقبل الحرف نفسه أو الكود (و / 0648 / U+FE8D) — ونرسم الحبّة الحقيقية.
+         مع اختيار الشكل: بنرسم شكل الحرف نفسه بالشكل المطلوب
+         (مثال: ل + وسط → ﻟ الوسطى من الخط نفسه كفيكتور) */
+      let r = null;
+      try {
+        /* الحرف المركب: نرسم الحروف نفسها («من») — مش كود الـ PUA
+           اللي مالوش شكل في الخطوط (كان بيطلع علبة) */
+        r = await textCharToFontPath(ligWord || String.fromCodePoint(cp), font.unitsPerEm);
+      } catch (eSelf) {
+        /* الحركات بتفشل نصيًا في بعض المتصفحات (دائرة منقطة) —
+           نرجع للشكل الجاهز تلقائيًا بدل ما نبوّظ العملية */
+        r = builtinMarkPath(cp, font.unitsPerEm);
+        if (!r) throw eSelf;
+      }
+      g = makeEmptyGlyph(cp);
+      g.path = r.path;
+      g.advanceWidth = r.advance;
+    } else if (mode === "ready") {
+      /* الشكل الجاهز: حركات مولّدة فيكتور — متاحة لكل الحركات الشائعة */
+      const r = builtinMarkPath(cp, font.unitsPerEm);
+      if (!r) {
+        await uiAlert("الشكل الجاهز متاح للحركات (فتحة/ضمة/كسرة/شدة/سكون/تنوين/ألف خنجرية) — للحرف ده استخدم مصدر تاني.");
+        return;
+      }
+      g = makeEmptyGlyph(cp);
+      g.path = r.path;
+      g.advanceWidth = r.advance; /* صفر — حركة */
+    } else if (mode === "img") {
+      if (!window.__nImgFile) {
+        await uiAlert("اختر صورة أولًا من زر «اختر صورة».");
+        return;
+      }
+      statusEl.textContent = "جارٍ تتبّع الصورة…";
+      const r = await imageFileToFontPath(window.__nImgFile, font.unitsPerEm);
+      g = makeEmptyGlyph(cp);
+      g.path = r.path;
+      g.advanceWidth = r.advance;
+      defaultStatus();
+    } else {
+      g = makeEmptyGlyph(cp);
+    }
+    /* شبكة أمان أخيرة: أي حرف حركات عرضه صفر مهما كان المصدر */
+    if (g && isMarkCp(cp)) g.advanceWidth = 0;
+    /* ⚠ لا و ـلا شكلين مستقلين: بنربط بس الكود اللي المستخدم اختاره.
+       g بقا مربوط بكود واحد بس (cp) — الرسمة التانية (ـلا) مستقلة. */
+  } catch (e) {
+    defaultStatus();
+    await uiAlert(e.message);
+    return;
+  }
+
+  /* استبدال رسمة موجودة بنفس الكود: بنحدّث الرسمة على الـ GID الحالي
+     بس، من غير ما نلمس الكود التاني (ـلا لو المستخدم بيضيف لا). */
+  if (laReplace) {
+    pushUndo();
+    const mapR = (font.glyphIndexMap = font.glyphIndexMap || {});
+    const existingGid = mapR[cp];
+
+    /* اكتشاف كل رسمات لام-ألف اللي بيطبعها الخط فعليًا — الخطوط
+       (زي أميري) بتولّد لام-ألف من GSUB برسمات داخلية مش أكواد FEFx —
+       من غير الخطوة دي «لا» المكتوبة تفضل ترسمة الخط القديمة */
+    /* firstOfRun = أول رسمة في المتتابعة المولَّدة تاخد الرسمة،
+       والباقي (خطوط مقسومة نصين) تتفضى بمسار فاضي — والمقاسات الأصلية
+       كلها تفضل زي ما هي عشان إيقاع الخط ما يتكسّرش */
+    const drawGids = new Set();
+    const emptyGids = new Set();
+    const seenGids = new Set();
+    try {
+      const slotLA = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot] : null;
+      if (existingGid !== undefined) drawGids.add(existingGid);
+      if (slotLA && slotLA.ttfSource) {
+        const fk = await getFontkit();
+        if (fk && typeof fk.create === "function") {
+          const fkF = fk.create(new Uint8Array(slotLA.ttfSource));
+          /* أبجدية الاكتشاف: حروف متصلة + الألفات — بلا لام+ألف متجاورين
+             في سياقات «العادية» عشان المجموعة الأساسية تتغطى كلها */
+          const AZ = ["ب", "ل", "ا", "أ", "إ", "آ", "ي"];
+          const isAlf = (c) => (c === "ا" || c === "أ" || c === "إ" || c === "آ");
+          const laOK = (s) => {
+            for (let i = 0; i < s.length - 1; i++) {
+              if (s[i] === "ل" && isAlf(s[i + 1])) return false;
+            }
+            return true;
+          };
+          const plain = new Set();
+          const addPlain = (txt) => {
+            try { fkF.layout(txt).glyphs.forEach((gg) => plain.add(gg.id)); } catch (e) {}
+          };
+          AZ.forEach(addPlain);
+          AZ.forEach((a) => AZ.forEach((b) => { if (laOK(a + b)) addPlain(a + b); }));
+          AZ.forEach((a) => ["ب", "ل", "ي"].forEach((m) => AZ.forEach((c) => {
+            if (laOK(a + m + c)) addPlain(a + m + c);
+          })));
+          /* سياقات لام-ألف — كل رسمة خارج المجموعة العادية = لام-ألف
+             ⚠ إصلاح «لإ و لأ لآ بتتغير تلقائي لرسمة لا»: نكتشف بس
+             رسمات النوع اللي المستخدم بيضيفه (لا أو لأ أو لإ أو لآ)،
+             مش كل الأنواع. كده رسمة «لأ» ما تتغيرش لما تضيف «لا». */
+          const alefCpForLA = cp === 0xFEF5 || cp === 0xFEF6 ? 0x0622 :  /* لآ */
+                              cp === 0xFEF7 || cp === 0xFEF8 ? 0x0623 :  /* لأ */
+                              cp === 0xFEF9 || cp === 0xFEFA ? 0x0625 :  /* لإ */
+                              0x0627;                            /* لا (افتراضي) */
+          const alefCharLA = String.fromCodePoint(alefCpForLA);
+          const extrasSet = new Set();
+          const runs = []; /* متتابعات الرسمات الخارجة عن العادي — بالترتيب */
+          /* بس النوع اللي المستخدم بيضيفه: ل + ألف-النوع-ده */
+          const laStrs = ["ل" + alefCharLA, "لل" + alefCharLA];
+          AZ.forEach((a) => { if (a !== "ل") laStrs.push(a + "ل" + alefCharLA); });
+          laStrs.forEach((txt) => {
+            try {
+              const out = fkF.layout(txt).glyphs.map((gg) => gg.id);
+              let run = [];
+              out.forEach((gi) => {
+                if (!plain.has(gi)) {
+                  extrasSet.add(gi);
+                  run.push(gi);
+                } else if (run.length) { runs.push(run); run = []; }
+              });
+              if (run.length) runs.push(run);
+            } catch (e) {}
+          });
+          /* فلادة أمان: أي رسمة معاها كود حرف خام مش لام-ألف */
+          const okExtra = (gi) => {
+            let gg2 = null;
+            try { gg2 = font.glyphs.get(gi); } catch (e) { gg2 = null; }
+            const us2 = (gg2 && gg2.unicodes) || [];
+            return !us2.some((u) => u >= 0x0621 && u <= 0x064A);
+          };
+          runs.forEach((run) => {
+            run.forEach((gi, k) => {
+              if (!okExtra(gi)) return;
+              if (!seenGids.has(gi)) seenGids.add(gi);
+              if (k === 0) { drawGids.add(gi); emptyGids.delete(gi); }
+              else if (!drawGids.has(gi)) emptyGids.add(gi);
+            });
+          });
+        }
+      }
+    } catch (eLA) { console.warn("اكتشاف رسمات لام-ألف فشل:", eLA); }
+
+    drawGids.forEach((gi) => {
+      const gOld = font.glyphs.get(gi);
+      if (!gOld) return;
+      gOld.path = g.path; /* المقاس الأصلي يفضل زي ما هو — إيقاع الخط سليم */
+      markUserInk(gOld);
+      try {
+        const bb = g.path.getBoundingBox();
+        if (isFinite(bb.x1)) {
+          gOld.xMin = bb.x1; gOld.xMax = bb.x2;
+          gOld.yMin = bb.y1; gOld.yMax = bb.y2;
+        }
+      } catch (e) { /* تجاهل */ }
+    });
+    /* الخطوط اللي بتقسم لام-ألف نصين: الأجزاء التانية تتفضى —
+       المسار فاضي والمقاس الأصلي باقي — فالكلمة تمشي على قياس الخط */
+    emptyGids.forEach((gi) => {
+      if (drawGids.has(gi)) return;
+      const gOld = font.glyphs.get(gi);
+      if (!gOld) return;
+      gOld.path = new opentype.Path();
+      gOld.xMin = 0; gOld.xMax = 0; gOld.yMin = 0; gOld.yMax = 0;
+    });
+    /* ⚠ لا و ـلا مستقلة: ما بنضيفش رسمة للكود التاني. كل شكل مستقل. */
+    markStructChanged();
+    closeModal();
+    renderAll();
+    toast("استبدلت رسمة الكود U+" + cp.toString(16).toUpperCase().padStart(4, "0") + " — الشكل التاني (ـلا) مستقل");
+    return;
+  }
+
+  pushUndo();
+  const newGid = appendGlyph(g);
+  /* ⚠ لا و ـلا مستقلة: ما بنربطش الكودين على نفس الرسمة.
+     بس بنربط الكلمة المدمجة (لا/لأ/لإ/لآ) عشان الكتابة تطلع الرسمة. */
+  let autoBound = null;
+  if (ligWord) {
+    const ov = activeEmbed();
+    ov.add[ligWord] = { c: "G" + newGid };
+    saveActiveEmbed(ov);
+    applyEmbedOverlay(font);
+    autoBound = ligWord;
+  }
+  const fi = selectedAddFormIndex();
+  if (!skipClose) { closeModal(); renderAll(); }
+  else { markStructChanged(); }
+  if (autoBound) {
+    toast("تمت الإضافة: «" + autoBound + "» (U+" +
+      cp.toString(16).toUpperCase().padStart(4, "0") + ") — اتربطت تلقائيًا ككلمة مدمجة: اكتبها في أي نص تطلع");
+  } else if (fi !== 0 && cp !== parsed.cp && !skipClose) {
+    toast("تمت الإضافة: " + uniText(g));
+  }
+  return true;
+}
+
+/* زر «الكل» — يضيف الحرف بأشكاله الأربعة (مقطوع/أول/وسط/آخر) دفعة
+   واحدة، بدون قفل النافذة أو تحديث العرض إلا بعد آخر شكل — بيتفعّل
+   بس للحروف العربية المتصلة العادية (مش لحرف مركب زي «لا» لأن
+   لام-ألف أصلًا شكلين بس ومسارها الخاص مختلف تمامًا) */
+async function saveAddAllForms() {
+  const parsed = parseSeqInput(qs("#nChar").value);
+  if (parsed === undefined || parsed === null) {
+    await uiAlert("اكتب حرفًا أو كودًا صالحًا.");
+    return;
+  }
+  if (parsed.seq) {
+    await uiAlert("زر «الكل» غير متاح للحروف المركبة زي «لا» — اختر شكلًا واحدًا (مقطوع/آخر).");
+    return;
+  }
+  if (!AR_FORMS[parsed.cp]) {
+    await uiAlert("الحرف ده مش من الحروف العربية المتصلة اللي ليها أربعة أشكال.");
+    return;
+  }
+
+  const radios = modalBox.querySelectorAll('input[name="nForm"]');
+  const order = [0, 2, 3, 1]; /* مقطوع، أول، وسط، آخر */
+  let addedCount = 0;
+  for (let i = 0; i < order.length; i++) {
+    const formIndex = order[i];
+    /* الشكل ده ممكن يكون مش موجود لبعض الحروف (زي و/ى بس لهم مقطوع وآخر) */
+    if (!AR_FORMS[parsed.cp][formIndex] && AR_FORMS[parsed.cp][formIndex] !== 0) continue;
+    radios.forEach((r) => { r.checked = (parseInt(r.value, 10) === formIndex); });
+    const ok = await saveAdd({ skipClose: true });
+    if (ok) addedCount++;
+  }
+  closeModal();
+  renderAll();
+  toast("تمت إضافة " + addedCount + " من أشكال الحرف");
+}
+
+/* مدخل الصور العام — بيخدم «تغيير الرسمة من صورة» و«إضافة حرف من صورة» */
+(function initImgInput() {
+  if (document.getElementById("imgFileInput")) return;
+  const fi = document.createElement("input");
+  fi.type = "file";
+  fi.id = "imgFileInput";
+  fi.accept = "image/png,image/jpeg,image/webp,image/gif,image/bmp,image/*";
+  fi.style.display = "none";
+  document.body.appendChild(fi);
+  fi.addEventListener("change", () => {
+    const file = fi.files && fi.files[0];
+    fi.value = "";
+    if (!file) return;
+    /* لو التبديل مستني هدف → تغيير رسمة موجودة
+      (saveSwapImage بتقرأ swapImgTarget أول سطر قبل أي await) */
+    if (typeof swapImgTarget === "number" && swapImgTarget !== null) {
+      saveSwapImage(file);
+      return;
+    }
+    /* غير كده: نحن في نافذة إضافة حرف — نخزن الملف للمعالجة عند الحفظ */
+    window.__nImgFile = file;
+    const nm = document.getElementById("nImgName");
+    if (nm) nm.textContent = "تم الاختيار: " + file.name;
+  });
+})();
+
+/* ================================================================
+   § 21 — معلومات الملف
+   ================================================================ */
+const NAME_FIELDS = [
+  ["fontFamily", "اسم العائلة"],
+  ["fontSubfamily", "النمط"],
+  ["fullName", "الاسم الكامل"],
+  ["postScriptName", "اسم PostScript"],
+  ["version", "الإصدار"],
+  ["copyright", "حقوق النشر"],
+  ["trademark", "العلامة التجارية"],
+  ["manufacturer", "المصنّع"],
+  ["designer", "المصمم"],
+  ["description", "الوصف"],
+  ["license", "الترخيص"],
+  ["sampleText", "نص تجريبي"]
+];
+
+const pickLang = (r) => {
+  if (r == null) return "";
+  if (typeof r === "string") return r;
+  if (r.en) return r.en;
+  const v = Object.values(r || {});
+  return v.length ? String(v[0]) : "";
+};
+
+const psName = (s) => String(s || "")
+  .replace(/[^\x20-\x7E]/g, "").replace(/[\s(){}<>\[\]%\/]/g, "").trim();
+
+function openFileInfo() {
+  if (!font) return;
+  font.names = font.names || {};
+
+  const extra = Object.keys(font.names)
+    .filter((k) => !NAME_FIELDS.some((f) => f[0] === k));
+  const outline = font.outlinesFormat === "truetype" ? "TrueType" : "CFF";
+  const tables = Object.keys(font.tables || {}).sort().join(", ") || "—";
+  const wc = font.wordByGid ? Object.keys(font.wordByGid).length : 0;
+
+  let html = `
+    <h4>الملف</h4>
+    <div class="roGrid">
+      <span class="k">الاسم</span><span class="v">${esc(fileName)}</span>
+      <span class="k">الحجم</span><span class="v">${fmtSize(fileSize)}</span>
+      <span class="k">المسارات</span><span class="v">${outline}</span>
+      <span class="k">الحروف</span><span class="v">${liveGlyphCount()}</span>
+      ${wc ? '<span class="k">كلمات مدمجة</span><span class="v">' + wc + " (من GSUB)</span>" : ""}
+      <span class="k">Units/Em</span><span class="v">${font.unitsPerEm || "—"}</span>
+    </div>
+    <p class="hint">الجداول: <span class="tablesList">${esc(tables)}</span></p>
+
+    <h4>المقاييس</h4>
+    <label>Ascender</label>
+    <input id="m_asc" dir="ltr" type="number" value="${font.ascender != null ? font.ascender : 0}">
+    <label>Descender</label>
+    <input id="m_desc" dir="ltr" type="number" value="${font.descender != null ? font.descender : 0}">
+    <label>LineGap</label>
+    <input id="m_gap" dir="ltr" type="number" value="${font.lineGap != null ? font.lineGap : 0}">
+
+    <h4>الأسماء</h4>
+  `;
+
+  NAME_FIELDS.forEach((f) => {
+    html += `<label>${f[1]}</label>
+      <input class="nameField" data-key="${f[0]}" dir="auto" value="${esc(pickLang(font.names[f[0]]))}">`;
+  });
+
+  extra.forEach((k) => {
+    html += `<label>${esc(k)}</label>
+      <input class="nameField" data-key="${esc(k)}" dir="auto" value="${esc(pickLang(font.names[k]))}">`;
+  });
+
+  html += `
+    <div class="mbtns">
+      <button class="btn ok" data-act="fi-save">حفظ التعديلات</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>`;
+
+  openModal("معلومات الملف", html);
+}
+
+async function saveFileInfo() {
+  pushUndo();
+
+  const asc = parseInt(qs("#m_asc").value, 10);
+  const desc = parseInt(qs("#m_desc").value, 10);
+  const gap = parseInt(qs("#m_gap").value, 10);
+
+  if (!Number.isNaN(asc)) font.ascender = asc;
+  if (!Number.isNaN(desc)) font.descender = desc;
+  if (!Number.isNaN(gap)) font.lineGap = gap;
+
+  try {
+    if (font.tables && font.tables.os2) {
+      if (!Number.isNaN(asc)) font.tables.os2.sTypoAscender = asc;
+      if (!Number.isNaN(desc)) font.tables.os2.sTypoDescender = desc;
+    }
+  } catch (e) { /* تجاهل */ }
+
+  /* ⚠ إصلاح «التعديلات بتختفي في التصدير»: من غير استدعاء markStructChanged
+     التصدير كان بيستخدم بايتات المصدر الأصلية (structChanged=false → canUseSource=true)
+     فالاسم والمقاييس القديمة بتطلع في الملف المصدَّر بدل التعديلات الجديدة.
+     دلوقتي بنعلّم البنية إنها اتغيرت فالتصدير بيبني من opentype.js (toArrayBuffer)
+     اللي بيستخدم font.names و font.ascender الجديدة.
+     استثناء: خطوط CFF مع التصدير العادي (مش النضيف) — لأن canUseSource=false
+     مع CFF بيمنع التصدير تمامًا. في الحالة دي التعديلات بتتطبق على المستوى
+     الداخلي بس (للعرض والمعاينة) ومن غير ما نكسر التصدير. */
+  const isTT = !font.outlinesFormat || font.outlinesFormat === "truetype";
+  if (isTT || pureExportEnabled()) {
+    markStructChanged();
+  }
+
+  modalBox.querySelectorAll(".nameField").forEach((inp) => {
+    const old = font.names[inp.dataset.key];
+    const rec = (old && typeof old === "object") ? Object.assign({}, old) : {};
+    rec.en = inp.value;
+    font.names[inp.dataset.key] = rec;
+  });
+
+  const fam = pickLang(font.names.fontFamily);
+  const sty = pickLang(font.names.fontSubfamily) || "Regular";
+  let ps = pickLang(font.names.postScriptName);
+  if (!ps) {
+    ps = psName(fam) + "-" + psName(sty);
+    font.names.postScriptName = { en: ps };
+  }
+  font.familyName = fam || font.familyName;
+  font.styleName = sty;
+  font.postScriptName = ps;
+
+  closeModal();
+  defaultStatus();
+  await uiAlert("تم الحفظ — ستظهر التعديلات في الملف المصدَّر.", "حفظ ناجح");
+}
+
+/* ════════════════════════════════════════════════════════════════
+   مِحْبَر — الجزء الرابع:
+   محرك التشكيل الذكي ← القاموس لكل خط ← كلمات الخط المدمجة
+   ════════════════════════════════════════════════════════════════ */
+
+/* ================================================================
+   § 22 — محرك التشكيل الذكي
+   أشكال الحروف العربية المعزولة/البداية/الوسط/النهاية + لام-ألف
+   ================================================================ */
+const AR_FORMS = {
+  0x0621: [0xFE80, null, null, null],
+  0x0622: [0xFE81, 0xFE82, null, null],
+  0x0623: [0xFE83, 0xFE84, null, null],
+  0x0624: [0xFE85, 0xFE86, null, null],
+  0x0625: [0xFE87, 0xFE88, null, null],
+  0x0626: [0xFE89, 0xFE8A, 0xFE8B, 0xFE8C],
+  0x0627: [0xFE8D, 0xFE8E, null, null],
+  0x0628: [0xFE8F, 0xFE90, 0xFE91, 0xFE92],
+  0x0629: [0xFE93, 0xFE94, null, null],
+  0x062A: [0xFE95, 0xFE96, 0xFE97, 0xFE98],
+  0x062B: [0xFE99, 0xFE9A, 0xFE9B, 0xFE9C],
+  0x062C: [0xFE9D, 0xFE9E, 0xFE9F, 0xFEA0],
+  0x062D: [0xFEA1, 0xFEA2, 0xFEA3, 0xFEA4],
+  0x062E: [0xFEA5, 0xFEA6, 0xFEA7, 0xFEA8],
+  0x062F: [0xFEA9, 0xFEAA, null, null],
+  0x0630: [0xFEAB, 0xFEAC, null, null],
+  0x0631: [0xFEAD, 0xFEAE, null, null],
+  0x0632: [0xFEAF, 0xFEB0, null, null],
+  0x0633: [0xFEB1, 0xFEB2, 0xFEB3, 0xFEB4],
+  0x0634: [0xFEB5, 0xFEB6, 0xFEB7, 0xFEB8],
+  0x0635: [0xFEB9, 0xFEBA, 0xFEBB, 0xFEBC],
+  0x0636: [0xFEBD, 0xFEBE, 0xFEBF, 0xFEC0],
+  0x0637: [0xFEC1, 0xFEC2, 0xFEC3, 0xFEC4],
+  0x0638: [0xFEC5, 0xFEC6, 0xFEC7, 0xFEC8],
+  0x0639: [0xFEC9, 0xFECA, 0xFECB, 0xFECC],
+  0x063A: [0xFECD, 0xFECE, 0xFECF, 0xFED0],
+  0x0640: [0x0640, 0x0640, 0x0640, 0x0640],
+  0x0641: [0xFED1, 0xFED2, 0xFED3, 0xFED4],
+  0x0642: [0xFED5, 0xFED6, 0xFED7, 0xFED8],
+  0x0643: [0xFED9, 0xFEDA, 0xFEDB, 0xFEDC],
+  0x0644: [0xFEDD, 0xFEDE, 0xFEDF, 0xFEE0],
+  0x0645: [0xFEE1, 0xFEE2, 0xFEE3, 0xFEE4],
+  0x0646: [0xFEE5, 0xFEE6, 0xFEE7, 0xFEE8],
+  0x0647: [0xFEE9, 0xFEEA, 0xFEEB, 0xFEEC],
+  0x0648: [0xFEED, 0xFEEE, null, null],
+  0x0649: [0xFEEF, 0xFEF0, null, null],
+  0x064A: [0xFEF1, 0xFEF2, 0xFEF3, 0xFEF4]
+};
+
+const LAM_ALEF = {
+  0x0622: [0xFEF5, 0xFEF6],
+  0x0623: [0xFEF7, 0xFEF8],
+  0x0625: [0xFEF9, 0xFEFA],
+  0x0627: [0xFEFB, 0xFEFC]
+};
+
+/* عكس جدول الأشكال: كود شكل العرض ← الحرف الأم + رقم الشكل
+   (0=مقطوع 1=آخر 2=أول 3=وسط) — عشان نعرف رسمة المستخدم تابعة لأنهي حرف */
+const FORM_TO_BASE = (() => {
+  const m = Object.create(null);
+  for (const k in AR_FORMS) {
+    const base = +k;
+    const forms = AR_FORMS[base];
+    for (let fi = 0; fi < 4; fi++) {
+      const f = forms[fi];
+      if (f !== null && f !== undefined) m[f] = { base: base, form: fi };
+    }
+  }
+  /* روابط لام-ألف (U+FEF5..U+FEFC) — أمها الألف وشكلها 0=مقطوع 1=آخر
+     عشان كودها يتعرف ويشتغل حرف واحد مباشر: «ﻼ» = U+FEFC */
+  for (const k in LAM_ALEF) {
+    const base = +k;
+    const pair = LAM_ALEF[k];
+    for (let fi = 0; fi < 2; fi++) {
+      if (pair[fi] !== null && pair[fi] !== undefined) {
+        m[pair[fi]] = { base: base, form: fi };
+      }
+    }
+  }
+  return m;
+})();
+
+const MARKS_RE = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/;
+
+/* حركة/علامة تشكيل؟ */
+const isMarkCp = (cp) =>
+  (cp >= 0x0610 && cp <= 0x061A) || (cp >= 0x064B && cp <= 0x065F) ||
+  cp === 0x0670 || (cp >= 0x06D6 && cp <= 0x06ED);
+
+/* تكافؤ الحروف عند مطابقة الكلمات — عشان الإملاء المختلف:
+   ى≡ي، أ/إ/آ/ٱ≡ا، ة≡ه، واللاتيني بلا حساسية للحالة */
+function normCpForMatch(cp) {
+  if (cp < 128) return String.fromCodePoint(cp).toLowerCase().codePointAt(0);
+  if (cp === 0x0649) return 0x064A;
+  if (cp === 0x0622 || cp === 0x0623 || cp === 0x0625 || cp === 0x0671) return 0x0627;
+  if (cp === 0x0629) return 0x0647;
+  return cp;
+}
+
+/* مطابقة كلمة القاموس على النص من موضع i مع تخطي الحركات
+   — تُرجع عدد الأحرف المستهلكة من النص، أو -1 لو مفيش تطابق */
+function matchWordAt(chars, i, key) {
+  const k = [...String(key)];
+  let j = i;
+  let ki = 0;
+  while (ki < k.length) {
+    if (j >= chars.length) return -1;
+    const cp = chars[j].codePointAt(0);
+    if (isMarkCp(cp)) { j++; continue; } /* الحركات مش عائق */
+    if (normCpForMatch(cp) !== normCpForMatch(k[ki].codePointAt(0))) return -1;
+    j++;
+    ki++;
+  }
+  return j - i;
+}
+
+/* الحرف الفعلي السابق/التالي متجاهلين الحركات — لفحص حدود الكلمة */
+function prevBaseChar(chars, i) {
+  for (let j = i - 1; j >= 0; j--) {
+    if (!isMarkCp(chars[j].codePointAt(0))) return chars[j];
+  }
+  return null;
+}
+
+function nextBaseChar(chars, end) {
+  for (let j = end; j < chars.length; j++) {
+    if (!isMarkCp(chars[j].codePointAt(0))) return chars[j];
+  }
+  return null;
+}
+
+/* محرف حدود كلمة (مسافة/علامة ترقيم) — نفس قائمة التصدير WORD_BOUNDARY
+   عشان المعاينة والخط المصدَّر يتصرّفوا زي بعض بالظبط */
+function isWordBoundaryChar(ch) {
+  /* بداية/نهاية النص = حدود كلمة ✓ (كانت بترجع false —
+     فالكلمة المكتوبة في أول سطر مش بتتعوّض أبدًا — دي كانت علّة
+     «الكلمات المتعددة مش بتشتغل» والفرادى بتشتغل) */
+  if (!ch) return true;
+  if (/\s/.test(ch)) return true;
+  const cp = ch.codePointAt(0);
+  return (cp >= 0x2000 && cp <= 0x200A) || cp === 0x202F || cp === 0x205F ||
+    cp === 0x3000 || cp === 0x00A0 || cp === 0x2E || cp === 0x2C ||
+    cp === 0x3A || cp === 0x3B || cp === 0x21 || cp === 0x3F ||
+    cp === 0x2D || cp === 0xAB || cp === 0xBB || cp === 0x2026 ||
+    cp === 0x060C || cp === 0x061B || cp === 0x061F || cp === 0x066D ||
+    cp === 0x200C || cp === 0x200D || cp === 0x28 || cp === 0x29 ||
+    cp === 0x0640;
+}
+
+/* فهرس رسمات المستخدم (userInk) حسب الحرف الأم:
+   لكل حرف عربي مرسوم — إيه أشكاله المرسومة (مقطوع/أول/وسط/آخر)
+   ده اللي بيخلي رسمتك تظهر في كل مواضع الحرف في الكتابة المتصلة */
+function buildUserInkReg() {
+  const reg = Object.create(null);
+  const arr = glyphsArr();
+  for (let gid = 0; gid < arr.length; gid++) {
+    const g = arr[gid];
+    if (!g || !g.userInk) continue;
+    const us = (g.unicodes && g.unicodes.length)
+      ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+    for (let k = 0; k < us.length; k++) {
+      const u = us[k];
+      let base = null, fi = 0;
+      if (AR_FORMS[u]) { base = u; fi = 0; } /* الحرف الخام نفسه */
+      else if (FORM_TO_BASE[u]) {
+        /* روابط لام-ألف (FEF5-FEFC) مش أشكال ألف — ممنوع الرسمة تتحسب حبرًا لألف */
+        if (u >= 0xFEF5 && u <= 0xFEFC) continue;
+        base = FORM_TO_BASE[u].base; fi = FORM_TO_BASE[u].form;
+      }
+      if (base === null) continue; /* رسمة مش حرف عربي */
+      const e = reg[base] = reg[base] || { cps: [], byForm: {} };
+      if (e.cps.indexOf(u) === -1) e.cps.push(u);
+      if (e.byForm[fi] === undefined) e.byForm[fi] = u;
+    }
+  }
+  return reg;
+}
+
+
+/* ================================================================
+   § 21-أ — المعاينة الأصلية للخط (Browser Native Shaping)
+   تستخدم نفس محرك تشكيل المتصفح الذي يفهم GSUB/GPOS و ligatures
+   بدل تحويل كل حرف يدويًا إلى U+FE.. ثم اعتبار الـglyph غير المرمّز مفقودًا.
+   مهم: ttfSource هو الملف الأصلي، لذلك تبقى GSUB/GPOS الحقيقية موجودة.
+   ================================================================ */
+const __mhNativePreviewCache = new Map();
+
+function __mhNativeSourceBuffer(bytes) {
+  if (!bytes) return null;
+  if (bytes instanceof ArrayBuffer) return bytes.slice(0);
+  if (ArrayBuffer.isView(bytes)) {
+    return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+  }
+  return null;
+}
+
+async function __mhEnsureNativePreviewFont() {
+  if (!font || activeSlot < 0 || !slots[activeSlot]) return null;
+
+  const slot = slots[activeSlot];
+  /* ⚠ لازم نبني نسخة الخط اللي فيها قواعد القاموس/الأزواج/السياقات
+     مضمَّنة فعليًا (نفس منطق التصدير الحقيقي buildFullTtfBuffer) —
+     مش الملف الخام (slot.ttfSource) لوحده، وإلا "معاينة نص بصفحات"
+     هترسم بمحرك المتصفح على GSUB الأصلي بس وتتجاهل أي كلمة مدمجة
+     ضافها المستخدم، رغم إنها هتظهر صح في الملف المُصدَّر فعليًا */
+  const cacheKey = __mhDictVersion;
+  const cached = __mhNativePreviewCache.get(font);
+  if (cached && cached.cacheKey === cacheKey) {
+    try { await cached.ready; return cached.family; } catch (e) {}
+  }
+
+  const canUseSource = !!(slot && slot.ttfSource && !slot.structChanged);
+  if (!canUseSource && font.outlinesFormat && font.outlinesFormat !== "truetype") {
+    return null; /* خط CFF بدون مصدر أصلي — معاينة أصلية مش متاحة، renderFallback هيتولى الأمر */
+  }
+
+  /* نفس ما بيحصل عند التصدير الحقيقي: نولّد أشكال الالتحام الناقصة
+     (أول/وسط/آخر + لام-ألف) قبل بناء buffer المعاينة — بأمان، لأنها
+     بتتجاهل أي شكل موجود بالفعل ومفيش ضرر من تكرار استدعائها */
+  try { ensureJoiningForms(); } catch (e) { console.warn("توليد أشكال الالتحام (معاينة) فشل:", e); }
+
+  let built = null;
+  try {
+    built = await buildFullTtfBuffer({ canUseSource, slot });
+  } catch (e) {
+    console.warn("بناء خط المعاينة الأصلية فشل:", e);
+    return null;
+  }
+  if (!built || !built.buffer) return null;
+
+  const family = "__MihabarNativePreview_" + Math.random().toString(36).slice(2);
+  const source = __mhNativeSourceBuffer(built.buffer);
+  if (!source) return null;
+
+  try {
+    const face = new FontFace(family, source, {
+      style: "normal",
+      weight: "normal",
+      stretch: "normal"
+    });
+    const ready = face.load().then(() => {
+      document.fonts.add(face);
+      return family;
+    });
+    __mhNativePreviewCache.set(font, { cacheKey, family, face, ready });
+    await ready;
+    return family;
+  } catch (e) {
+    console.warn("Native font preview failed:", e);
+    __mhNativePreviewCache.delete(font);
+    return null;
+  }
+}
+
+function __mhNativeFontCss(family, fs) {
+  return fs + "px " + JSON.stringify(family);
+}
+
+function __mhNativeMeasure(ctx, text, family, fs) {
+  ctx.font = __mhNativeFontCss(family, fs);
+  ctx.direction = "rtl";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
+  return ctx.measureText(String(text || "")).width;
+}
+
+function __mhDrawNativeLine(ctx, text, family, fs, xRight, baseline, ink) {
+  ctx.save();
+  ctx.font = __mhNativeFontCss(family, fs);
+  ctx.direction = "rtl";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = ink || INK;
+  ctx.fillText(String(text || ""), xRight, baseline);
+  ctx.restore();
+}
+
+/* تقسيم نص الصفحة باستخدام عرض المتصفح نفسه؛ التشكيل يحدث على السطر
+   كاملًا، فلا نكسر GSUB/ligature بين حروف السطر. */
+function paginateNativeText(text, width, height, fontSize, lineHeight, family) {
+  const margin = 40;
+  const availW = width - margin * 2;
+  const availH = height - margin * 2;
+  const lineH = fontSize * lineHeight;
+  const probe = document.createElement("canvas").getContext("2d");
+
+  const lines = [];
+  const paragraphs = String(text || "").split(/\r?\n/);
+
+  const pushWrapped = (para) => {
+    if (!para.trim()) {
+      lines.push("");
+      return;
+    }
+
+    const words = para.trim().split(/\s+/);
+    let cur = "";
+
+    for (const word of words) {
+      const candidate = cur ? cur + " " + word : word;
+      const w = __mhNativeMeasure(probe, candidate, family, fontSize);
+
+      if (!cur || w <= availW) {
+        cur = candidate;
+        continue;
+      }
+
+      lines.push(cur);
+      cur = word;
+
+      /* كلمة أطول من عرض الصفحة: نفكها فقط عند الضرورة. */
+      if (__mhNativeMeasure(probe, cur, family, fontSize) > availW) {
+        let part = "";
+        for (const ch of [...cur]) {
+          const test = part + ch;
+          if (part && __mhNativeMeasure(probe, test, family, fontSize) > availW) {
+            lines.push(part);
+            part = ch;
+          } else {
+            part = test;
+          }
+        }
+        cur = part;
+      }
+    }
+
+    if (cur) lines.push(cur);
+  };
+
+  paragraphs.forEach(pushWrapped);
+
+  const pages = [];
+  let pageLines = [];
+  const maxLines = Math.max(1, Math.floor((availH + lineH * 0.5) / lineH));
+
+  lines.forEach((line) => {
+    pageLines.push(line);
+    if (pageLines.length >= maxLines) {
+      pages.push(pageLines);
+      pageLines = [];
+    }
+  });
+
+  if (pageLines.length) pages.push(pageLines);
+
+  return { pages, lineH, margin };
+}
+
+function shapeArabic(text) {
+  const chars = [...String(text || "")];
+  const out = [];
+
+  const userReg = buildUserInkReg();
+  const pairRes = resolvePairGids();
+
+  const combined = combinedDict2();
+  const dictKeys = Object.keys(combined).sort((a, b) => b.length - a.length);
+  /* عدّاد ورود الكلمة في التمريرة الواحدة — لتناوب الرسمات البديلة */
+  const occCount = {};
+
+  const classify = (cp) => {
+    if (AR_FORMS[cp]) return AR_FORMS[cp][2] !== null ? "D" : "R";
+    /* أشكال العرض المكتوبة مباشرة (U+FExx — زي ﻼ U+FEFC):
+       بترث تصنيف الحرف الأم عشان الجوار يتوصل صح —
+       «يـ + ﻼ» يبقى اليه أولية متصلة بدل ما تفضل مقطوعة */
+    const fb = FORM_TO_BASE[cp];
+    if (fb) {
+      const bf = AR_FORMS[fb.base];
+      if (bf) return bf[2] !== null ? "D" : "R";
+    }
+    if (MARKS_RE.test(String.fromCodePoint(cp))) return "T";
+    return "U";
+  };
+
+  const types = chars.map((c) => classify(c.codePointAt(0)));
+
+  const prevJoin = (i) => {
+    for (let j = i - 1; j >= 0; j--) {
+      if (types[j] !== "T") return types[j];
+    }
+    return "U";
+  };
+
+  const nextJoin = (i) => {
+    for (let j = i + 1; j < types.length; j++) {
+      if (types[j] !== "T") return types[j];
+    }
+    return "U";
+  };
+
+  for (let i = 0; i < chars.length; i++) {
+    const cp = chars[i].codePointAt(0);
+
+    /* أولوية القاموس: أطول تطابق أولًا — بتتجاهل الحركات
+       وبتقبل فروق الإملاء (ى/ي، أ/إ/آ، ة/ه) */
+    if (dictKeys.length && font && font.glyphIndexMap) {
+      let bestKey = null;
+      let bestUsed = 0;
+
+      for (const key of dictKeys) {
+        const used = matchWordAt(chars, i, key);
+        if (used >= 0) {
+          bestKey = key;
+          bestUsed = used;
+          break; /* dictKeys مرتبة بالطول تنازليًا — أول تطابق هو الأطول */
+        }
+      }
+
+      if (bestKey) {
+        const ent = combined[bestKey];
+        let bounded = true;
+
+        /* نطاق "لوحدها": لازم مسافة أو علامة ترقيم من الجانبين —
+           زي قواعد التصدير بالظبط (السلاسل السياقية لا ترى حدود النص،
+           فالمعاينة هنا مطابقة لها حرفيًا عشان مفيش مفاجآت خارجيًا).
+           والحركات متحسبش حرف */
+        if (ent && ent.scope === "alone") {
+          const prevCh = prevBaseChar(chars, i);
+          const nextCh = nextBaseChar(chars, i + bestUsed);
+          bounded = isWordBoundaryChar(prevCh) && isWordBoundaryChar(nextCh);
+        }
+
+        if (bounded && ent && ent.gid !== undefined && isRenderable(ent.gid)) {
+          const isBuiltin = font.wordLigatures &&
+            (font.wordLigatures[bestKey] !== undefined);
+          /* التناوب: كل ورود الكلمة ياخد رسمة مختلفة بالدور
+             (الأولى الأساسية، التانية البديل الأول، ...) —
+             زي تلوين الكلمات المكررة في المصاحب المزخرفة */
+          let chosenGid = ent.gid;
+          if (ent.mode === "cycle" && ent.alts && ent.alts.length) {
+            const cyc = [ent.gid].concat(ent.alts);
+            chosenGid = cyc[(occCount[bestKey] || 0) % cyc.length];
+          }
+          occCount[bestKey] = (occCount[bestKey] || 0) + 1;
+          out.push({
+            cp: 0,
+            gid: chosenGid,
+            missing: false,
+            dictWord: bestKey,
+            cpText: isBuiltin ? bestKey : undefined
+          });
+          i += bestUsed - 1;
+          continue;
+        }
+        /* الرسمة غير موجودة أو الكلمة مش لوحدها → نكمل التشكيل العادي */
+      }
+    }
+
+    if (types[i] === "T") {
+      const gid = font.glyphIndexMap[cp];
+      if (gid !== undefined) out.push({ cp: cp, gid: gid, missing: false });
+      continue;
+    }
+
+    /* لام-ألف */
+    if (cp === 0x0644 && i + 1 < chars.length && LAM_ALEF[chars[i + 1].codePointAt(0)]) {
+      const pair = LAM_ALEF[chars[i + 1].codePointAt(0)];
+      const target = pair[prevJoin(i) === "D" ? 1 : 0];
+      i++;
+      let gid = font.glyphIndexMap[target];
+      if (gid === undefined) {
+        /* الشكل مش موجود — جرّب الشكل التاني لرابط لام-ألف */
+        const alt = pair[0] === target ? pair[1] : pair[0];
+        gid = font.glyphIndexMap[alt];
+      }
+      out.push({ cp: target, gid: gid, missing: gid === undefined });
+      continue;
+    }
+
+    if (AR_FORMS[cp]) {
+      const lp = prevJoin(i) === "D";
+      const ln = types[i] === "D" && nextJoin(i) !== "U";
+      let form = lp && ln ? 3 : lp ? 1 : ln ? 2 : 0;
+
+      /* ✅ أولوية أعلىها: بديل الزوج — رسمة مخصوصة للحرف
+         حسب اللي جانبه (مثال: ن في «من» تترسم بشكل مختلف عن ن في «لن»).
+         الشكل الوسطي كمان: «لنا/عنع/ححنح» نونها وسطية — بنجرب الجار
+         السابق (بديل v2) وبعدين الجار التالي (بديل v1) بنفس أولوية
+         قواعد التصدير (v2 كلها قبل v1) */
+      const ureg = userReg[cp];
+      if (pairRes.length && (form === 1 || form === 2 || form === 3)) {
+        let pv = null;
+        if (form === 1 || form === 3) {
+          /* شكل آخر/وسط — البديل حسب اللي قبله */
+          const prev = prevBaseChar(chars, i);
+          if (prev) {
+            const pcp = prev.codePointAt(0);
+            pv = pairRes.find((e) => e.side === 2 &&
+              normCpForMatch(e.aCp) === normCpForMatch(pcp) &&
+              normCpForMatch(e.bCp) === normCpForMatch(cp));
+          }
+        }
+        if (!pv && (form === 2 || form === 3)) {
+          /* شكل أول/وسط — البديل حسب اللي بعده */
+          const nx = nextBaseChar(chars, i + 1);
+          if (nx) {
+            const ncp = nx.codePointAt(0);
+            pv = pairRes.find((e) => e.side === 1 &&
+              normCpForMatch(e.aCp) === normCpForMatch(cp) &&
+              normCpForMatch(e.bCp) === normCpForMatch(ncp));
+          }
+        }
+        if (pv && isRenderable(pv.gid)) {
+          out.push({ cp: cp, gid: pv.gid, missing: false, pairVar: true });
+          continue;
+        }
+      }
+
+      /* أولوية رسمة المستخدم: لو صاحب الخط رسم الحرف ده
+         والخط مفيهوش الحرف الخام (خط رسمات) — رسمته هي اللي بتظهر
+         في كل المواضع، مش أشكال الخط الأصلية الغريبة
+         (دي اللي كانت بتخلي «نن» يطلع رسمات تانية خالص) */
+      if (ureg && ureg.cps.length && font.glyphIndexMap[cp] === undefined) {
+        let ucp = ureg.byForm[form];
+        if (ucp === undefined) ucp = ureg.byForm[0];
+        if (ucp === undefined) ucp = ureg.cps[0];
+        const ugid = font.glyphIndexMap[ucp];
+        out.push({ cp: ucp, gid: ugid, missing: ugid === undefined });
+        continue;
+      }
+
+      /* المستخدم رسم الشكل المطلوب بالظبط؟ رسمته على طول */
+      if (ureg && ureg.byForm[form] !== undefined) {
+        const ugid = font.glyphIndexMap[ureg.byForm[form]];
+        out.push({ cp: ureg.byForm[form], gid: ugid, missing: ugid === undefined });
+        continue;
+      }
+
+      const target = AR_FORMS[cp][form] || AR_FORMS[cp][0];
+      let gid = font.glyphIndexMap[target];
+      if (gid === undefined) gid = font.glyphIndexMap[cp];
+      out.push({ cp: target, gid: gid, missing: gid === undefined });
+      continue;
+    }
+
+    /* شكل عرض مكتوب مباشرة (U+FExx): المستخدم كتب ﻼ أو يـ جاهزة —
+       حرف واحد بيكتب نفسه من cmap، ولو ناقص من الخط نرجع
+       لشكل الحرف الأم (ولام-ألف من الشكل التاني للرابط) */
+    if (cp >= 0xFE70 && FORM_TO_BASE[cp]) {
+      const fb = FORM_TO_BASE[cp];
+      let gid = font.glyphIndexMap[cp];
+      if (gid === undefined) {
+        if (LAM_ALEF[fb.base] && LAM_ALEF[fb.base][fb.form] != null) {
+          const pair = LAM_ALEF[fb.base];
+          gid = font.glyphIndexMap[pair[fb.form]];
+          if (gid === undefined) gid = font.glyphIndexMap[pair[fb.form ? 0 : 1]];
+        } else {
+          const forms = AR_FORMS[fb.base];
+          if (forms && forms[fb.form] != null) gid = font.glyphIndexMap[forms[fb.form]];
+          if (gid === undefined) gid = font.glyphIndexMap[fb.base];
+        }
+      }
+      out.push({ cp: cp, gid: gid, missing: gid === undefined });
+      continue;
+    }
+
+    const gid = font.glyphIndexMap[cp];
+    if (cp === 0x20 && gid === undefined) {
+      out.push({ cp: cp, gid: undefined, blank: true, missing: false });
+    } else {
+      out.push({ cp: cp, gid: gid, missing: gid === undefined });
+    }
+  }
+
+  return out;
+}
+
+/* فاصل أبيض: مسافة/نيولاين/تاب وغيرهم — بتاخد مساحة من غير رسم
+   (إصلاح «مربعات بين الكلمات»: النيولاين من التكست إيريا والمسافة
+   كانوا بيتحسبوا حروف ناقصة ويتطلعوا علب متقطعة) */
+function __isSpaceCp(cp) {
+  return cp === 0x20 || cp === 0xA0 || cp === 0x09 || cp === 0x0A || cp === 0x0D ||
+    (cp >= 0x2000 && cp <= 0x200A) || cp === 0x202F || cp === 0x205F || cp === 0x3000;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   إصلاح «الروسمات دخلة في بعض» — رسمة الكلمة المدمجة اللي عرضها
+   المعلن (advanceWidth) أصغر بكتير من عرض حبرها الفعلي — الكلمة
+   اللي بعدها بتقع فوقها لأن السطر بيتقدم بالعرض المعلن بس.
+   الحل من طبقتين:
+   ١) المعاينة: كلمات القاموس/المدمجة اللي حبرها تجاوز عرضها بقيمة
+      كبيرة (تداخل حقيقي مش التحام طبيعي) بتاخد عرض الحبر + هامش
+   ٢) الشفاء: أي ربط كلمة (قاموس/مدمجة/مفتش الحرف/حرف مركب) وكل خط
+      يتنشط وكل تصدير — العرض يتظبط تلقائيًا في الخط نفسه
+   عتبة 0.25em: تجاوز أقل من كده = التحام طبيعي للحروف العربية —
+   متلمسوش عشان إيقاع الخط ما يتكسرش
+   ════════════════════════════════════════════════════════════════ */
+const __mhInkWCache = new Map(); /* gid → عرض الحبر بوحدات الخط */
+
+function __mhInkWCacheClear() { __mhInkWCache.clear(); }
+
+function __mhGlyphInkW(gid) {
+  if (__mhInkWCache.has(gid)) return __mhInkWCache.get(gid);
+  let w = 0;
+  try {
+    const g = font.glyphs.get(gid);
+    if (g && g.path && g.path.commands && g.path.commands.length) {
+      const bb = g.path.getBoundingBox();
+      if (isFinite(bb.x1) && isFinite(bb.x2)) w = Math.max(0, bb.x2 - bb.x1);
+    }
+  } catch (e) { w = 0; }
+  __mhInkWCache.set(gid, w);
+  return w;
+}
+
+/* ميزة «شفاء عرض الرسمة تلقائيًا» اتلغت بطلب المستخدم — كانت بتوسّع
+   advanceWidth تلقائيًا لما تحس إن حبر الرسمة أوسع من عرضها المعلن،
+   وده كان بيولّد مسافات إضافية غير مقصودة بين بعض الرسمات (خصوصًا
+   المسافة/space). الفانكشنين اتسابوا كـ no-op عشان كل الاستدعاءات
+   القديمة المنتشرة في الملف (8 أماكن) تتعطل تلقائيًا من غير ما
+   نلمسها واحد واحد. */
+/* ================================================================
+   § 22-ب — العرض الموحد للسطر المُشكَّل (مع تثبيت الحركات)
+   «التشكيل بيبوظ في المعاينة» — الحل: محرك رسم واحد بيترسم بيه
+   كل حاجة (تجربة الكتابة / الصفحات / البطاقة / الدفتر):
+   - RTL من اليمين لليسار
+   - الحركة بتترسم فوق (أو تحت) آخر حرف أساس، في النص بالظبط،
+     والشدة + الحركة يتكدسوا فوق بعض — نفس منطق fallback
+     وضع العلامات في HarfBuzz عشان المعاينة تشبه الخارج
+   - الحرف الناقص = مربع متقطع
+   ================================================================ */
+
+/* علامات بترسم تحت الأساس (كسرة وتنوين الكسر وعلامات سفلية) */
+function isBelowMarkCp(cp) {
+  return cp === 0x064D || cp === 0x0650 || cp === 0x0655 ||
+    cp === 0x0656 || cp === 0x065A || cp === 0x065B;
+}
+
+function __glyphFromFont(gid) {
+  try { return font.glyphs.get(gid); } catch (err) { return null; }
+}
+
+/* رسم حرف أساس/كلمة قاموس عند موضعه — بيرجّع صندوقه بالكانفاس (y-down) */
+function drawShapedBaseGlyph(ctx, g, left, baseline, fs, inkColor) {
+  /* Color Font: الطبقات تُرسم في نفس موضع الـglyph وبنفس baseline.
+     لا نستخدم drawGlyphLayerRaw هنا لأن تحويله القديم كان يقلب Y. */
+  const layers = __mhGetColorLayers(g, font);
+  if (layers) {
+    let x1 = Infinity, x2 = -Infinity, y1 = Infinity, y2 = -Infinity;
+
+    const gid = (g._mhOriginalGID !== undefined) ? g._mhOriginalGID : g.index;
+    const colorLayers = font && font._mhColorGlyphs && gid !== undefined ? font._mhColorGlyphs[gid] : null;
+    const palette = (font && font._mhPalette) || [];
+    if (colorLayers && colorLayers.length) {
+      let drew = false;
+      for (const layer of colorLayers) {
+        try {
+          const lg = font.glyphs.get(layer.glyphIndex);
+          const p = lg.getPath(left, baseline, fs, null, font);
+          const bb = p.getBoundingBox();
+          if (isFinite(bb.x1) && isFinite(bb.y1) && isFinite(bb.x2) && isFinite(bb.y2) &&
+              (bb.x2 - bb.x1) > 0.001 && (bb.y2 - bb.y1) > 0.001) {
+            p.fill = palette[layer.paletteIndex] || INK;
+            p.draw(ctx);
+            x1 = Math.min(x1, bb.x1); x2 = Math.max(x2, bb.x2);
+            y1 = Math.min(y1, bb.y1); y2 = Math.max(y2, bb.y2);
+            drew = true;
+          }
+        } catch (eLayer) {}
+      }
+      if (drew) return { x1, x2, y1, y2 };
+    }
+  }
+
+  const p = g.getPath(left, baseline, fs, null, font);
+  const bb = p.getBoundingBox();
+  const hasContent = isFinite(bb.x1) && isFinite(bb.y1) &&
+    (bb.x2 - bb.x1) > 0.01 && (bb.y2 - bb.y1) > 0.01;
+  if (hasContent) {
+    p.fill = inkColor || INK;
+    p.draw(ctx);
+    return { x1: bb.x1, x2: bb.x2, y1: bb.y1, y2: bb.y2 };
+  }
+  drawGlyphRaw(g, left, baseline, fs, ctx);
+  return { x1: left, x2: left + fs * 0.6, y1: baseline - fs * 0.72, y2: baseline + fs * 0.16 };
+}
+function drawShapedMissingBox(ctx, left, baseline, fs, adv, color) {
+  ctx.strokeStyle = color || MISSING_COLOR;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 4]);
+  ctx.strokeRect(left + 1, baseline - fs * 0.72,
+    Math.max(adv - 2, fs * 0.4), fs * 0.88);
+  ctx.setLineDash([]);
+}
+
+/*
+ * رسم سطر مُشكَّل كامل.
+ * shaped: ناتج shapeArabic — fs: حجم الخط بالبكسل — baseline: خط الأساس
+ * penRight: حافة البداية (يمين السطر في RTL) — ink: لون الحبر
+ * بترجع موضع القلم النهائي (يسار آخر حرف) — فتقدر تسلسل أسطر بيها.
+ */
+function drawShapedLine(ctx, shaped, fs, baseline, penRight, ink) {
+  const upm = (font && font.unitsPerEm) || 1000;
+  let pen = penRight;
+  let lastBaseBox = null;
+  let markStack = 0;
+  let markStackDir = 0;
+
+  for (let idx = 0; idx < shaped.length; idx++) {
+    const s = shaped[idx];
+    const adv = shapedAdv(s, fs, upm);
+    const left = pen - adv;
+
+    const isMark = isMarkCp(s.cp);
+
+    if (s.missing && !isMark) {
+      if (__isSpaceCp(s.cp)) {
+        /* فاصل أبيض ناقص من الخط = فراغ صامت — مفيش علبة
+           (المسافة/النيولاين عمرهم ما يترسموا كحرف ناقص) */
+        markStack = 0; markStackDir = 0;
+      } else {
+        drawShapedMissingBox(ctx, left, baseline, fs, adv, null);
+        lastBaseBox = { x1: left, x2: pen, y1: baseline - fs * 0.72, y2: baseline + fs * 0.16 };
+        markStack = 0; markStackDir = 0;
+      }
+    } else if (isMark && s.gid !== undefined && s.gid !== null) {
+      /* حركة: فوق/تحت آخر حرف أساس — تتمركز عليه وتتكدس لو متتالية */
+      const g = (s.gid !== undefined) ? __glyphFromFont(s.gid) : null;
+      if (g && lastBaseBox) {
+        const p = g.getPath(0, 0, fs, null, font);
+        const bb = p.getBoundingBox();
+        const mw = bb.x2 - bb.x1, mh = bb.y2 - bb.y1;
+        if (isFinite(mw) && isFinite(mh) && mw > 0.01 && mh > 0.01) {
+          const below = isBelowMarkCp(s.cp);
+          const dir = below ? -1 : 1;
+          if (markStackDir === dir) markStack++; else { markStackDir = dir; markStack = 0; }
+          const gap = fs * 0.035;
+          const shift = markStack * fs * 0.26;
+          const cx = (lastBaseBox.x1 + lastBaseBox.x2) / 2;
+          const dx = cx - (bb.x1 + bb.x2) / 2;
+          const dy = below
+            ? (lastBaseBox.y2 + gap + shift) - bb.y1
+            : (lastBaseBox.y1 - gap - shift) - bb.y2;
+          ctx.save();
+          ctx.translate(dx, dy);
+          p.fill = ink || INK;
+          p.draw(ctx);
+          ctx.restore();
+        }
+      }
+      /* الحركة مهما كانت pen مايتحركش — عرضها صفر */
+    } else if (s.gid !== undefined && s.gid !== null) {
+      const g = __glyphFromFont(s.gid);
+      if (g) {
+        lastBaseBox = drawShapedBaseGlyph(ctx, g, left, baseline, fs, ink);
+        markStack = 0; markStackDir = 0;
+      } else {
+        drawShapedMissingBox(ctx, left, baseline, fs, adv, null);
+        lastBaseBox = { x1: left, x2: pen, y1: baseline - fs * 0.72, y2: baseline + fs * 0.16 };
+      }
+    }
+    pen = left;
+  }
+  return pen;
+}
+
+/* ================================================================
+   § 23 — القاموس — لكل خط على حدة
+   ربط كلمة كاملة برسمة (GID) + نطاق:
+     alone = الكلمة واقفة لوحدها (مسافة/بداية/نهاية)
+     any   = في أي موضع حتى وسط كلمات أخرى
+   صيغة التخزين: { "الكلمة": "FB51" }  (قديم)
+              أو { "الكلمة": { c:"U+FB51" | "G123", s:"alone"|"any" } }
+   ================================================================ */
+function dictKeyFor(name) {
+  return "mihabarDict:" + String(name || "font");
+}
+
+function loadSavedDictFor(name) {
+  try {
+    /* توافق مع قواميس المحرر القديم */
+    const legacy = localStorage.getItem("fontDict:" + name);
+    const mine = localStorage.getItem(dictKeyFor(name));
+    return JSON.parse((mine != null ? mine : legacy) || "{}");
+  } catch (e) {
+    return {};
+  }
+}
+
+function activeDict() {
+  if (activeSlot < 0 || !slots[activeSlot]) return {};
+  return slots[activeSlot].dict || {};
+}
+
+function saveActiveDict(d) {
+  if (activeSlot < 0 || !slots[activeSlot]) return;
+  slots[activeSlot].dict = d;
+  __mhBumpDictVersion();
+  try {
+    localStorage.setItem(dictKeyFor(slots[activeSlot].name), JSON.stringify(d));
+  } catch (e) { /* تجاهل */ }
+}
+
+/* عداد يزيد كل مرة يتغيّر فيها القاموس/الأزواج/السياقات — بيُستخدم
+   كجزء من مفتاح كاش "معاينة نص بصفحات" (§26) عشان لما المستخدم يضيف
+   كلمة مدمجة جديدة، الخط اللي بيتحمّل في المعاينة يتبنى من جديد
+   بدل ما يفضل مستخدم النسخة القديمة المخزّنة مؤقتًا */
+let __mhDictVersion = 0;
+function __mhBumpDictVersion() { __mhDictVersion++; }
+
+/* تطبيع قيمة القاموس — القديم (نص) = نطاق "لوحدها" سلوكًا:
+   الحكم في وسط كلمات تانية (سلام = س+لا+م) كان بيبوّظ كلمات سليمة —
+   فالافتراضي الآمن بقى "لوحدها" واللي عايز أي حتة يختارها بوضوح */
+function normDictVal(v) {
+  if (v && typeof v === "object") {
+    const alts = Array.isArray(v.alts)
+      ? v.alts.map((x) => String(x == null ? "" : x).trim()).filter((x) => x)
+      : [];
+    return {
+      c: String(v.c || ""),
+      s: v.s === "any" ? "any" : "alone",
+      alts: alts,
+      mode: v.mode === "cycle" ? "cycle" : "one"
+    };
+  }
+  return { c: String(v == null ? "" : v), s: "alone", alts: [], mode: "one" };
+}
+
+/* ================================================================
+   § 23-ج — أشكال الأزواج (المقاسات السياقية)
+   الحرف الواحد له رسمة مختلفة حسب اللي جانبه:
+     «من» → الميم تترسم صغيرة لما بعدها نون، والنون تتغير لما قبلها ميم
+   التخزين لكل خط: { "من": { v1: "U+FBxx"|"G12"|"", v2: ... } }
+     v1 = بديل الحرف الأول لما يكون بعده التاني (شكل أول)
+     v2 = بديل الحرف التاني لما يكون قبله الأول (شكل آخر)
+   ================================================================ */
+function pairKeyFor(name) {
+  return "mihabarPairs:" + String(name || "font");
+}
+
+function loadSavedPairsFor(name) {
+  try {
+    return JSON.parse(localStorage.getItem(pairKeyFor(name)) || "{}");
+  } catch (e) {
+    return {};
+  }
+}
+
+function activePairs() {
+  if (activeSlot < 0 || !slots[activeSlot]) return {};
+  return slots[activeSlot].pairs || {};
+}
+
+function saveActivePairs(p) {
+  if (activeSlot < 0 || !slots[activeSlot]) return;
+  slots[activeSlot].pairs = p;
+  __mhBumpDictVersion();
+  try {
+    localStorage.setItem(pairKeyFor(slots[activeSlot].name), JSON.stringify(p));
+  } catch (e) { /* تجاهل */ }
+}
+
+/* تحويل جدول الأزواج لقواعد جاهزة للمعاينة (GID محسومة ضد الخط الحالي) */
+function resolvePairGids() {
+  const out = [];
+  const pairs = activePairs();
+  for (const pw in pairs) {
+    const ch = [...String(pw)];
+    if (ch.length !== 2) continue;
+    const ent = pairs[pw] || {};
+    const aCp = ch[0].codePointAt(0), bCp = ch[1].codePointAt(0);
+    const v1 = resolveBindingGid(ent.v1);
+    const v2 = resolveBindingGid(ent.v2);
+    if (v1.gid !== undefined) out.push({ side: 1, aCp: aCp, bCp: bCp, gid: v1.gid });
+    if (v2.gid !== undefined) out.push({ side: 2, aCp: aCp, bCp: bCp, gid: v2.gid });
+  }
+  return out;
+}
+
+/* فك نص الكود: "G123" = رقم حرف مباشر، وإلا فكود/حرف عبر parseCharInput */
+function resolveBindingGid(codeText) {
+  const str = (codeText || "").trim();
+  if (!str) return { gid: undefined, norm: "" };
+  const gm = /^G(\d+)$/i.exec(str);
+  if (gm) {
+    const gid = parseInt(gm[1], 10);
+    return { gid: gid, norm: "G" + gid, byGid: true };
+  }
+  const cp = parseCharInput(str);
+  if (cp === undefined || cp === null) return { gid: undefined, norm: "" };
+  const gid = (font && font.glyphIndexMap || {})[cp];
+  return { gid: gid, norm: "U+" + cp.toString(16).toUpperCase(), cp: cp };
+}
+
+/* القاموس المدمج: كلمات الخط المدمجة (نطاق any) + كلمات المستخدم */
+function combinedDict2() {
+  const out = {};
+  const builtin = (font && font.wordLigatures) || {};
+  const builtinAlts = (font && font.wordLigatureAlts) || {};
+  for (const w in builtin) {
+    const prim = builtin[w];
+    const bAlts = [];
+    (Array.isArray(builtinAlts[w]) ? builtinAlts[w] : []).forEach((g) => {
+      if (typeof g === "number" && g !== prim && isRenderable(g) &&
+          bAlts.indexOf(g) === -1) bAlts.push(g);
+    });
+    out[w] = { gid: prim, scope: "any", alts: bAlts, mode: "one" };
+  }
+
+  const user = activeDict();
+  for (const w in user) {
+    const v = normDictVal(user[w]);
+    if (!v.c) continue;
+    const r = resolveBindingGid(v.c);
+    if (r.gid === undefined) continue;
+    const alts = [];
+    (v.alts || []).forEach((code) => {
+      const ar = resolveBindingGid(code);
+      if (ar.gid !== undefined && ar.gid !== r.gid && isRenderable(ar.gid) &&
+          alts.indexOf(ar.gid) === -1) alts.push(ar.gid);
+    });
+    out[w] = { gid: r.gid, scope: v.s, alts: alts, mode: v.mode };
+  }
+  return out;
+}
+
+/* سلسلة الأشكال المتوقعة لكلمة (بدون قاموس) — للتصدير
+   (الحركات بتتشرخ: القواعد تُبنى على الحروف الأساسية بس) */
+function wordShapedCps(word, embedded) {
+  const chars = [...String(word || "")].filter((c) => !isMarkCp(c.codePointAt(0)));
+  if (embedded) chars.unshift("\u0628"); /* با للتوصيل في الوسط */
+  const out = [];
+
+  const form4 = (c) => AR_FORMS[c.codePointAt(0)];
+  const isDual = (c) => { const f = form4(c); return !!(f && f[2] !== null); };
+  const isArabic = (c) => !!form4(c);
+
+  for (let i = 0; i < chars.length; i++) {
+    const cp = chars[i].codePointAt(0);
+
+    /* لام-ألف */
+    if (cp === 0x0644 && i + 1 < chars.length && LAM_ALEF[chars[i + 1].codePointAt(0)]) {
+      const pair = LAM_ALEF[chars[i + 1].codePointAt(0)];
+      out.push(pair[(i > 0 && isDual(chars[i - 1])) ? 1 : 0]);
+      i++;
+      continue;
+    }
+
+    if (AR_FORMS[cp]) {
+      const lp = i > 0 && isDual(chars[i - 1]);
+      const ln = isDual(chars[i]) && (i + 1 < chars.length) && isArabic(chars[i + 1]);
+      const form = lp && ln ? 3 : lp ? 1 : ln ? 2 : 0;
+      out.push(AR_FORMS[cp][form] || AR_FORMS[cp][0]);
+      continue;
+    }
+
+    out.push(cp); /* مسافة/علامة/حرف أجنبي كما هو */
+  }
+  return out;
+}
+
+function cpsToGids(cps) {
+  const map = (font && font.glyphIndexMap) || {};
+  return cps.map((cp) => map[cp]);
+}
+
+function dictEmbedEnabled() {
+  try {
+    return localStorage.getItem("mihabarDictEmbed") !== "0";
+  } catch (e) {
+    return true;
+  }
+}
+
+function setDictEmbed(on) {
+  try {
+    localStorage.setItem("mihabarDictEmbed", on ? "1" : "0");
+  } catch (e) { /* تجاهل */ }
+}
+
+/* التصدير النضيف: الملف المصدَّر فيه رسومات المستخدم وربط الكلمات بس —
+   الخط المركّب على الموقع خارج الملف تمامًا (افتراضيًا مفعّل) */
+function pureExportEnabled() {
+  try {
+    return localStorage.getItem("mihabarPureExport") !== "0";
+  } catch (e) {
+    return true;
+  }
+}
+
+function setPureExport(on) {
+  try {
+    localStorage.setItem("mihabarPureExport", on ? "1" : "0");
+  } catch (e) { /* تجاهل */ }
+}
+
+function updatePureExportLabel() {
+  const lbl = document.getElementById("pureExportToggleLabel");
+  if (!lbl) return;
+  lbl.textContent = "التصدير النضيف: " + (pureExportEnabled() ? "مفعّل" : "معطّل");
+}
+
+function toggleUiPureExport() {
+  const next = !pureExportEnabled();
+  setPureExport(next);
+  updatePureExportLabel();
+  toast(
+    next
+      ? "التصدير النضيف اتفعّل — التصدير هيطلّع رسوماتك وربط القاموس بس، من غير حروف الخط الأصلي"
+      : "التصدير النضيف اتعطّل — التصدير هيطلّع الخط الأصلي كامل (عربي/إنجليزي/أرقام) زائد رسوماتك"
+  );
+}
+
+function openDict() {
+  const dict = activeDict();
+  const keys = Object.keys(dict).sort();
+  const builtinCount = font && font.wordLigatures
+    ? Object.keys(font.wordLigatures).length : 0;
+
+  let rows = "";
+  keys.forEach((k) => {
+    const v = normDictVal(dict[k]);
+    const disc = ligAltsForWord(k);
+    const hasAlts = v.alts.length > 0 || disc.length > 0;
+    rows += `<div class="dictEntry">
+      <div class="dictRow">
+        <canvas class="dictCv" data-dict-cv="${esc(v.c)}" width="112" height="112"></canvas>
+        <span class="dictWord">${esc(k)}</span>
+        <span class="dictArrow">←</span>
+        <span class="dictCode" dir="ltr">${esc(v.c)}</span>
+        <span class="dictScope">${v.s === "alone" ? "لوحدها" : "أي حتة"}</span>
+        <button class="dictMini${v.mode === "cycle" ? " on" : ""}" data-act="dict-mode"
+          data-word="${esc(k)}" title="كل ورود الكلمة ياخد رسمة مختلفة بالدور">${v.mode === "cycle" ? "🔁 التناوب شغّال" : "التناوب"}</button>
+        <button class="dictDel" data-act="dict-del" data-word="${esc(k)}" title="حذف">✕</button>
+      </div>
+      <div class="dictAlts">
+        ${(v.alts || []).map((code) => `
+          <span class="dictAltCell">
+            <canvas data-dict-cv="${esc(code)}" width="112" height="112"></canvas>
+            <span class="dictCode" dir="ltr">${esc(code)}</span>
+            <button class="dictDel" data-act="dict-alt-del" data-word="${esc(k)}"
+              data-alt="${esc(code)}" title="شيل البديل">✕</button>
+          </span>`).join("")}
+        <button class="dictMini" data-act="dict-alt-add" data-word="${esc(k)}"
+          title="اختار رسمة بديلة من شبكة الخط">+ بديل</button>
+        ${disc.length ? `<button class="dictMini" data-act="dict-alts-scan" data-word="${esc(k)}"
+          title="إضافة كل بدائل المصمم المكتشفة في GSUB الخط">🔎 +${disc.length} من المصمم</button>` : ""}
+        ${!hasAlts ? `<span class="dictAltsHint">نفس الكلمة ليها رسمات تانية؟ ضيفها وشغّل التناوب.</span>` : ""}
+      </div>
+    </div>`;
+  });
+
+  if (!keys.length) {
+    rows = "<p class='hint'>قاموسك فاضي لهذا الخط — أضف أول كلمة.</p>";
+  }
+
+  /* كلمات المصمم اللي ليها رسمات متعددة متكتشفة في GSUB الخط نفسه
+     (روسمات القرآن: نفس الكلمة بـ3-6 رسومات) — مش ليها قيد مستخدم */
+  let bRows = "";
+  try {
+    const bAlts = (font && font.wordLigatureAlts) || {};
+    Object.keys(bAlts).sort().forEach((w) => {
+      if (dict[w] !== undefined) return; /* ليها قيد مستخدم — ظاهرة فوق */
+      const gids = ligAltsForWord(w);
+      if (!gids.length) return;
+      const primGid = font.wordLigatures[w];
+      bRows += `<div class="dictRow">
+        <canvas class="dictCv" data-dict-gid="${primGid !== undefined ? primGid : ""}" width="112" height="112"></canvas>
+        <span class="dictWord">${esc(w)}</span>
+        <span class="dictArrow">←</span>
+        <span class="dictCode" dir="ltr">${gids.length + 1} رسمات من المصمم</span>
+        <button class="dictMini" data-act="dict-mode" data-word="${esc(w)}">🔁 شغّل التناوب</button>
+      </div>`;
+    });
+  } catch (e) { /* تجاهل */ }
+
+  openModal("قاموس الكلمات — " + fontLabel, `
+    <p class="hint">
+      اربط كلمة أو عبارة برسمة — تتخبز جوه ملف الخط وتشتغل في أي برنامج.
+      ${builtinCount ? "والخط كمان فيه <b>" + builtinCount + " كلمة مدمجة</b> من المصمم." : ""}
+      ${builtinCount ? "<br>" : ""}نفس الكلمة ليها أكتر من رسمة في الخط (زي «الرحمن» بأشكال كاليجرافي مختلفة)؟
+      ضيف البدائل وشغّل <b>التناوب</b> — كل ورود الكلمة في النص ياخد رسمة مختلفة بالدور،
+      والمحرك بيتكفل إن الرسمات ما تدخلش في بعض.
+    </p>
+
+    <div style="max-height:22vh;overflow-y:auto;margin-top:10px">${rows}</div>
+    ${bRows ? `<p class="hint" style="margin-top:12px"><b>رسمات المصمم المتعددة</b> — متكتشفة في الخط نفسه، جاهزة للتناوب:</p>
+    <div style="max-height:16vh;overflow-y:auto">${bRows}</div>` : ""}
+
+    <div class="dictAddBox">
+      <label>الكلمة</label>
+      <input id="dictWord" dir="rtl" placeholder="لا">
+
+      <label>الرسمة اللي هتظهر — كود أو حرف أو اختيار من الشبكة</label>
+      <div class="charRow">
+        <input id="dictCode" dir="ltr" placeholder="U+FB51 أو ﭑ أو G123">
+        <button class="btn" data-act="pick-open" style="flex:0 0 auto">من الشبكة</button>
+        <div class="charPrevBox" id="dictPrev">
+          <canvas width="192" height="192"></canvas>
+          <div class="cpLabel">—</div>
+        </div>
+      </div>
+
+      <label>تظهر الرسمة فين؟</label>
+      <div class="scopeRow">
+        <label class="scopeOpt"><input type="radio" name="dictScope" value="alone" checked>
+          <span>لوحدها بس (كلمة مستقلة — الأصل والافتراضي)</span></label>
+        <label class="scopeOpt"><input type="radio" name="dictScope" value="any">
+          <span>في أي حتة (حتى وسط الكلمات — ممكن يبوّظ كلمات فيها نفس الحروف)</span></label>
+      </div>
+    </div>
+
+    <div class="embedRow">
+      <input type="checkbox" id="dictEmbed" ${dictEmbedEnabled() ? "checked" : ""}>
+      <span>تضمين القاموس في ملف الخط عند التصدير</span>
+    </div>
+
+    <div class="embedRow">
+      <input type="checkbox" id="pureExport" ${pureExportEnabled() ? "checked" : ""}>
+      <span>تصدير نضيف — رسوماتي وربطي بس، من غير الخط المركّب على الموقع</span>
+    </div>
+
+    <div class="mbtns">
+      <button class="btn ok" data-act="dict-add">إضافة</button>
+      <button class="btn" data-act="dict-export">تصدير</button>
+      <button class="btn" data-act="dict-import">استيراد</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  bindCharPreview(qs("#dictCode"), qs("#dictPrev"));
+
+  /* معاينات الصفوف */
+  modalBox.querySelectorAll("[data-dict-cv]").forEach((cv) => {
+    const r = resolveBindingGid(cv.dataset.dictCv);
+    if (r.gid === undefined) return;
+    let g = null;
+    try { g = font.glyphs.get(r.gid); } catch (e) { g = null; }
+    if (g) drawGlyphToCanvas(g, cv);
+  });
+
+  /* معاينات كلمات المصمم (برقم GID مباشر) */
+  modalBox.querySelectorAll("[data-dict-gid]").forEach((cv) => {
+    const gid = parseInt(cv.dataset.dictGid, 10);
+    if (!isFinite(gid)) return;
+    let g = null;
+    try { g = font.glyphs.get(gid); } catch (e) { g = null; }
+    if (g) drawGlyphToCanvas(g, cv);
+  });
+
+  qs("#dictEmbed").addEventListener("change", function () {
+    setDictEmbed(this.checked);
+    toast(this.checked ? "التضمين مفعّل" : "التضمين متوقف");
+  });
+
+  const pureChk = qs("#pureExport");
+  if (pureChk) {
+    pureChk.addEventListener("change", function () {
+      setPureExport(this.checked);
+      toast(this.checked
+        ? "التصدير النضيف مفعّل — الملف هيطلع من غير الخط الأصلي"
+        : "رجعنا للتصدير العادي — الخط الأصلي هيدخل الملف");
+    });
+  }
+
+  if (!document.getElementById("dictFileInput")) {
+    const fi = document.createElement("input");
+    fi.type = "file";
+    fi.id = "dictFileInput";
+    fi.accept = ".json,application/json";
+    fi.style.display = "none";
+    document.body.appendChild(fi);
+
+    fi.addEventListener("change", () => {
+      const file = fi.files && fi.files[0];
+      fi.value = "";
+      if (!file) return;
+
+      file.text().then((txt) => {
+        try {
+          const data = JSON.parse(txt);
+          if (data && typeof data === "object" && !Array.isArray(data)) {
+            saveActiveDict(Object.assign(activeDict(), data));
+            toast("تم استيراد القاموس لهذا الخط");
+            openDict();
+          } else {
+            throw new Error("صيغة غير صحيحة");
+          }
+        } catch (e) {
+          uiAlert("ملف غير صالح: " + e.message);
+        }
+      });
+    });
+  }
+}
+
+function dictAdd() {
+  const word = (qs("#dictWord").value || "").trim();
+  const code = (qs("#dictCode").value || "").trim();
+  const scopeEl = modalBox.querySelector('input[name="dictScope"]:checked');
+  const scope = scopeEl ? scopeEl.value : "any";
+
+  if (!word) { toast("اكتب الكلمة", true); return; }
+  if (!code) { toast("اكتب الكود أو اختار من الشبكة", true); return; }
+
+  const r = resolveBindingGid(code);
+  if (r.gid === undefined || !isRenderable(r.gid)) {
+    toast("الكود غير موجود في الخط", true);
+    return;
+  }
+
+  /* فحص حروف الكلمة: كل حرف لازم يكون له رسمة في الخط
+     (خام أو من أشكال العرض) — وإلا القاعدة مش هتنضمّن في التصدير */
+  const missing = [];
+  [...word].forEach((c) => {
+    if (isMarkCp(c.codePointAt(0))) return;
+    if (resolveCharGid(c) === undefined) missing.push(c);
+  });
+  if (missing.length) {
+    toast("⚠ حروف مش موجودة في الخط: " + missing.join(" ") + " — القاعدة مش هتشتغل خارجيًا", true);
+  }
+
+  const dict = activeDict();
+  dict[word] = { c: r.norm, s: scope };
+  saveActiveDict(dict);
+  /* تكتيش تلقائي: لو رسومات المصمم فيها بدائل لنفس الكلمة —
+     تتحفظ فورًا كبدائل جاهزة، شغّل التناوب بأي وقت */
+  try {
+    const disc = ligAltsForWord(word);
+    if (disc.length) {
+      const vv = normDictVal(dict[word]);
+      disc.forEach((g) => {
+        const code = "G" + g;
+        if (vv.alts.indexOf(code) === -1) vv.alts.push(code);
+      });
+      dict[word] = vv;
+      saveActiveDict(dict);
+      toast("لقيت " + disc.length + " رسمة بديلة لنفس الكلمة في خط المصمم — اتضافت جاهزة للتناوب");
+    }
+  } catch (e) { /* تجاهل */ }
+  if (!missing.length) toast("تمت الإضافة: " + word);
+  openDict();
+}
+
+function dictDel(word) {
+  const dict = activeDict();
+  delete dict[word];
+  saveActiveDict(dict);
+  openDict();
+}
+
+/* ================================================================
+   § 23-ج٢ — الرسمات البديلة لنفس الكلمة (تناوب الكاليجرافي)
+   نفس الكلمة ممكن يكون ليها 3-6 رسمات مختلفة في الخط
+   (الرحمن/الرحيم/عليهم) — البدائل تتحفظ في القاموس، والتناوب
+   يوزعها على ورود الكلمة بالدور في كل معاينة.
+   ================================================================ */
+const DICT_SCAN_STRIP_RE = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g;
+
+/* مفتاح مطابقة مرن: بلا حركات + تكافؤ إملائي (ى≡ي، أإآٱ≡ا، ة≡ه) */
+function normWordScanKey(s) {
+  let t = String(s || "").replace(DICT_SCAN_STRIP_RE, "");
+  t = t.replace(/[ىي]/g, "\u064A").replace(/[أإآٱ]/g, "\u0627").replace(/ة/g, "\u0647");
+  return t;
+}
+
+/* بدائل المصمم المكتشفة من GSUB الخط نفسه — بمفتاح مرن + تصفية الرسم */
+function ligAltsForWord(word) {
+  const idx = (font && font.wordLigatureAlts) || {};
+  const q = normWordScanKey(word);
+  if (!q) return [];
+  let hit = idx[word];
+  if (!hit) {
+    for (const k in idx) {
+      if (normWordScanKey(k) === q) { hit = idx[k]; break; }
+    }
+  }
+  const prim = (font && font.wordLigatures && font.wordLigatures[word] !== undefined)
+    ? font.wordLigatures[word] : undefined;
+  const out = [];
+  (Array.isArray(hit) ? hit : []).forEach((g) => {
+    if (typeof g !== "number" || g === prim || out.indexOf(g) !== -1) return;
+    if (!isRenderable(g)) return;
+    out.push(g);
+  });
+  return out;
+}
+
+/* ضمان قيد أساسي للكلمة: كلمة مصمم من غير قيد مستخدم →
+   نعمل قيد يحافظ على رسمتها الأساسية ونطاقها (أي حتة) */
+function dictEnsureEntry(word, dict) {
+  const v = normDictVal(dict[word]);
+  if (!v.c && font && font.wordLigatures && font.wordLigatures[word] !== undefined) {
+    v.c = "G" + font.wordLigatures[word];
+    v.s = "any";
+  }
+  return v;
+}
+
+
+/* زر التناوب: تشغيل/إيقاف توزيع الرسمات على ورود الكلمة */
+function dictToggleMode(word) {
+  const dict = activeDict();
+  const v = dictEnsureEntry(word, dict);
+  if (!v.c) { toast("اربط الرسمة الأساسية الأول", true); return; }
+  if (v.mode === "cycle") {
+    v.mode = "one";
+  } else {
+    if (!v.alts.length) {
+      const found = ligAltsForWord(word);
+      if (!found.length) {
+        toast("مفيش بدائل لسه — ضيف بديل من الشبكة أو دوّر في المصمم", true);
+        return;
+      }
+      v.alts = found.map((g) => "G" + g);
+    }
+    v.mode = "cycle";
+  }
+  dict[word] = v;
+  saveActiveDict(dict);
+  healDictAlts(v);
+  toast(v.mode === "cycle"
+    ? "🔁 التناوب شغّال: " + word + " — كل ورودها هتاخد رسمة مختلفة"
+    : "التناوب متوقف: " + word);
+  openDict();
+}
+
+/* إضافة بديل بالكود (من منتقي الشبكة أو كتابة) */
+function dictAddAltCode(word, code) {
+  const dict = activeDict();
+  const v = dictEnsureEntry(word, dict);
+  if (!v.c) { toast("اربط الرسمة الأساسية الأول", true); return; }
+  const r = resolveBindingGid(code);
+  if (r.gid === undefined || !isRenderable(r.gid)) {
+    toast("الكود غير موجود في الخط", true);
+    return;
+  }
+  const pr = resolveBindingGid(v.c);
+  if (pr.gid === r.gid) { toast("دي هي الرسمة الأساسية أصلًا", true); return; }
+  if (v.alts.indexOf(r.norm) !== -1) {
+    toast("البديل مضاف أصلًا");
+    openDict();
+    return;
+  }
+  v.alts.push(r.norm);
+  dict[word] = v;
+  saveActiveDict(dict);
+  toast("تمت إضافة بديل: " + word + " ← " + r.norm);
+  openDict();
+}
+
+/* حذف بديل */
+function dictAltDel(word, code) {
+  const dict = activeDict();
+  const v = normDictVal(dict[word]);
+  v.alts = (v.alts || []).filter((c) => c !== code);
+  dict[word] = v;
+  saveActiveDict(dict);
+  openDict();
+}
+
+/* تكتيش بدائل المصمم من GSUB الخط وإضافتها كلها */
+function dictAltsScan(word) {
+  const dict = activeDict();
+  const v = dictEnsureEntry(word, dict);
+  if (!v.c) { toast("اربط الرسمة الأساسية الأول", true); return; }
+  const pr = resolveBindingGid(v.c);
+  const found = ligAltsForWord(word);
+  let added = 0;
+  found.forEach((g) => {
+    const code = "G" + g;
+    if (pr.gid === g || v.alts.indexOf(code) !== -1) return;
+    v.alts.push(code);
+    added++;
+  });
+  if (!added) {
+    toast(found.length ? "كل بدائل المصمم مضافة أصلًا"
+      : "مفيش بدائل متكتشفة للكلمة دي في GSUB الخط — استخدم «+ بديل» من الشبكة", true);
+    return;
+  }
+  dict[word] = v;
+  saveActiveDict(dict);
+  toast("🔎 اتضافت " + added + " رسمة بديلة من رسومات المصمم: " + word);
+  openDict();
+}
+
+function dictExport() {
+  const data = JSON.stringify(activeDict(), null, 2);
+  downloadBuffer(data, "dict-" + fileBase + ".json", "application/json");
+  toast("تم تصدير قاموس: " + fileBase);
+}
+
+/* ================================================================
+   § 23-د — واجهة أشكال الأزواج (المقاسات السياقية)
+   ================================================================ */
+let pairDraftWord = "";
+
+function openPairs() {
+  const pairs = activePairs();
+  const keys = Object.keys(pairs).sort();
+
+  let rows = "";
+  keys.forEach((k) => {
+    const ent = pairs[k] || {};
+    const ch = [...k];
+    const aCh = ch[0] || "؟", bCh = ch[1] || "؟";
+    const lbl = [];
+    if (ent.v1) lbl.push(esc(aCh) + " قبل " + esc(bCh));
+    if (ent.v2) lbl.push(esc(bCh) + " بعد " + esc(aCh));
+    rows += `<div class="dictRow">
+      <canvas class="dictCv" data-pair-cv="${esc(ent.v1 || "")}|${esc(ent.v2 || "")}" width="112" height="112"></canvas>
+      <span class="dictWord">${esc(k)}</span>
+      <span class="dictScope" dir="rtl">${lbl.length ? lbl.join(" — ") : "فاضي"}</span>
+      <span class="dictCode" dir="ltr">${esc(ent.v1 || "—")} | ${esc(ent.v2 || "—")}</span>
+      <button class="dictDel" data-act="pairs-del" data-pair="${esc(k)}" title="حذف">✕</button>
+    </div>`;
+  });
+  if (!keys.length) rows = "<p class='hint'>مفيش أزواج مرسومة للخط ده — أضف أول زوج.</p>";
+
+  openModal("أشكال الأزواج — المقاسات السياقية", `
+    <p class="hint">
+      كل حرف يترسم بشكل مختلف حسب اللي جنبه: في «من» الميم تترسم بمقاس،
+      وفي «مي» بمقاس تاني. اكتب <b>زوج حروف</b> وحدد رسمة بديلة لكل طرف —
+      والبدائل تتخبز في ملف الخط عند التصدير وتشتغل في أي برنامج.
+    </p>
+    <div style="max-height:24vh;overflow-y:auto;margin-top:10px">${rows}</div>
+
+    <label>الزوج (حرفين — مثال: من)</label>
+    <input id="pairWord" dir="rtl" placeholder="من">
+
+    <label><b id="pairV1Lbl">الأول</b> لما يكون بعده التاني — شكل أول</label>
+    <div class="charRow">
+      <input id="pairV1" dir="ltr" placeholder="U+FBxx أو G12">
+      <button class="btn" data-act="pick-open" data-target="pairV1" style="flex:0 0 auto">من الشبكة</button>
+      <div class="charPrevBox" id="pairV1Prev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+
+    <label><b id="pairV2Lbl">التاني</b> لما يكون قبله الأول — شكل آخر</label>
+    <div class="charRow">
+      <input id="pairV2" dir="ltr" placeholder="U+FBxx أو G12">
+      <button class="btn" data-act="pick-open" data-target="pairV2" style="flex:0 0 auto">من الشبكة</button>
+      <div class="charPrevBox" id="pairV2Prev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+
+    <div class="mbtns">
+      <button class="btn ok" data-act="pairs-add">إضافة / تحديث</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  bindCharPreview(qs("#pairV1"), qs("#pairV1Prev"));
+  bindCharPreview(qs("#pairV2"), qs("#pairV2Prev"));
+
+  const refreshLbl = () => {
+    const ch = [...(qs("#pairWord").value || "")];
+    qs("#pairV1Lbl").textContent = ch[0] ? ("«" + ch[0] + "»") : "الأول";
+    qs("#pairV2Lbl").textContent = ch[1] ? ("«" + ch[1] + "»") : "التاني";
+  };
+  qs("#pairWord").addEventListener("input", refreshLbl);
+  refreshLbl();
+
+  /* معاينات الصفوف — أول كود موجود في الصف */
+  modalBox.querySelectorAll("[data-pair-cv]").forEach((cv) => {
+    const codes = (cv.dataset.pairCv || "").split("|");
+    const code = codes.find((c) => c && c !== "—");
+    if (!code) return;
+    const r = resolveBindingGid(code);
+    if (r.gid === undefined) return;
+    let g = null;
+    try { g = font.glyphs.get(r.gid); } catch (e) { g = null; }
+    if (g) drawGlyphToCanvas(g, cv);
+  });
+}
+
+function pairsAdd() {
+  const word = (qs("#pairWord").value || "").trim();
+  if ([...word].length !== 2) { toast("اكتب حرفين بالظبط (مثال: من)", true); return; }
+  const v1 = (qs("#pairV1").value || "").trim();
+  const v2 = (qs("#pairV2").value || "").trim();
+  if (!v1 && !v2) { toast("حدد بديل واحد على الأقل — أو اختار من الشبكة", true); return; }
+  if (v1 && resolveBindingGid(v1).gid === undefined) { toast("بديل الأول مش موجود في الخط", true); return; }
+  if (v2 && resolveBindingGid(v2).gid === undefined) { toast("بديل التاني مش موجود في الخط", true); return; }
+  const pairs = activePairs();
+  const old = pairs[word] || {};
+  const nv1 = v1 || old.v1 || "";
+  const nv2 = v2 || old.v2 || "";
+  if (!nv1 && !nv2) delete pairs[word];
+  else pairs[word] = { v1: nv1, v2: nv2 };
+  saveActivePairs(pairs);
+  toast("تم حفظ الزوج: " + word);
+  openPairs();
+}
+
+function pairsDel(k) {
+  const pairs = activePairs();
+  delete pairs[k];
+  saveActivePairs(pairs);
+  openPairs();
+}
+
+/* ================================================================
+   § 23-ب — منتقي الرسمة من الشبكة
+   ================================================================ */
+let dictDraftWord = "";
+
+function openGlyphPicker(targetId) {
+  const arr = glyphsArr();
+  const PAGE = 60;
+  let page = 0;
+  let items = [];
+
+  window.__pickTarget = targetId || "dictCode";
+  if (window.__pickTarget === "dictCode") {
+    dictDraftWord = qs("#dictWord") ? qs("#dictWord").value : "";
+  } else if (String(window.__pickTarget).indexOf("dictAlt:") === 0) {
+    /* اختيار بديل لكلمة قائمة — الكلمة جوّه الهدف نفسه */
+  } else if (window.__pickTarget === "embCode") {
+    embDraft.word = qs("#embWord") ? qs("#embWord").value : "";
+    embDraft.orig = qs("#embOrig") ? qs("#embOrig").value : "";
+  } else {
+    pairDraftWord = qs("#pairWord") ? qs("#pairWord").value : "";
+  }
+
+  const buildItems = (q) => {
+    items = [];
+    const query = (q || "").trim().toLowerCase();
+    const gidQ = /^g(\d+)$/.exec(query);
+    /* أكواد غير صالحة للربط: محجوزة/غير محرفة */
+    const cpValid = (cp) => cp !== undefined && cp !== 0xFFFE && cp !== 0xFFFF &&
+      !(cp >= 0xFDD0 && cp <= 0xFDEF);
+    for (let i = 0; i < arr.length; i++) {
+      const g = arr[i];
+      if (!g || !isRenderable(i)) continue;
+      if (query) {
+        const unis = (g.unicodes || (g.unicode !== undefined ? [g.unicode] : []))
+          .filter(cpValid);
+        let hit = String(i) === query ||
+          (gidQ && i === parseInt(gidQ[1], 10)) ||
+          (g.name || "").toLowerCase().indexOf(query) >= 0 ||
+          unis.some((u) =>
+            u.toString(16) === query ||
+            ("u+" + u.toString(16)) === query ||
+            String.fromCodePoint(u).toLowerCase() === query);
+        if (!hit) continue;
+      }
+      items.push({ gid: i, cp: cpValid(g.unicode) ? g.unicode : undefined });
+    }
+    page = 0;
+  };
+
+  const renderPage = () => {
+    const grid = qs("#pickGrid");
+    if (!grid) return;
+    const start = page * PAGE;
+    const slice = items.slice(start, start + PAGE);
+
+    grid.innerHTML = slice.length ? slice.map((it) => `
+      <button class="pickCell" data-act="pick-select" data-gid="${it.gid}"
+              data-cp="${it.cp !== undefined ? it.cp : ""}" title="G${it.gid}">
+        <canvas width="160" height="160"></canvas>
+        <span class="pickLbl" dir="ltr">${it.cp !== undefined
+          ? "U+" + it.cp.toString(16).toUpperCase() : "G" + it.gid}</span>
+      </button>`).join("")
+      : "<p class='hint'>مفيش نتائج — جرّب كود تاني (مثال: FB51 أو G120).</p>";
+
+    grid.querySelectorAll("canvas").forEach((cv, k) => {
+      const g2 = arr[slice[k].gid];
+      if (g2) drawGlyphToCanvas(g2, cv);
+    });
+
+    const pages = Math.max(1, Math.ceil(items.length / PAGE));
+    qs("#pickPageLbl").textContent = page + 1 + " / " + pages +
+      "  (" + items.length + " رسمة)";
+    qs("#pickPrev").disabled = page === 0;
+    qs("#pickNext").disabled = start + PAGE >= items.length;
+  };
+
+  openModal("اختار الرسمة", `
+    <input id="pickSearch" dir="ltr" placeholder="فلترة: كود FB51 أو حرف أو G120">
+    <div id="pickGrid" class="pickGrid"></div>
+    <div class="pgnav" style="margin-top:10px">
+      <button class="btn" id="pickPrev" data-act="pick-prev">‹ السابق</button>
+      <span id="pickPageLbl" class="pglbl"></span>
+      <button class="btn" id="pickNext" data-act="pick-next">التالي ›</button>
+    </div>
+  `);
+
+  buildItems("");
+  renderPage();
+
+  qs("#pickSearch").addEventListener("input", function () {
+    buildItems(this.value);
+    renderPage();
+  });
+
+  window.__pickNav = (dir) => {
+    const pages = Math.max(1, Math.ceil(items.length / PAGE));
+    page = Math.min(pages - 1, Math.max(0, page + dir));
+    renderPage();
+  };
+}
+
+function pickSelect(btn) {
+  const gid = +btn.dataset.gid;
+  const cp = btn.dataset.cp;
+  const code = cp ? "U+" + parseInt(cp, 10).toString(16).toUpperCase() : "G" + gid;
+  const target = window.__pickTarget || "dictCode";
+  if (String(target).indexOf("dictAlt:") === 0) {
+    const w = String(target).slice(8);
+    window.__pickNav = null;
+    window.__pickTarget = null;
+    dictAddAltCode(w, code);
+    return;
+  }
+  if (target === "dictCode") {
+    openDict();
+    if (qs("#dictWord")) qs("#dictWord").value = dictDraftWord || "";
+    if (qs("#dictCode")) {
+      qs("#dictCode").value = code;
+      qs("#dictCode").dispatchEvent(new Event("input"));
+    }
+  } else if (target === "embCode") {
+    const d = embDraft;
+    openWordsList();
+    if (qs("#embWord")) qs("#embWord").value = d.word || "";
+    if (qs("#embOrig")) qs("#embOrig").value = d.orig || "";
+    embSyncForm();
+    if (qs("#embCode")) {
+      qs("#embCode").value = code;
+      qs("#embCode").dispatchEvent(new Event("input"));
+    }
+    embDraft = { word: "", orig: "" };
+  } else {
+    openPairs();
+    if (qs("#pairWord")) qs("#pairWord").value = pairDraftWord || "";
+    if (qs("#" + target)) {
+      qs("#" + target).value = code;
+      qs("#" + target).dispatchEvent(new Event("input"));
+    }
+  }
+  window.__pickNav = null;
+  window.__pickTarget = null;
+}
+
+/* ================================================================
+   § 24 — كلمات الخط المدمجة: إضافة / حذف / تعديل
+   طبقة فوق كلمات المصمم (اللي جاية من GSUB ملف الخط نفسه):
+     del  = { الكلمة الأصلية: 1 }           — كلمة المصمم متشالة
+     edit = { الكلمة الأصلية: { w, c } }    — تعديل النص و/أو الرسمة
+     add  = { الكلمة الجديدة: { c } }       — كلمة جديدة خالص
+   التخزين: localStorage "mihabarEmbed:<اسم الخط>" — زي القاموس والأزواج.
+   font.wordLigaturesBase = أصل المصمم (يتحفظ أول مرة بس)
+   font.wordLigatures     = الفعّال بعد الطبقة — المحرر والتصدير بيقراه
+   ================================================================ */
+function embedKeyFor(name) {
+  return "mihabarEmbed:" + String(name || "font");
+}
+
+function loadSavedEmbedFor(name) {
+  try {
+    const o = JSON.parse(localStorage.getItem(embedKeyFor(name)) || "{}");
+    return (o && typeof o === "object" && !Array.isArray(o)) ? o : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function activeEmbed() {
+  if (activeSlot < 0 || !slots[activeSlot]) return { del: {}, edit: {}, add: {} };
+  const s = slots[activeSlot];
+  if (!s.embed || typeof s.embed !== "object" || Array.isArray(s.embed)) {
+    s.embed = {};
+  }
+  if (!s.embed.del) s.embed.del = {};
+  if (!s.embed.edit) s.embed.edit = {};
+  if (!s.embed.add) s.embed.add = {};
+  return s.embed;
+}
+
+function saveActiveEmbed(ov) {
+  if (activeSlot < 0 || !slots[activeSlot]) return;
+  slots[activeSlot].embed = ov;
+  try {
+    localStorage.setItem(embedKeyFor(slots[activeSlot].name), JSON.stringify(ov));
+  } catch (e) { /* تجاهل */ }
+}
+
+/* تطبيق الطبقة على الخط — بتتنادى عند فتح/تبديل الخط وبعد كل تعديل.
+   idempotent: الأصل يتحفظ مرة واحدة والفعّال يتصلق من الأصل + الطبقة */
+function applyEmbedOverlay(f) {
+  if (!f || typeof registerWordLigatures !== "function") return;
+  if (!f.wordLigaturesBase) {
+    f.wordLigaturesBase = Object.assign({}, f.wordLigatures || {});
+  }
+  const ov = activeEmbed();
+  const base = f.wordLigaturesBase;
+  const eff = {};
+
+  for (const w in base) {
+    if (ov.del[w]) continue;
+    const e = ov.edit[w];
+    if (e) {
+      const w2 = String(e.w || w).trim();
+      if (!w2) continue;
+      let gid = base[w];
+      if (e.c) {
+        const r = resolveBindingGid(e.c);
+        if (r.gid !== undefined && isRenderable(r.gid)) gid = r.gid;
+      }
+      if (gid !== undefined && gid !== null) eff[w2] = gid;
+      continue;
+    }
+    eff[w] = base[w];
+  }
+
+  for (const w in ov.add) {
+    if (!w) continue;
+    const r = resolveBindingGid((ov.add[w] || {}).c);
+    if (r.gid === undefined || !isRenderable(r.gid)) continue;
+    eff[w] = r.gid;
+  }
+
+  /* بدائل المصمم تتبع الكلمة الفعّالة (حتى بعد حذف/تعديل طبقة الإضافة):
+     الكلمة المحذوفة بدائلها تتشال، والمعدلة بدائلها تمشي مع نصها الجديد
+     ومن غير رسمتها الأساسية الجديدة */
+  const baseAlts = f.wordLigatureAlts || {};
+  const effAlts = {};
+  for (const w in base) {
+    if (ov.del[w]) continue;
+    const e = ov.edit[w];
+    const key = e ? String(e.w || w).trim() : w;
+    if (!key || eff[key] === undefined) continue;
+    const list = (Array.isArray(baseAlts[w]) ? baseAlts[w] : [])
+      .filter((g) => typeof g === "number" && g !== eff[key]);
+    if (list.length) effAlts[key] = list;
+  }
+
+  registerWordLigatures(f, eff, effAlts);
+}
+
+/* الكلمات اللي لازم تتشال من GSUB الأصلي عند التصدير:
+   المحذوفة + المعدلة (نص أو رسمة) — عشان الخط بره يطابق المحرر بالظبط */
+function embedStripSpec() {
+  const spec = { gids: new Set(), words: new Set() };
+  if (!font || !font.wordLigaturesBase) return spec;
+  const ov = activeEmbed();
+  const base = font.wordLigaturesBase;
+
+  for (const w in ov.del) {
+    if (base[w] !== undefined) {
+      spec.words.add(w);
+      spec.gids.add(base[w]);
+    }
+  }
+  for (const orig in ov.edit) {
+    if (base[orig] === undefined) continue;
+    const e = ov.edit[orig] || {};
+    const w2 = String(e.w || orig).trim();
+    const r = e.c ? resolveBindingGid(e.c) : { gid: base[orig] };
+    if (w2 === orig && r.gid === base[orig]) continue; /* تعديل شكلي — مفيش تغيير */
+    spec.words.add(orig);
+    spec.gids.add(base[orig]);
+  }
+  return spec;
+}
+
+let embDraft = { word: "", orig: "" };
+
+/* خريطة: الكلمة الفعّالة ← كلمتها الأصلية (للكلمات المعدلة نصها) */
+function embEffToOrig() {
+  const ov = activeEmbed();
+  const map = {};
+  for (const orig in ov.edit) {
+    map[String((ov.edit[orig] || {}).w || orig)] = orig;
+  }
+  return map;
+}
+
+function openWordsList() {
+  if (!font) return;
+  const eff = font.wordLigatures || {};
+  const base = font.wordLigaturesBase || {};
+  const ov = activeEmbed();
+  const e2o = embEffToOrig();
+  const keys = Object.keys(eff)
+    .sort((a, b) => (b.length - a.length) || a.localeCompare(b));
+
+  /* ⚠ إصلاح «مفيش تحديد للحذف/للكل»: ضفنا multi-select —
+     كل كلمة بقا ليها checkbox، وفيه select bar فوق فيها:
+       - تحديد الكل / إلغاء الكل
+       - حذف المحدد (بالتأكيد) */
+  if (!window.__embSel) window.__embSel = new Set();
+
+  let rows = "";
+  keys.forEach((w) => {
+    const gid = eff[w];
+    const isBase = base[w] !== undefined;
+    let tag = "من المصمم";
+    let origNote = "";
+    if (!isBase && ov.add[w]) tag = "مضافة";
+    else if (!isBase && e2o[w] !== undefined) { tag = "معدّلة"; origNote = e2o[w]; }
+    else if (isBase && ov.edit[w]) tag = "معدّلة";
+
+    const isSel = window.__embSel.has(w);
+    rows += `<div class="wordRow${isSel ? " selected" : ""}" data-word-key="${esc(w)}" data-gid="${gid}">
+      <div class="wCheck${isSel ? " on" : ""}" data-act="emb-toggle" data-word="${esc(w)}" title="تحديد"></div>
+      <canvas data-word-cv="${gid}" width="176" height="176"></canvas>
+      <span class="wWord">${esc(w)}${origNote
+        ? ` <small>(أصلها: ${esc(origNote)})</small>` : ""}</span>
+      <span class="wTag${tag === "من المصمم" ? "" : " mod"}">${tag}</span>
+      <span class="wGid">G${gid}</span>
+      <button class="dictDel" data-act="emb-edit" data-word="${esc(w)}" title="تعديل">✎</button>
+      <button class="dictDel" data-act="emb-del" data-word="${esc(w)}" title="حذف">✕</button>
+    </div>`;
+  });
+
+  if (!keys.length) {
+    rows = "<p class='hint'>الخط ده مفيهوش كلمات مدمجة لسه — أضف أول كلمة من الفورم اللي تحت.</p>";
+  }
+
+  /* المحذوفات — مع إمكانية الاستعادة + استعادة الكل */
+  let delRows = "";
+  const delKeys = Object.keys(ov.del);
+  delKeys.forEach((w) => {
+    const gid = base[w];
+    delRows += `<div class="wordRow deleted">
+      ${gid !== undefined ? `<canvas data-word-cv="${gid}" width="176" height="176"></canvas>` : ""}
+      <span class="wWord">${esc(w)}</span>
+      <span class="wTag del">محذوفة</span>
+      <button class="btn" data-act="emb-restore" data-word="${esc(w)}">استعادة</button>
+    </div>`;
+  });
+
+  const editing = !!embDraft.orig;
+  const selCount = window.__embSel.size;
+
+  openModal("كلمات الخط المدمجة (" + keys.length + ")", `
+    <p class="hint">
+      كلمات جوه ملف الخط نفسه — بتظهر لأي حد يستخدم الخط في أي برنامج.
+      اضغط على الكلمة للانتقال لرسمتها، وعدّلها ✎ أو احذفها ✕ —
+      أو علّم المربعات ✓ لحذف جماعي. والتعديلات تتخبز في ملف الخط عند التصدير.
+    </p>
+
+    ${delRows ? `
+    <div class="delSection">
+      <div class="delTitle">المحذوفات — تقدر تستعيدها ${
+        delKeys.length > 1
+          ? '<button class="btn sm" data-act="emb-restore-all" style="margin-right:8px;font-size:10.5px;padding:3px 9px">استعادة الكل</button>'
+          : ""
+      }</div>
+      ${delRows}
+    </div>` : ""}
+
+    <div class="embSelBar">
+      <span class="selCount">${selCount} محدد من ${keys.length}</span>
+      <button class="btn sm" data-act="emb-sel-all">تحديد الكل</button>
+      <button class="btn sm ghost" data-act="emb-sel-none" ${selCount ? "" : "disabled"}>إلغاء التحديد</button>
+      <button class="btn sm bad" data-act="emb-del-sel" ${selCount ? "" : "disabled"}>حذف المحدد (${selCount})</button>
+    </div>
+
+    <div style="max-height:34vh;overflow-y:auto;margin-top:10px">${rows}</div>
+
+    <label id="embFormTitle">${editing ? "تعديل كلمة" : "كلمة جديدة (حرف واحد أو أكثر)"}</label>
+    <input id="embWord" dir="rtl" placeholder="مثال: سلم">
+    <input type="hidden" id="embOrig" value="${esc(embDraft.orig || "")}">
+
+    <label>الرسمة اللي هتظهر — كود أو حرف أو اختيار من الشبكة</label>
+    <div class="charRow">
+      <input id="embCode" dir="ltr" placeholder="U+FB51 أو ﭑ أو G123">
+      <button class="btn" data-act="pick-open" data-target="embCode" style="flex:0 0 auto">من الشبكة</button>
+      <div class="charPrevBox" id="embPrev">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+
+    <div class="mbtns">
+      <button class="btn ok" data-act="emb-save">${editing ? "حفظ التعديل" : "إضافة"}</button>
+      <button class="btn ghost" data-act="emb-cancel" id="embCancelBtn"
+        ${editing ? "" : 'style="display:none"'}>إلغاء التعديل</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  if (embDraft.word) qs("#embWord").value = embDraft.word;
+  bindCharPreview(qs("#embCode"), qs("#embPrev"));
+
+  modalBox.querySelectorAll("[data-word-cv]").forEach((cv) => {
+    const gid = +cv.dataset.wordCv;
+    let g = null;
+    try { g = font.glyphs.get(gid); } catch (e) { g = null; }
+    if (g) drawGlyphToCanvas(g, cv);
+  });
+}
+
+/* تبديل تحديد كلمة واحدة في قائمة كلمات الخط المدمجة */
+function embToggleSel(word) {
+  if (!window.__embSel) window.__embSel = new Set();
+  if (window.__embSel.has(word)) window.__embSel.delete(word);
+  else window.__embSel.add(word);
+  /* حدّث بس الصف اللي اتغير — بدل إعادة فتح المودال كله */
+  const row = modalBox.querySelector('.wordRow[data-word-key="' + CSS.escape(word) + '"]');
+  if (row) {
+    const cb = row.querySelector('.wCheck');
+    const on = window.__embSel.has(word);
+    row.classList.toggle("selected", on);
+    if (cb) cb.classList.toggle("on", on);
+  }
+  embUpdateSelBar();
+}
+
+function embUpdateSelBar() {
+  const selCount = window.__embSel ? window.__embSel.size : 0;
+  const sb = modalBox.querySelector(".embSelBar");
+  if (!sb) return;
+  const cnt = sb.querySelector(".selCount");
+  if (cnt) cnt.textContent = selCount + " محدد";
+  const delBtn = sb.querySelector('[data-act="emb-del-sel"]');
+  if (delBtn) {
+    delBtn.disabled = !selCount;
+    delBtn.textContent = "حذف المحدد (" + selCount + ")";
+  }
+  const noneBtn = sb.querySelector('[data-act="emb-sel-none"]');
+  if (noneBtn) noneBtn.disabled = !selCount;
+}
+
+function embSelAll() {
+  if (!font) return;
+  const eff = font.wordLigatures || {};
+  window.__embSel = new Set(Object.keys(eff));
+  openWordsList();
+}
+
+function embSelNone() {
+  window.__embSel = new Set();
+  openWordsList();
+}
+
+async function embDelSel() {
+  if (!window.__embSel || !window.__embSel.size) return;
+  const words = Array.from(window.__embSel);
+  const ok = await uiConfirm(
+    "حذف " + words.length + " كلمة مدمجة؟\n" +
+    words.slice(0, 5).map((w) => "• " + w).join("\n") +
+    (words.length > 5 ? "\n• … و " + (words.length - 5) + " كمان" : ""),
+    { title: "حذف جماعي", okText: "حذف الكل", danger: true });
+  if (!ok) return;
+
+  const ov = activeEmbed();
+  const base = font.wordLigaturesBase || {};
+  const e2o = embEffToOrig();
+
+  words.forEach((word) => {
+    if (ov.add[word]) {
+      delete ov.add[word];
+    } else {
+      const orig = base[word] !== undefined ? word
+        : (e2o[word] !== undefined ? e2o[word] : null);
+      if (orig === null) {
+        delete ov.add[word];
+      } else {
+        ov.del[orig] = 1;
+        delete ov.edit[orig];
+      }
+    }
+  });
+
+  saveActiveEmbed(ov);
+  applyEmbedOverlay(font);
+  window.__embSel = new Set();
+  toast("تم حذف " + words.length + " كلمة مدمجة");
+  renderAll(curIndex);
+  openWordsList();
+}
+
+async function embRestoreAll() {
+  const ov = activeEmbed();
+  const n = Object.keys(ov.del).length;
+  if (!n) return;
+  const ok = await uiConfirm("استعادة كل " + n + " كلمة محذوفة؟",
+    { title: "استعادة جماعية", okText: "استعادة الكل" });
+  if (!ok) return;
+  ov.del = {};
+  saveActiveEmbed(ov);
+  applyEmbedOverlay(font);
+  toast("تمت استعادة " + n + " كلمة");
+  renderAll(curIndex);
+  openWordsList();
+}
+
+/* مزامنة عنوان الفورم وزرار الإلغاء مع وضع التعديل */
+function embSyncForm() {
+  const oi = qs("#embOrig");
+  const editing = !!(oi && oi.value);
+  const t = qs("#embFormTitle");
+  if (t) t.textContent = editing ? "تعديل كلمة" : "كلمة جديدة (حرف واحد أو أكثر)";
+  const cb = qs("#embCancelBtn");
+  if (cb) cb.style.display = editing ? "" : "none";
+  const sb = modalBox.querySelector('[data-act="emb-save"]');
+  if (sb) sb.textContent = editing ? "حفظ التعديل" : "إضافة";
+}
+
+function embResetForm() {
+  embDraft = { word: "", orig: "" };
+  const wi = qs("#embWord"), ci = qs("#embCode"), oi = qs("#embOrig");
+  if (wi) wi.value = "";
+  if (ci) { ci.value = ""; ci.dispatchEvent(new Event("input")); }
+  if (oi) oi.value = "";
+  embSyncForm();
+}
+
+/* تعبئة الفورم ببيانات كلمة موجودة للتعديل */
+function embEdit(word) {
+  if (!font) return;
+  const eff = font.wordLigatures || {};
+  const base = font.wordLigaturesBase || {};
+  const ov = activeEmbed();
+  const e2o = embEffToOrig();
+
+  /* كلمة مضافة: مفتاحها الأصلي هو نفسها — والفورم يدخل وضع تعديل
+     (embSave بيعيد تسميتها في ov.add لو النص اتغير) */
+  const origKey = ov.add[word] ? word
+    : (base[word] !== undefined ? word
+      : (e2o[word] !== undefined ? e2o[word] : word));
+
+  let code = "";
+  if (ov.add[word]) code = ov.add[word].c || ("G" + eff[word]);
+  else if (ov.edit[origKey]) code = ov.edit[origKey].c || ("G" + eff[word]);
+  else code = "G" + eff[word];
+
+  embDraft = { word: word, orig: origKey };
+  const wi = qs("#embWord"), ci = qs("#embCode"), oi = qs("#embOrig");
+  if (wi) wi.value = word;
+  if (oi) oi.value = origKey;
+  if (ci) { ci.value = code; ci.dispatchEvent(new Event("input")); }
+  embSyncForm();
+  const t = qs("#embFormTitle");
+  if (t && t.scrollIntoView) t.scrollIntoView({ block: "center", behavior: "smooth" });
+  toast("عدّل الكلمة أو الرسمة واضغط حفظ التعديل");
+}
+
+function embSave() {
+  if (!font) return;
+  const word = (qs("#embWord").value || "").trim();
+  const code = (qs("#embCode").value || "").trim();
+  const orig = (qs("#embOrig").value || "").trim();
+
+  if (!word) { toast("اكتب الكلمة", true); return; }
+  if (!code) { toast("اكتب الكود أو اختار من الشبكة", true); return; }
+  const baseChars = [...word].filter((c) => !isMarkCp(c.codePointAt(0)));
+  if (baseChars.length < 1) {
+    toast("اكتب حرفًا واحدًا على الأقل (من غير الحركات)", true);
+    return;
+  }
+
+  const r = resolveBindingGid(code);
+  if (r.gid === undefined || !isRenderable(r.gid)) {
+    toast("الكود غير موجود في الخط", true);
+    return;
+  }
+
+  /* فحص حروف الكلمة: كل حرف لازم له رسمة في الخط — وإلا القاعدة
+     مش هتنضمّن في التصدير (تحذير بس، زي القاموس) */
+  const missing = [];
+  [...word].forEach((c) => {
+    if (isMarkCp(c.codePointAt(0))) return;
+    if (resolveCharGid(c) === undefined) missing.push(c);
+  });
+
+  const ov = activeEmbed();
+  if (orig) {
+    if (ov.add[orig]) {
+      /* تعديل كلمة كانت مضافة — إعادة تسمية/ربط */
+      if (orig !== word) delete ov.add[orig];
+      ov.add[word] = { c: r.norm };
+    } else {
+      /* تعديل كلمة من المصمم — النص القديم يتشال والجديد يدخل */
+      delete ov.del[orig];
+      ov.edit[orig] = { w: word, c: r.norm };
+    }
+  } else {
+    ov.add[word] = { c: r.norm };
+  }
+
+  saveActiveEmbed(ov);
+  applyEmbedOverlay(font);
+  embResetForm();
+  toast(missing.length
+    ? "⚠ اتحفظت، بس حروف مش موجودة في الخط: " + missing.join(" ")
+    : "تم حفظ الكلمة: " + word);
+  renderAll(curIndex);
+  openWordsList();
+}
+
+function embDel(word) {
+  if (!font) return;
+  const ov = activeEmbed();
+  const base = font.wordLigaturesBase || {};
+
+  if (ov.add[word]) {
+    /* كلمة مضافة — تتشال خالص */
+    delete ov.add[word];
+  } else {
+    const e2o = embEffToOrig();
+    const orig = base[word] !== undefined ? word
+      : (e2o[word] !== undefined ? e2o[word] : null);
+    if (orig === null) {
+      delete ov.add[word];
+    } else {
+      ov.del[orig] = 1;
+      delete ov.edit[orig];
+    }
+  }
+
+  if (embDraft.word === word || embDraft.orig === word) embResetForm();
+  saveActiveEmbed(ov);
+  applyEmbedOverlay(font);
+  toast("تم حذف: " + word + (base[word] !== undefined ? " — تلاقيها في المحذوفات" : ""));
+  renderAll(curIndex);
+  openWordsList();
+}
+
+function embRestore(word) {
+  const ov = activeEmbed();
+  delete ov.del[word];
+  saveActiveEmbed(ov);
+  applyEmbedOverlay(font);
+  toast("تمت استعادة: " + word);
+  renderAll(curIndex);
+  openWordsList();
+}
+
+function gotoGlyph(gid) {
+  closeModal();
+  curIndex = gid;
+  renderAll(gid);
+}
+
+/* ================================================================
+   § 25 — النسخ الاحتياطي للقواميس
+   ================================================================ */
+function backupAllDicts() {
+  const all = {};
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.startsWith("mihabarDict:") || key.startsWith("fontDict:"))) {
+      try {
+        all[key] = JSON.parse(localStorage.getItem(key));
+      } catch (e) { /* تجاهل */ }
+    }
+  }
+
+  slots.forEach((slot) => {
+    if (slot.dict && Object.keys(slot.dict).length) {
+      all[dictKeyFor(slot.name)] = slot.dict;
+    }
+  });
+
+  if (!Object.keys(all).length) {
+    toast("مفيش قواميس للحفظ", true);
+    return;
+  }
+
+  const data = JSON.stringify({
+    type: "mihabarDictBackup",
+    version: 1,
+    date: new Date().toISOString(),
+    dicts: all
+  }, null, 2);
+
+  downloadBuffer(data,
+    "mihabar-dicts-backup-" + new Date().toISOString().slice(0, 10) + ".json",
+    "application/json");
+  toast("تم الحفظ الاحتياطي ✓");
+}
+
+function restoreBackup() {
+  const fi = document.getElementById("backupFileInput");
+  if (fi) fi.click();
+}
+
+(function initBackupInput() {
+  if (document.getElementById("backupFileInput")) return;
+
+  const fi = document.createElement("input");
+  fi.type = "file";
+  fi.id = "backupFileInput";
+  fi.accept = ".json,application/json";
+  fi.style.display = "none";
+  document.body.appendChild(fi);
+
+  fi.addEventListener("change", () => {
+    const file = fi.files && fi.files[0];
+    fi.value = "";
+    if (!file) return;
+
+    file.text().then((txt) => {
+      try {
+        const data = JSON.parse(txt);
+
+        const isMine = data && data.type === "mihabarDictBackup" && data.dicts;
+        const isLegacy = data && data.type === "fontEditorDictBackup" && data.dicts;
+        if (!isMine && !isLegacy) {
+          throw new Error("صيغة نسخة احتياطية غير صحيحة");
+        }
+
+        let count = 0;
+        for (const key in data.dicts) {
+          if (key.startsWith("mihabarDict:") || key.startsWith("fontDict:")) {
+            localStorage.setItem(key, JSON.stringify(data.dicts[key]));
+            count++;
+          }
+        }
+
+        slots.forEach((slot) => {
+          slot.dict = loadSavedDictFor(slot.name);
+        });
+
+        toast("تم استعادة " + count + " قاموس ✓");
+        if (font) defaultStatus();
+      } catch (e) {
+        uiAlert("ملف غير صالح: " + e.message);
+      }
+    });
+  });
+})();
+
+/* ════════════════════════════════════════════════════════════════
+   مِحْبَر — الجزء الخامس:
+   تجربة الكتابة ← معاينة الصفحات ← مقارنة خطين ← الاستيراد
+   ← التصدير ← بناء GSUB والحقن ← خريطة الأوامر ← التهيئة
+   ════════════════════════════════════════════════════════════════ */
+
+/* ================================================================
+   § 26 — تجربة الكتابة
+   ================================================================ */
+function openTestDrive() {
+  if (!font) return;
+
+  openModal("تجربة الكتابة", `
+    <label>اكتب نصك</label>
+    <input id="tdText" dir="rtl" value="بسم الله الرحمن الرحيم">
+    <canvas id="tdCanvas" width="640" height="220"></canvas>
+    <div class="tdRow">
+      <span class="tdSizeLbl">الحجم</span>
+      <input id="tdSize" type="range" min="24" max="140" value="80" step="2">
+      <span class="tdSizeLbl" id="tdSizeLbl">80px</span>
+    </div>
+    <p class="hint" id="tdInfo"></p>
+    <p class="hint">المعاينة الأصلية تستخدم GSUB/GPOS والـligatures الحقيقية للخط.</p>
+    <div class="mbtns">
+      <button class="btn" data-act="td-copy">نسخ النص المُشكَّل</button>
+      <button class="btn" data-act="td-diag">تشخيص الفراغات</button>
+      <button class="btn" data-act="td-clear">مسح</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  const textInput = qs("#tdText");
+  const sizeInput = qs("#tdSize");
+  const canvas = qs("#tdCanvas");
+  const infoEl = qs("#tdInfo");
+
+  const renderFallback = () => {
+    const LW = 640, LH = 220;
+    const S = Math.min(2.5, Math.max(1, (window.devicePixelRatio || 1) * 1.25));
+    const bw = Math.round(LW * S), bh = Math.round(LH * S);
+    if (canvas.width !== bw || canvas.height !== bh) {
+      canvas.width = bw; canvas.height = bh;
+    }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(S, 0, 0, S, 0, 0);
+    ctx.clearRect(0, 0, LW, LH);
+    qs("#tdSizeLbl").textContent = sizeInput.value + "px";
+
+    const shaped = shapeArabic(textInput.value);
+    const upm = font.unitsPerEm || 1000;
+    const avail = LW - 48;
+    let fs = +sizeInput.value;
+    const measure = (sz) => shaped.reduce((w, x) => w + shapedAdv(x, sz, upm), 0);
+    let total = measure(fs);
+    if (total > avail && total > 0) {
+      fs = Math.max(14, fs * avail / total);
+      total = measure(fs);
+    }
+
+    const baseline = LH * 0.72;
+    const penStart = LW - 24 - Math.max(0, (avail - total) / 2);
+    const missing = shaped.filter((x) => x.missing && !isMarkCp(x.cp)).length;
+
+    drawShapedLine(ctx, shaped, fs, baseline, penStart, INK);
+    infoEl.classList.toggle("warn", !!missing);
+    infoEl.textContent = missing
+      ? "⚠ ناقص: " + missing + " — المعاينة الداخلية"
+      : "✓ المعاينة الداخلية";
+  };
+
+  textInput.addEventListener("input", renderFallback);
+  sizeInput.addEventListener("input", renderFallback);
+  renderFallback();
+}
+
+/* ================================================================
+   § 26-ب — استوديو المسافة (توحيد عرض الفراغ بين الخطوط)
+   بلاغ «الفراغ الأساسي تبع الخط يختلف بين خط و خط — U+0020»:
+   كل خط بيرسم جليف المسافة بعرض مختلف (508 هنا، 532 هناك…) —
+   فلما تمزج خطوط أو تبدل بينهم تباعد الكلمات بيتغير.
+   الحل:
+     ١) ضبط عرض المسافة (U+0020 + U+00A0) في الخط الحالي —
+        بالوحدات أو كنسبة من em، بمعاينة حية قبل التطبيق
+     ٢) نسخ عرض المسافة من خط تاني مفتوح (مقارنة خط بخط)
+     ٣) توحيد كل الخطوط المفتوحة على نفس العرض دفعة واحدة
+     ٤) الإعداد بيتحفظ لكل خط (localStorage) وبينتزع تلقائيًا
+        مع كل تفعيل، وبيتوصل للتصدير (الكامل والنضيف) والمعاينات
+   ════════════════════════════════════════════════════════════════ */
+const __MH_SPACE_DEFAULT_EM = 0.26;   /* نفس القيمة القديمة — صفر تغيير سلوك من غير إعداد */
+const __MH_SPACE_MIN_EM = 0.04;
+const __MH_SPACE_MAX_EM = 0.90;
+
+/* كاش الإعداد المحفوظ — القراءة بتحصل لكل حرف مسافة في كل رسم،
+   فبنخففها بميمو بيتبطّل عند أي حفظ/مسح */
+let __mhSpaceSavedMemo = { key: null, em: null };
+
+/* وحدات المسافة الفعّالة للخط النشط لو فيه إعداد (تجاوز استوديو أو محفوظ) —
+   بترجع null لو مفيش إعداد عشان الخطوط اللي مالهاش إعداد ما تتلمسش.
+   دي مصدر الحقيقة الموحّد للرسم في كل المعاينات (إصلاح «التباعد لسه موجود») */
+function __mhActiveSpaceUnits(upm) {
+  if (typeof __mhSpaceEmOverride === "number" && isFinite(__mhSpaceEmOverride)) {
+    const ov = Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, __mhSpaceEmOverride));
+    return Math.max(1, Math.round(upm * ov));
+  }
+  const nm = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot].name : "";
+  const key = String(nm || "");
+  if (__mhSpaceSavedMemo.key !== key) {
+    const sv = loadSavedSpaceFor(nm);
+    __mhSpaceSavedMemo = { key: key, em: (sv && typeof sv.em === "number" && isFinite(sv.em))
+      ? Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, sv.em)) : null };
+  }
+  if (__mhSpaceSavedMemo.em === null) return null;
+  return Math.max(1, Math.round(upm * __mhSpaceSavedMemo.em));
+}
+
+function spaceKeyFor(name) {
+  return "mihabarSpace:" + String(name || "font");
+}
+function loadSavedSpaceFor(name) {
+  try {
+    const v = JSON.parse(localStorage.getItem(spaceKeyFor(name)) || "null");
+    return (v && typeof v.em === "number" && isFinite(v.em)) ? v : null;
+  } catch (e) { return null; }
+}
+function saveSpaceFor(name, em) {
+  try { localStorage.setItem(spaceKeyFor(name), JSON.stringify({ em: em })); }
+  catch (e) { /* تجاهل */ }
+  __mhSpaceSavedMemo = { key: null, em: null }; /* إبطال الكاش */
+}
+function clearSpaceFor(name) {
+  try { localStorage.removeItem(spaceKeyFor(name)); } catch (e) {}
+  __mhSpaceSavedMemo = { key: null, em: null }; /* إبطال الكاش */
+}
+
+/* قراءة عرض المسافة الفعّال للخط النشط (وحدات em):
+   تجاوز مؤقت للمعاينة ← إعداد محفوظ ← القيمة القياسية */
+let __mhSpaceEmOverride = null;
+function __mhSpaceEm() {
+  if (typeof __mhSpaceEmOverride === "number" && isFinite(__mhSpaceEmOverride)) {
+    return Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, __mhSpaceEmOverride));
+  }
+  const nm = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot].name : "";
+  const saved = loadSavedSpaceFor(nm);
+  if (saved && typeof saved.em === "number" && isFinite(saved.em)) {
+    return Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, saved.em));
+  }
+  return __MH_SPACE_DEFAULT_EM;
+}
+
+/* كل جليفات المسافة في الخط (U+0020 و NBSP — ممكن يكونوا جليف واحد أو اتنين) */
+function spaceGlyphsOf(f) {
+  const out = [];
+  if (!f || !f.glyphs) return out;
+  let arr = null;
+  if (Array.isArray(f.glyphs)) arr = f.glyphs;
+  else if (f.glyphs && Array.isArray(f.glyphs.glyphs)) arr = f.glyphs.glyphs;
+  else if (f.glyphs && f.glyphs.glyphs && typeof f.glyphs.glyphs === "object") {
+    const src = f.glyphs.glyphs;
+    arr = [];
+    for (const k in src) arr[+k] = src[k];
+  }
+  const n = arr ? arr.length : (typeof f.numGlyphs === "number" ? f.numGlyphs : 0);
+  for (let i = 0; i < n; i++) {
+    let g = arr ? arr[i] : null;
+    if (!g && f.glyphs && typeof f.glyphs.get === "function") {
+      try { g = f.glyphs.get(i); } catch (e) { g = null; }
+    }
+    if (!g || g.deleted) continue;
+    const cps = (g.unicodes && g.unicodes.length)
+      ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+    if (cps.indexOf(0x20) !== -1 || cps.indexOf(0xA0) !== -1) out.push(g);
+  }
+  return out;
+}
+
+/* تطبيق عرض موحد (بوحدات الخط) على كل جليفات مسافة الخط — بيرجع عدد المتغيّر */
+function applySpaceUnits(f, units) {
+  const gl = spaceGlyphsOf(f);
+  gl.forEach((g) => { g.advanceWidth = units; });
+  return gl.length;
+}
+
+/* إعادة تطبيق الإعداد المحفوظ عند تفعيل الخط — بلا undo وبلا رسم جديد،
+   بس لازم نعلّم البنية عشان التصدير يبني من الخط الحالي بالعرض المطبَّق */
+function __mhApplySavedSpaceOnActivate(slot) {
+  if (!slot || !slot.font) return;
+  const saved = loadSavedSpaceFor(slot.name);
+  if (!saved || typeof saved.em !== "number" || !isFinite(saved.em)) return;
+  const em = Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, saved.em));
+  const upm = slot.font.unitsPerEm || 1000;
+  const n = applySpaceUnits(slot.font, Math.max(1, Math.round(upm * em)));
+  if (n > 0) {
+    const isTT = !slot.font.outlinesFormat || slot.font.outlinesFormat === "truetype";
+    if (isTT) slot.structChanged = true; /* التصدير يعكس العرض الجديد */
+    if (typeof __mhBumpDictVersion === "function") __mhBumpDictVersion();
+  }
+}
+
+function openSpaceStudio() {
+  if (!font) return;
+  const slot = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot] : null;
+  const upm = font.unitsPerEm || 1000;
+
+  /* حالة الخط الحالية (قبل أي تغيير مقترح) */
+  const glNow = spaceGlyphsOf(font);
+  const gid20 = font.glyphIndexMap ? font.glyphIndexMap[0x20] : undefined;
+  const gidA0 = font.glyphIndexMap ? font.glyphIndexMap[0xA0] : undefined;
+  let curUnits = glNow.length ? (glNow[0].advanceWidth || 0) : 0;
+  let curEm = curUnits / upm;
+  let saved = loadSavedSpaceFor(slot ? slot.name : "");
+  const initEm = (saved && typeof saved.em === "number")
+    ? saved.em : (glNow.length ? Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, curEm)) : __MH_SPACE_DEFAULT_EM);
+  /* قيم أصلية للرجوع: من خطة الأصل المحفوظة عند الفتح */
+  const origUnitsByGlyph = new Map();
+  if (slot && font._mhOriginalGlyphs && typeof font.glyphs.get === "function") {
+    glNow.forEach((g) => {
+      const gi = g.index;
+      if (font._mhOriginalGlyphs[gi]) origUnitsByGlyph.set(g, font._mhOriginalGlyphs[gi].advanceWidth);
+    });
+  }
+
+  openModal("توحيد عرض المسافة — استوديو الفراغ", `
+    <p class="hint">كل خط بيرسم جليف المسافة <b dir="ltr">U+0020</b> بعرض مختلف — وده اللي بيخلي
+    تباعد الكلمات يتغير من خط لخط. حرّك السلايدر أو اختار قيمة — <b>بتتطبق على الخط فورًا
+    وبتبان في كل المعاينات والتصدير على طول</b> — أو انسخ العرض من خط تاني.
+    القيمة بتتحفظ للخط تلقائيًا وبترجع مع أي تفعيل للخط.</p>
+
+    <div class="spwGrid">
+      <div class="spwCell">
+        <div class="spwK">المسافة العادية <span class="mono" dir="ltr">U+0020</span></div>
+        <div class="spwV" id="spwInfo20">…</div>
+      </div>
+      <div class="spwCell">
+        <div class="spwK">مسافة غير قابلة للكسر <span class="mono" dir="ltr">U+00A0</span></div>
+        <div class="spwV" id="spwInfoA0">…</div>
+      </div>
+    </div>
+
+    <div class="spwRow">
+      <label>الكلمة في المربع</label>
+      <input id="spwText" type="text" maxlength="80" autocomplete="off"
+             placeholder="اكتب أي كلمة أو جملة للمعاينة">
+      <button class="btn ghost" id="spwTextReset" style="min-width:0;flex-shrink:0">↺ بسملة</button>
+    </div>
+    <p class="hint">التعديل ده للمعاينة بس — مش بيلمس الخط. والمربع بيتقلّص عشان النص يفضل جوه الحد على أي شاشة.</p>
+
+    <canvas id="spwCanvas" width="640" height="170"></canvas>
+
+    <div class="tdRow">
+      <span class="tdSizeLbl">العرض</span>
+      <input id="spwRange" type="range" min="4" max="90" value="26" step="0.5">
+      <span class="tdSizeLbl mono" id="spwRangeLbl">26%</span>
+    </div>
+
+    <div class="spwRow">
+      <label>بالوحدات</label>
+      <input id="spwUnits" type="number" min="1" step="1" style="width:110px">
+      <span class="hint mono" id="spwPx" dir="ltr"></span>
+    </div>
+
+    <div class="spwRow spwPresets" id="spwPresets">
+      <span class="hint">قيم جاهزة:</span>
+      <button class="btn ghost spwP" data-em="0.20">20%</button>
+      <button class="btn ghost spwP" data-em="0.25">25%</button>
+      <button class="btn ghost spwP" data-em="0.26">26% قياسي</button>
+      <button class="btn ghost spwP" data-em="0.30">30%</button>
+      <button class="btn ghost spwP" data-em="0.35">35%</button>
+      <button class="btn ghost spwP" data-em="0.44">44% نص قرآني</button>
+    </div>
+
+    <div class="spwRow">
+      <label>انسخ من خط تاني</label>
+      <select id="spwSrc" style="max-width:60%">
+        <option value="">— اختار خط مفتوح —</option>
+      </select>
+    </div>
+
+    <p class="hint" id="spwState"></p>
+
+    <div class="mbtns">
+      <button class="btn ok" data-act="spw-apply">تطبيق على الخط الحالي</button>
+      <button class="btn" data-act="spw-unify">توحيد كل الخطوط المفتوحة</button>
+      <button class="btn" data-act="spw-restore">إرجاع عرض الخط الأصلي</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  const canvas = qs("#spwCanvas");
+  const range = qs("#spwRange");
+  const rangeLbl = qs("#spwRangeLbl");
+  const unitsInp = qs("#spwUnits");
+  const pxLbl = qs("#spwPx");
+  const stateEl = qs("#spwState");
+  const srcSel = qs("#spwSrc");
+  /* الكلمة المكتوبة في المربع — نص المعاينة بيتعدل حر وبيتحفظ (مش بيلمس الخط) */
+  const textInp = qs("#spwText");
+  const SPW_TEXT_KEY = "mihabarSpaceText";
+  const SPW_DEFAULT_TEXT = "بسم الله الرحمن الرحيم";
+  try { textInp.value = localStorage.getItem(SPW_TEXT_KEY) || ""; } catch (e) { /* تجاهل */ }
+  let proposedEm = initEm;
+  let applying = false; /* قفل بسيط ضد التداخل أثناء إعادة الرسم */
+
+  /* ── التطبيق الحي ── أي تغيير للقيمة بيتطبق على الخط نفسه فورًا —
+     «اللي بتشوفه في معاينة الاستوديو هو اللي على الخط وفي كل الشاشات».
+     (إصلاح «حركت السلايدر والمعاينة الأساسية ما اتغيرتش» — كان التطبيق
+     محتاج ضغطة يدوية فكان شكل السلايدر مضلل) */
+  let burstUndo = false; /* لقطة تراجع واحدة لكل سحبة سلايدر */
+  let saveTimer = 0, drawTimer = 0;
+  const scheduleAppRefresh = () => {
+    clearTimeout(drawTimer);
+    drawTimer = setTimeout(() => {
+      try { if (typeof renderAll === "function") renderAll(); } catch (e) { /* تجاهل */ }
+    }, 220);
+  };
+  const liveApply = (discrete) => {
+    const units = Math.max(1, Math.round(upm * proposedEm));
+    if (discrete) {
+      if (typeof pushUndo === "function") pushUndo();
+    } else if (!burstUndo) {
+      if (typeof pushUndo === "function") pushUndo();
+      burstUndo = true;
+    }
+    applySpaceUnits(font, units);
+    if (slot) {
+      const isTT = !font.outlinesFormat || font.outlinesFormat === "truetype";
+      if (isTT) slot.structChanged = true; /* التصدير يبني بالعرض الجديد */
+    }
+    if (typeof __mhBumpDictVersion === "function") __mhBumpDictVersion();
+    curUnits = units; curEm = proposedEm;
+    /* حفظ فوري مش مؤجل — التأجيل كان ممكن يرجع يحفظ قيمة قديمة بعد
+       «إرجاع الأصل» لو المستخدم ضغط الرجوع في نص الثانية بعد التغيير (سباق) */
+    saveSpaceFor(slot ? slot.name : "", proposedEm);
+    saved = loadSavedSpaceFor(slot ? slot.name : "");
+    refreshInfo();
+    scheduleAppRefresh();
+  };
+
+  /* قائمة الخطوط المفتوحة (للنسخ والتوحيد) */
+  slots.forEach((s, i) => {
+    const o = document.createElement("option");
+    o.value = String(i);
+    o.textContent = s.name + (i === activeSlot ? " (الحالي)" : "");
+    srcSel.appendChild(o);
+  });
+
+  const fmtPct = (em) => (em * 100).toFixed(1).replace(/\.0$/, "") + "%";
+
+  const refreshInfo = () => {
+    const units = Math.max(1, Math.round(upm * proposedEm));
+    const info20 = qs("#spwInfo20"), infoA0 = qs("#spwInfoA0");
+    const line = (gid, exists) => exists
+      ? ("gid " + gid + " — " + Math.round(upm * proposedEm) + " وحدة (" + fmtPct(proposedEm) + " من em)")
+      : "مش موجود في الخط — العرض المختار هيتطبق في المعاينة والتصدير النضيف";
+    if (info20) info20.textContent = gid20 !== undefined ? line(gid20, true) : line(undefined, false);
+    if (infoA0) infoA0.textContent = gidA0 !== undefined ? line(gidA0, true) : line(undefined, false);
+    if (unitsInp && document.activeElement !== unitsInp) unitsInp.value = String(units);
+    if (pxLbl) pxLbl.textContent = "= " + (proposedEm * 80).toFixed(1) + "px @ 80px";
+    if (range && document.activeElement !== range) range.value = String(Math.round(proposedEm * 100));
+    if (rangeLbl) rangeLbl.textContent = fmtPct(proposedEm);
+    if (stateEl) {
+      const parts = [];
+      parts.push("الحالي في الخط: " + (glNow.length ? (curUnits + " وحدة (" + fmtPct(curEm) + ")") : "مفيش جليف مسافة"));
+      if (saved) parts.push("محفوظ: " + fmtPct(saved.em));
+      parts.push("أي تغيير بيتطبق فورًا");
+      stateEl.textContent = parts.join(" — ");
+    }
+  };
+
+  const renderPreview = () => {
+    const LW = 640, LH = 170;
+    const S = Math.min(2.5, Math.max(1, (window.devicePixelRatio || 1) * 1.25));
+    const bw = Math.round(LW * S), bh = Math.round(LH * S);
+    if (canvas.width !== bw || canvas.height !== bh) { canvas.width = bw; canvas.height = bh; }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(S, 0, 0, S, 0, 0);
+    ctx.clearRect(0, 0, LW, LH);
+
+    /* تجاوز مؤقت: المعاينة بتترسم بالعرض المقترح — بيتشال فورًا بعد الرسم */
+    const tmpUnits = Math.max(1, Math.round(upm * proposedEm));
+    const restored = [];
+    glNow.forEach((g) => { restored.push([g, g.advanceWidth]); g.advanceWidth = tmpUnits; });
+    __mhSpaceEmOverride = proposedEm;
+
+    try {
+      const prevText = ((textInp.value || "").trim() || SPW_DEFAULT_TEXT).slice(0, 80);
+      const shaped = shapeArabic(prevText);
+      const avail = LW - 48;
+      let fs = 72;
+      const measure = (sz) => shaped.reduce((w, x) => w + shapedAdv(x, sz, upm), 0);
+      let total = measure(fs);
+      if (total > avail && total > 0) { fs = Math.max(3, fs * avail / total); }
+      const baseline = LH * 0.62;
+      const penStart = LW - 24 - Math.max(0, (avail - measure(fs)) / 2);
+      drawShapedLine(ctx, shaped, fs, baseline, penStart, INK);
+
+      /* مسطرة صغيرة تحت النص: عرض em كامل مقابل عرض المسافة المختار */
+      const y = LH - 26;
+      const emPx = fs;                 /* 1em بالبكسل الحالي */
+      const spPx = emPx * proposedEm;
+      const x0 = LW - 24;
+      ctx.strokeStyle = "rgba(210,172,110,.55)";
+      ctx.fillStyle = "rgba(243,237,225,.75)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x0 - emPx, y); ctx.lineTo(x0, y);
+      ctx.moveTo(x0 - emPx, y - 4); ctx.lineTo(x0 - emPx, y + 4);
+      ctx.moveTo(x0, y - 4); ctx.lineTo(x0, y + 4);
+      ctx.stroke();
+      ctx.font = "10px sans-serif"; ctx.textAlign = "center"; ctx.direction = "rtl";
+      ctx.fillText("1em", x0 - emPx / 2, y - 6);
+      ctx.strokeStyle = "rgba(74,185,138,.9)";
+      ctx.beginPath();
+      ctx.moveTo(x0 - emPx, y + 9); ctx.lineTo(x0 - emPx + spPx, y + 9);
+      ctx.moveTo(x0 - emPx, y + 6); ctx.lineTo(x0 - emPx, y + 12);
+      ctx.moveTo(x0 - emPx + spPx, y + 6); ctx.lineTo(x0 - emPx + spPx, y + 12);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(74,185,138,.95)";
+      ctx.fillText("المسافة " + fmtPct(proposedEm), x0 - emPx + spPx / 2, y + 16);
+    } finally {
+      /* إرجاع كل حاجة زي ما كانت — مفيش أثر على الخط */
+      restored.forEach(([g, w]) => { g.advanceWidth = w; });
+      __mhSpaceEmOverride = null;
+    }
+  };
+
+  const refresh = () => { refreshInfo(); renderPreview(); };
+
+  range.addEventListener("input", () => {
+    proposedEm = Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, (+range.value || 26) / 100));
+    liveApply(false);
+    renderPreview();
+  });
+  range.addEventListener("change", () => { burstUndo = false; });
+  unitsInp.addEventListener("input", () => {
+    const u = +unitsInp.value;
+    if (isFinite(u) && u >= 1) {
+      proposedEm = Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, u / upm));
+      liveApply(false);
+      renderPreview();
+    }
+  });
+  unitsInp.addEventListener("change", () => { burstUndo = false; });
+  qs("#spwPresets").addEventListener("click", (e) => {
+    const b = e.target.closest(".spwP");
+    if (!b) return;
+    proposedEm = Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, +b.dataset.em));
+    liveApply(true);
+    renderPreview();
+  });
+  srcSel.addEventListener("change", () => {
+    const i = +srcSel.value;
+    const s = slots[i];
+    if (!s || !s.font) return;
+    const srcUpm = s.font.unitsPerEm || 1000;
+    const srcGl = spaceGlyphsOf(s.font);
+    if (!srcGl.length) {
+      toast("الخط «" + s.name + "» مفيهوش جليف مسافة", true);
+      return;
+    }
+    /* تحويل عرض المسافة من upm المصدر لـ upm الخط الحالي (نسبة em هي اللي بتنتقل) */
+    proposedEm = Math.min(__MH_SPACE_MAX_EM, Math.max(__MH_SPACE_MIN_EM, (srcGl[0].advanceWidth || 0) / srcUpm));
+    liveApply(true);
+    renderPreview();
+    toast("اتنسخ واتطبق " + fmtPct(proposedEm) + " من " + s.name);
+  });
+
+  /* مستمعات «الكلمة في المربع» — حفظ فوري وإعادة رسم، وزر الرجوع للبسملة */
+  let textTimer = 0;
+  textInp.addEventListener("input", () => {
+    clearTimeout(textTimer);
+    textTimer = setTimeout(() => {
+      try { localStorage.setItem(SPW_TEXT_KEY, textInp.value.slice(0, 80)); } catch (e) { /* تجاهل */ }
+      renderPreview();
+    }, 140);
+  });
+  qs("#spwTextReset").addEventListener("click", () => {
+    textInp.value = "";
+    try { localStorage.removeItem(SPW_TEXT_KEY); } catch (e) { /* تجاهل */ }
+    renderPreview();
+    textInp.focus();
+  });
+
+  /* زر التطبيق: تأكيد وحفظ فوري — القيمة نفسها متطبقة حي مع أي تغيير */
+  window.__spwApply = () => {
+    if (applying) return;
+    applying = true;
+    try {
+      const units = Math.max(1, Math.round(upm * proposedEm));
+      const n = applySpaceUnits(font, units); /* ضمان التطابق حتى لو المعاينة اتلغت */
+      if (slot) {
+        const isTT = !font.outlinesFormat || font.outlinesFormat === "truetype";
+        if (isTT && n > 0) slot.structChanged = true; /* التصدير يبني بالعرض الجديد */
+      }
+      clearTimeout(saveTimer);
+      saveSpaceFor(slot ? slot.name : "", proposedEm);
+      saved = loadSavedSpaceFor(slot ? slot.name : "");
+      if (typeof __mhBumpDictVersion === "function") __mhBumpDictVersion();
+      curUnits = units; curEm = proposedEm;
+      refreshInfo();
+      scheduleAppRefresh();
+      toast(n > 0
+        ? "اتحفظ " + fmtPct(proposedEm) + " كعرض مسافة ثابت للخط — شغال في كل المعاينات والتصدير"
+        : "القيمة محفوظة — بتتطبق في المعاينة والتصدير النضيف (الخط مفيهوش جليف مسافة)");
+    } finally { applying = false; }
+  };
+
+  /* إرجاع عرض الخط الأصلي (من خطة أول فتح) ومسح الإعداد المحفوظ */
+  window.__spwRestore = () => {
+    if (applying) return;
+    applying = true;
+    try {
+      if (!origUnitsByGlyph.size) {
+        clearSpaceFor(slot ? slot.name : "");
+        toast("مفيش خطة أصل محفوظة — اتمسح الإعداد فقط");
+        return;
+      }
+      if (typeof pushUndo === "function") pushUndo();
+      origUnitsByGlyph.forEach((w, g) => { g.advanceWidth = w; });
+      if (slot) {
+        const isTT = !font.outlinesFormat || font.outlinesFormat === "truetype";
+        if (isTT) slot.structChanged = true;
+      }
+      clearSpaceFor(slot ? slot.name : "");
+      clearTimeout(saveTimer);
+      if (typeof __mhBumpDictVersion === "function") __mhBumpDictVersion();
+      curUnits = (glNow.length ? glNow[0].advanceWidth : 0); curEm = curUnits / upm;
+      saved = loadSavedSpaceFor(slot ? slot.name : "");
+      refreshInfo();
+      renderPreview();
+      scheduleAppRefresh();
+      toast("رجع عرض المسافة الأصلي واتمسح الإعداد المحفوظ");
+    } finally { applying = false; }
+  };
+
+  /* توحيد كل الخطوط المفتوحة على نفس العرض */
+  window.__spwUnify = async () => {
+    if (applying) return;
+    if (slots.length < 2) {
+      toast("مفيش غير خط واحد مفتوح — افتح الخطوط التانية ووحّدهم", true);
+      return;
+    }
+    const ok = await uiConfirm(
+      "توحيد عرض المسافة (" + fmtPct(proposedEm) + ") على كل الخطوط المفتوحة (" +
+      slots.length + " خطوط)؟\nالقيمة بتتحفظ لكل خط وهتتطبق في التصدير.\nملاحظة: التراجع (Ctrl+Z) بيشتغل على الخط النشط بس.",
+      { title: "توحيد كل الخطوط", okText: "وحّدهم" }
+    );
+    if (!ok) return;
+    if (typeof pushUndo === "function") pushUndo();
+    const units = Math.max(1, Math.round(upm * proposedEm));
+    let touched = 0;
+    slots.forEach((s) => {
+      if (!s.font) return;
+      const supm = s.font.unitsPerEm || 1000;
+      const su = Math.max(1, Math.round(supm * proposedEm)); /* احترام upm مختلف */
+      const n = applySpaceUnits(s.font, su);
+      saveSpaceFor(s.name, proposedEm);
+      if (n > 0) {
+        const isTT = !s.font.outlinesFormat || s.font.outlinesFormat === "truetype";
+        if (isTT) s.structChanged = true;
+        touched++;
+      }
+    });
+    if (typeof __mhBumpDictVersion === "function") __mhBumpDictVersion();
+    curUnits = units; curEm = proposedEm;
+    refreshInfo();
+    scheduleAppRefresh();
+    toast("اتوحد " + touched + " من " + slots.length + " خط على " + fmtPct(proposedEm));
+  };
+
+  refresh();
+}
+
+/* أزرار الاستوديو — موصولة بالخريطة العامة تحت (ACTIONS) */
+
+/* ================================================================
+   § 27 — معاينة نص كامل بصفحات
+   ================================================================ */
+const pgState = { page: 0, fontSize: 48, lineHeight: 1.9, pages: [] };
+
+function paginateText(text, width, height, fontSize, lineHeight, upm) {
+  const margin = 40;
+  const availW = width - margin * 2;
+  const availH = height - margin * 2;
+  const lineH = fontSize * lineHeight;
+
+  const shaped = shapeArabic(String(text || ""));
+  const lines = [];
+  let curLine = [];
+
+  const lineW = (arr) => arr.reduce((w, s) => {
+    if (s.gid === undefined || s.gid === null) {
+      /* فواصل بيضاء ناقصة: عرض سبيس من إعداد استوديو المسافة — مش نص إم */
+      return w + (__isSpaceCp(s.cp) ? fontSize * __mhSpaceEm() : fontSize * 0.5);
+    }
+    const g = font.glyphs.get(s.gid);
+    let adv = (g.advanceWidth || upm / 2);
+    /* جليف مسافة موجود: إعداد الاستوديو مصدر الحقيقة (نفس منطق shapedAdv) */
+    if (__isSpaceCp(s.cp)) {
+      const su = __mhActiveSpaceUnits(upm);
+      if (su !== null) adv = su;
+    }
+    /* رسمة كلمة مدمجة: تداخل حقيقي أو فراغ مفتعل → عرض الحبر + هامش
+       (نفس منطق shapedAdv بالاتجاهين) */
+    if (s.dictWord !== undefined) {
+      const inkW = __mhGlyphInkW(s.gid);
+      if (inkW > 0 && inkW > adv && (inkW - adv) > upm * 0.25) adv = inkW + upm * 0.04;
+      else if (inkW > 0 && adv > inkW && (adv - inkW) > upm * 0.25) adv = inkW + upm * 0.04;
+    }
+    return w + (adv * fontSize) / upm;
+  }, 0);
+
+  shaped.forEach((s) => {
+    curLine.push(s);
+    if (lineW(curLine) > availW) {
+      const last = curLine.pop();
+      lines.push(curLine);
+      curLine = [last];
+    }
+  });
+  if (curLine.length) lines.push(curLine);
+
+  const pages = [];
+  let pageLines = [];
+  lines.forEach((ln) => {
+    pageLines.push(ln);
+    if (pageLines.length * lineH > availH - lineH) {
+      pages.push(pageLines);
+      pageLines = [];
+    }
+  });
+  if (pageLines.length) pages.push(pageLines);
+
+  return { pages: pages, lineH: lineH, margin: margin };
+}
+
+function openFontPages() {
+  if (!font) return;
+
+  openModal("معاينة نص كامل بصفحات", `
+    <label>اكتب النص الكامل (آية أو صفحة)</label>
+    <textarea id="pgText" rows="4" dir="rtl" placeholder="اكتب أو الصق النص هنا…"></textarea>
+    <canvas id="pgCanvas" width="620" height="760"></canvas>
+
+    <div class="pgRow">
+      <span class="pgLbl">الحجم</span>
+      <input id="pgSize" type="range" min="20" max="90" value="48" step="2">
+      <span class="pgLbl" id="pgSizeLbl">48</span>
+    </div>
+
+    <div class="pgRow">
+      <span class="pgLbl">التباعد</span>
+      <input id="pgLine" type="range" min="14" max="30" value="19" step="1">
+      <span class="pgLbl" id="pgLineLbl">1.9</span>
+    </div>
+
+    <p class="hint" id="pgInfo"></p>
+
+    <div class="pgNav">
+      <button class="btn" data-act="pg-prev" id="pgPrev" disabled>↦ السابقة</button>
+      <button class="btn" data-act="pg-next" id="pgNext" disabled>اللاحقة ⇤</button>
+    </div>
+
+    <div class="mbtns">
+      <button class="btn ok" data-act="pg-export-png">تصدير الصفحة الحالية PNG</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  pgState.page = 0;
+
+  const textEl = qs("#pgText");
+  const sizeEl = qs("#pgSize");
+  const lineEl = qs("#pgLine");
+  const canvas = qs("#pgCanvas");
+  const infoEl = qs("#pgInfo");
+
+  const renderFallback = () => {
+    const LW = 620, LH = 760;
+    const S = Math.min(2.5, Math.max(1, (window.devicePixelRatio || 1) * 1.25));
+    const bw = Math.round(LW * S), bh = Math.round(LH * S);
+    if (canvas.width !== bw || canvas.height !== bh) {
+      canvas.width = bw; canvas.height = bh;
+    }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(S, 0, 0, S, 0, 0);
+    ctx.clearRect(0, 0, LW, LH);
+
+    pgState.fontSize = +sizeEl.value;
+    pgState.lineHeight = lineEl.value / 10;
+    qs("#pgSizeLbl").textContent = sizeEl.value;
+    qs("#pgLineLbl").textContent = pgState.lineHeight.toFixed(1);
+
+    const upm = font.unitsPerEm || 1000;
+    const result = paginateText(textEl.value, LW, LH, pgState.fontSize, pgState.lineHeight, upm);
+    pgState.pages = result.pages;
+    pgState.page = Math.max(0, Math.min(pgState.page, Math.max(0, result.pages.length - 1)));
+
+    $("pgPrev").disabled = pgState.page <= 0;
+    $("pgNext").disabled = pgState.page >= result.pages.length - 1;
+    infoEl.textContent = result.pages.length
+      ? "صفحة " + (pgState.page + 1) + " من " + result.pages.length + " — المعاينة الداخلية"
+      : "اكتب نصًا للمعاينة";
+
+    if (!result.pages.length) return;
+    const page = result.pages[pgState.page];
+    let y = result.margin + pgState.fontSize;
+    page.forEach((line) => {
+      drawShapedLine(ctx, line, pgState.fontSize, y, LW - result.margin, INK);
+      y += result.lineH;
+    });
+  };
+
+  textEl.addEventListener("input", () => { pgState.page = 0; renderFallback(); });
+  sizeEl.addEventListener("input", renderFallback);
+  lineEl.addEventListener("input", renderFallback);
+  renderFallback();
+}
+
+function pageNav(dir) {
+  pgState.page = Math.max(0, pgState.page + dir);
+  const input = qs("#pgText");
+  if (input) input.dispatchEvent(new Event("input"));
+}
+
+function exportPagePNG() {
+  const canvas = qs("#pgCanvas");
+  if (!canvas) return;
+  canvas.toBlob((blob) => {
+    if (!blob) { toast("فشل التصدير", true); return; }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mihabar-page-" + (pgState.page + 1) + ".png";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast("تم تصدير الصفحة ✓");
+  }, "image/png");
+}
+
+/* ================================================================
+   § 28 — تصدير الحرف كصورة PNG
+   ================================================================ */
+function exportGlyphPNG() {
+  if (curIndex === null) {
+    uiAlert("افتح حرفًا أولًا من الشبكة.");
+    return;
+  }
+
+  let g = null;
+  try { g = font.glyphs.get(curIndex); } catch (e) { g = null; }
+  if (!g) return;
+
+  const size = 1024;
+  const cv = document.createElement("canvas");
+  cv.width = size;
+  cv.height = size;
+  const ctx = cv.getContext("2d");
+
+  const path = g.getPath(0, 0, PREVIEW, null, font);
+  const bb = path.getBoundingBox();
+  const gw = bb.x2 - bb.x1, gh = bb.y2 - bb.y1;
+
+  if (isFinite(gw) && isFinite(gh) && gw > 0 && gh > 0) {
+    const pad = size * 0.1;
+    const scale = Math.min((size - pad * 2) / gw, (size - pad * 2) / gh);
+    ctx.save();
+    ctx.translate(size / 2 - (bb.x1 + bb.x2) / 2 * scale,
+      size / 2 - (bb.y1 + bb.y2) / 2 * scale);
+    ctx.scale(scale, scale);
+    path.fill = "#000";
+    path.draw(ctx);
+    ctx.restore();
+  } else {
+    drawGlyphRaw(g, 0, 0, PREVIEW * (size / (font.unitsPerEm || 1000)), ctx);
+  }
+
+  cv.toBlob((blob) => {
+    if (!blob) { toast("فشل التصدير", true); return; }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mihabar-glyph-" + curIndex + ".png";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast("تم تصدير PNG ✓");
+  }, "image/png");
+}
+
+/* ================================================================
+   § 28-ب — بطاقة المعاينة الجاهزة (PNG للسوشيال)
+   نصك بخطك على خلفية استوديوة بإطار زخرفي — مقاسات جاهزة
+   (مربع/ستوري/بانر) وتحميل PNG بدقة كاملة من غير أي مكتبة.
+   ================================================================ */
+const CARD_PALETTES = [
+  { name: "ملكي ذهبي", bg: ["#0B0906", "#1A140A"], ink: "#EFD9A7", orn: "#CFA75F" },
+  { name: "ليلي سماوي", bg: ["#0A0F1E", "#131C36"], ink: "#E8CFA0", orn: "#CFA75F" },
+  { name: "زمردي", bg: ["#062B25", "#0B443B"], ink: "#F3E7C8", orn: "#C9A85C" },
+  { name: "نبيتي", bg: ["#2B0A0F", "#47101A"], ink: "#F5DFB0", orn: "#D3A44C" },
+  { name: "عاجي فاخر", bg: ["#F5EFE2", "#EDE2CC"], ink: "#3A2A10", orn: "#A97F3C" },
+  { name: "وردي حالم", bg: ["#1A0A1E", "#2D1442"], ink: "#F0C4FF", orn: "#C77DFF" }
+];
+
+const CARD_SIZES = [
+  { name: "مربع — 1080×1080", w: 1080, h: 1080 },
+  { name: "ستوري — 1080×1920", w: 1080, h: 1920 },
+  { name: "بانر — 1200×630", w: 1200, h: 630 }
+];
+
+const cardState = { pal: 0, size: 0, fs: 120 };
+
+/* تقسيم النص لأسطر بحد أقصى للعرض — كل سطر بيتشكّل لوحده */
+function cardWrapLines(text, fs, maxW) {
+  const upm = (font && font.unitsPerEm) || 1000;
+  const paras = String(text || "").split(/\n/);
+  const out = [];
+  paras.forEach((para) => {
+    const words = para.split(/\s+/).filter((x) => x.length);
+    if (!words.length) { out.push([]); return; }
+    let cur = [];
+    const wOf = (arr) => arr.reduce((acc, wd) =>
+      acc + shapeArabic((cur.length ? " " : "") + wd)
+        .reduce((w2, s) => w2 + shapedAdv(s, fs, upm), 0), 0);
+    for (const wd of words) {
+      const cand = cur.concat([wd]);
+      if (cur.length && wOf(cand) > maxW) {
+        out.push(cur);
+        cur = [wd];
+      } else {
+        cur = cand;
+      }
+      if (!cur.length) cur = [wd];
+    }
+    if (cur.length) out.push(cur);
+  });
+  return out.map((words) => shapeArabic(words.join(" ")));
+}
+
+/* رسم البطاقة كاملة على كانفاس بدقة كاملة — الرسمة النهائية */
+function renderCardToCanvas(cv, W, H, pal, text, fsMax) {
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d");
+
+  /* الخلفية — تدرج ناعم */
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, pal.bg[0]);
+  grad.addColorStop(1, pal.bg[1]);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  /* الإطار الزخرفي المزدوج + علامات الزوايا */
+  const m = Math.round(Math.min(W, H) * 0.052);
+  ctx.strokeStyle = pal.orn;
+  ctx.lineWidth = Math.max(2, W * 0.0035);
+  ctx.globalAlpha = 0.95;
+  ctx.strokeRect(m, m, W - m * 2, H - m * 2);
+  ctx.globalAlpha = 0.5;
+  ctx.lineWidth = 1.2;
+  const m2 = m + Math.round(Math.min(W, H) * 0.016);
+  ctx.strokeRect(m2, m2, W - m2 * 2, H - m2 * 2);
+
+  /* معينات الزوايا */
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = pal.orn;
+  const dm = Math.max(6, W * 0.007);
+  const corner = (cx, cy) => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-dm / 2, -dm / 2, dm, dm);
+    ctx.restore();
+  };
+  corner(m, m); corner(W - m, m); corner(m, H - m); corner(W - m, H - m);
+  ctx.globalAlpha = 1;
+
+  /* النص: لفّ أسطر + تصغير تلقائي لو عدّى المساحة */
+  const innerX = m2 + Math.round(W * 0.03);
+  const maxW = W - innerX * 2;
+  const sigZone = Math.round(H * 0.085);
+  const topZone = m2 + Math.round(H * 0.045);
+  const availH = (H - m2 * 2) - topZone - sigZone;
+
+  let fs = fsMax;
+  let lines = cardWrapLines(text, fs, maxW);
+  const blockH = (fs2, n) => n * fs2 * 1.58;
+  let tries = 0;
+  while (tries++ < 40) {
+    lines = cardWrapLines(text, fs, maxW);
+    const widest = Math.max(1, ...lines.map((sh) =>
+      sh.reduce((w2, s) => w2 + shapedAdv(s, fs, (font.unitsPerEm || 1000)), 0)));
+    if (blockH(fs, lines.length) <= availH && widest <= maxW) break;
+    fs = fs * 0.92;
+    if (fs < 18) { fs = 18; break; }
+  }
+  lines = cardWrapLines(text, fs, maxW);
+  const lineH = fs * 1.58;
+
+  /* توسيط الكتلة رأسيًا */
+  const blockStart = topZone + Math.max(0, (availH - blockH(fs, lines.length)) / 2);
+  let y = blockStart + fs * 1.02;
+  lines.forEach((sh) => {
+    if (!sh.length) { y += lineH; return; }
+    const upm = font.unitsPerEm || 1000;
+    const lw = sh.reduce((w2, s) => w2 + shapedAdv(s, fs, upm), 0);
+    const penRight = innerX + maxW - Math.max(0, (maxW - lw) / 2);
+    drawShapedLine(ctx, sh, fs, y, penRight, pal.ink);
+    y += lineH;
+  });
+
+  /* توقيع مِحْبَر */
+  const sigY = H - m2 - Math.round(sigZone * 0.42);
+  ctx.globalAlpha = 0.75;
+  ctx.fillStyle = pal.orn;
+  ctx.strokeStyle = pal.orn;
+  ctx.lineWidth = 1;
+  const ruleW = Math.round(W * 0.16);
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - ruleW, sigY - Math.round(H * 0.018));
+  ctx.lineTo(W / 2 + ruleW, sigY - Math.round(H * 0.018));
+  ctx.stroke();
+  const sigSize = Math.max(14, Math.round(Math.min(W, H) * 0.026));
+  ctx.font = "600 " + sigSize + "px system-ui,-apple-system,'Segoe UI',Tahoma,Arial,sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("مِحْبَر — كل حرف له حكاية", W / 2, sigY + Math.round(H * 0.012));
+  ctx.globalAlpha = 1;
+  return fs;
+}
+
+function openPreviewCard() {
+  if (!font) return;
+
+  openModal("بطاقة معاينة — جاهزة للسوشيال", `
+    <label>نص البطاقة (سطر جديد = سطر في البطاقة)</label>
+    <textarea id="cardText" rows="2" dir="rtl">بسم الله الرحمن الرحيم</textarea>
+    <label>الألوان</label>
+    <div class="palRow" id="cardPals"></div>
+    <label>المقاس</label>
+    <select id="cardSize">
+      ${CARD_SIZES.map((s, i) =>
+        '<option value="' + i + '">' + esc(s.name) + "</option>").join("")}
+    </select>
+    <div class="tdRow">
+      <span class="tdSizeLbl">حجم الخط</span>
+      <input id="cardFs" type="range" min="40" max="240" value="120" step="4">
+      <span class="tdSizeLbl" id="cardFsLbl">120</span>
+    </div>
+    <canvas id="cardCanvas"></canvas>
+    <p class="hint" id="cardHint"></p>
+    <div class="mbtns">
+      <button class="btn ok" data-act="card-save">حمّل PNG</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  const palsEl = qs("#cardPals");
+  CARD_PALETTES.forEach((pal, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "palSw" + (i === cardState.pal ? " on" : "");
+    b.title = pal.name;
+    b.style.background = "linear-gradient(135deg," + pal.bg[0] + "," + pal.bg[1] + ")";
+    b.style.setProperty("--swInk", pal.ink);
+    b.addEventListener("click", () => {
+      cardState.pal = i;
+      palsEl.querySelectorAll(".palSw").forEach((x) => x.classList.remove("on"));
+      b.classList.add("on");
+      render();
+    });
+    palsEl.appendChild(b);
+  });
+
+  const textEl = qs("#cardText");
+  const sizeEl = qs("#cardSize");
+  const fsEl = qs("#cardFs");
+  const fsLbl = qs("#cardFsLbl");
+  const hintEl = qs("#cardHint");
+  const canvas = qs("#cardCanvas");
+
+  const render = () => {
+    const size = CARD_SIZES[cardState.size];
+    const fsEff = renderCardToCanvas(
+      canvas, size.w, size.h,
+      CARD_PALETTES[cardState.pal],
+      textEl.value, +fsEl.value
+    );
+    canvas.style.width = "100%";
+    canvas.style.maxWidth = size.h > size.w ? "260px" : "360px";
+    canvas.style.height = "auto";
+    hintEl.textContent = "الملف بيتصدر بدقة " + size.w + "×" + size.h +
+      " — حجم الخط الفعلي بعد التصغير التلقائي: " + Math.round(fsEff) + "px";
+  };
+
+  textEl.addEventListener("input", render);
+  sizeEl.addEventListener("change", () => { cardState.size = +sizeEl.value; render(); });
+  fsEl.addEventListener("input", () => {
+    fsLbl.textContent = fsEl.value;
+    cardState.fs = +fsEl.value;
+    render();
+  });
+  render();
+}
+
+function exportCardPNG() {
+  const size = CARD_SIZES[cardState.size];
+  const cv = document.createElement("canvas");
+  const textEl = qs("#cardText");
+  const fsEl = qs("#cardFs");
+  renderCardToCanvas(
+    cv, size.w, size.h,
+    CARD_PALETTES[cardState.pal],
+    textEl ? textEl.value : "",
+    fsEl ? +fsEl.value : cardState.fs
+  );
+  cv.toBlob((blob) => {
+    if (!blob) { toast("فشل التصدير", true); return; }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mihabar-card-" + size.w + "x" + size.h + ".png";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    toast("البطاقة اتصدرت ✓");
+  }, "image/png");
+}
+
+/* ================================================================
+   § 28-ج — دفتر الحروف (PDF عن طريق الطباعة)
+   صفحة أنيقة بكل حروف الخط — لكل حرف عربي أشكاله الأربعة —
+   بتفتح في نافذة طباعة والمتصفح يحفظها PDF بجودة فيكتور.
+   ================================================================ */
+function bookCellList(scope) {
+  const map = (font && font.glyphIndexMap) || {};
+  const has = (cp) => map[cp] !== undefined;
+  const cells = [];
+
+  if (scope === "all") {
+    Object.keys(map).map(Number).sort((a, b) => a - b).forEach((cp) => {
+      cells.push({ cp: cp, lbl: "" });
+    });
+    return cells;
+  }
+
+  /* الحروف العربية الأساسية + أشكالها */
+  for (let cp = 0x0621; cp <= 0x064A; cp++) {
+    if (!has(cp)) continue;
+    const forms = AR_FORMS[cp];
+    cells.push({ cp: cp, lbl: "أساسي" });
+    if (forms) {
+      const names = ["مقطوع", "آخر", "أول", "وسط"];
+      for (let fi = 0; fi < 4; fi++) {
+        const f = forms[fi];
+        if ((f === null || f === undefined) || !has(f)) continue;
+        if (f === cp) continue;
+        cells.push({ cp: f, lbl: names[fi] });
+      }
+    }
+  }
+  /* لام-ألف */
+  Object.keys(LAM_ALEF).map(Number).forEach((cp) => {
+    LAM_ALEF[cp].forEach((f, k) => {
+      if (has(f)) cells.push({ cp: f, lbl: k ? "لام-ألف آخر" : "لام-ألف" });
+    });
+  });
+  /* الحركات */
+  [0x064B, 0x064C, 0x064D, 0x064E, 0x064F, 0x0650, 0x0651, 0x0652, 0x0670]
+    .forEach((cp) => { if (has(cp)) cells.push({ cp: cp, lbl: "حركة" }); });
+  /* أرقام وعلامات عربية */
+  for (let cp = 0x0660; cp <= 0x0669; cp++) if (has(cp)) cells.push({ cp: cp, lbl: "" });
+  [0x060C, 0x061B, 0x061F, 0x066A, 0x066D].forEach((cp) => {
+    if (has(cp)) cells.push({ cp: cp, lbl: "" });
+  });
+  /* لاتيني وأساسي لو موجود */
+  for (let cp = 0x0041; cp <= 0x005A; cp++) if (has(cp)) cells.push({ cp: cp, lbl: "" });
+  for (let cp = 0x0061; cp <= 0x007A; cp++) if (has(cp)) cells.push({ cp: cp, lbl: "" });
+  for (let cp = 0x0030; cp <= 0x0039; cp++) if (has(cp)) cells.push({ cp: cp, lbl: "" });
+  [0x0021, 0x0028, 0x0029, 0x002E, 0x002C, 0x003A, 0x003B, 0x003F, 0x00AB, 0x00BB]
+    .forEach((cp) => { if (has(cp)) cells.push({ cp: cp, lbl: "" }); });
+  return cells;
+}
+
+function renderBookCellImg(gid, size) {
+  let g = null;
+  try { g = font.glyphs.get(gid); } catch (e) { g = null; }
+  if (!g) return null;
+  const cv = document.createElement("canvas");
+  cv.width = size; cv.height = size;
+  const ctx = cv.getContext("2d");
+  const p = g.getPath(0, 0, PREVIEW, null, font);
+  const bb = p.getBoundingBox();
+  const gw = bb.x2 - bb.x1, gh = bb.y2 - bb.y1;
+  if (isFinite(gw) && isFinite(gh) && gw > 0 && gh > 0) {
+    const pad = size * 0.16;
+    const sc = Math.min((size - pad * 2) / gw, (size - pad * 2) / gh);
+    ctx.save();
+    ctx.translate(size / 2 - (bb.x1 + bb.x2) / 2 * sc,
+      size / 2 - (bb.y1 + bb.y2) / 2 * sc);
+    ctx.scale(sc, sc);
+    p.fill = "#000";
+    p.draw(ctx);
+    ctx.restore();
+  } else {
+    drawGlyphRaw(g, 0, 0, PREVIEW * (size / (font.unitsPerEm || 1000)), ctx);
+  }
+  return cv.toDataURL("image/png");
+}
+
+async function bookPrint(scope) {
+  const cells = bookCellList(scope);
+  if (!cells.length) {
+    await uiAlert("مفيش حروف مطابقة للنطاق المختار في الخط.");
+    return;
+  }
+
+  statusEl.classList.remove("err");
+  const gidOf = (cp) => (font.glyphIndexMap || {})[cp];
+  const items = [];
+  for (let i = 0; i < cells.length; i++) {
+    const c = cells[i];
+    const gid = gidOf(c.cp);
+    if (gid === undefined) continue;
+    const img = renderBookCellImg(gid, 220);
+    if (!img) continue;
+    items.push({
+      img: img,
+      hex: "U+" + c.cp.toString(16).toUpperCase().padStart(4, "0"),
+      ch: String.fromCodePoint(c.cp),
+      lbl: c.lbl
+    });
+    if (i % 50 === 49) {
+      statusEl.textContent = "دفتر الحروف: " + (i + 1) + " / " + cells.length + " …";
+      await new Promise((r) => setTimeout(r, 0));
+    }
+  }
+
+  const rows = [];
+  for (let i = 0; i < items.length; i += 6) {
+    rows.push(items.slice(i, i + 6));
+  }
+  const cellsHtml = rows.map((row) =>
+    "<tr>" + row.map((it) =>
+      '<td><img src="' + it.img + '"/><div class="l">' +
+      esc(it.ch) + " · " + it.hex + (it.lbl ? " · " + esc(it.lbl) : "") +
+      "</div></td>").join("") + "</tr>").join("\n");
+
+  const html = "<!doctype html><html dir=\"rtl\" lang=\"ar\"><head><meta charset=\"utf-8\">" +
+    "<title>دفتر الحروف — " + esc(fontLabel || "الخط") + "</title><style>" +
+    "body{font-family:system-ui,'Segoe UI',Tahoma,sans-serif;margin:26px;color:#1a1a1a}" +
+    "h1{font-size:21px;margin:0 0 3px}" +
+    ".sub{color:#666;font-size:12px;margin-bottom:20px}" +
+    "table{width:100%;border-collapse:collapse}" +
+    "td{border:1px solid #ddd;padding:9px 6px;text-align:center;vertical-align:middle}" +
+    "td img{width:64px;height:64px;display:block;margin:0 auto 5px}" +
+    ".l{font-size:9.5px;color:#777;direction:ltr;font-family:monospace}" +
+    ".bar{position:fixed;top:10px;left:10px;display:flex;gap:8px}" +
+    "button{font-size:14px;padding:9px 16px;border-radius:9px;border:1px solid #bbb;" +
+    "background:#111;color:#fff;cursor:pointer}" +
+    "@media print{.bar{display:none}td{break-inside:avoid}}" +
+    "</style></head><body>" +
+    '<div class="bar"><button onclick="window.print()">طباعة / حفظ PDF</button></div>' +
+    "<h1>دفتر الحروف — " + esc(fontLabel || "الخط") + "</h1>" +
+    '<div class="sub">' + items.length + " رسمة · مِحْبَر — كل حرف له حكاية</div>" +
+    "<table>" + cellsHtml + "</table>" +
+    "</body></html>";
+
+  defaultStatus();
+  const w = window.open("", "_blank");
+  if (!w) {
+    await uiAlert("المتصفح منع النافذة المنبثقة — اسمح بالشبابيك المنبثقة وجرّب تاني.");
+    return;
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  toast("نسخة الطباعة اتفتحت — احفظها PDF من زر الطباعة ✓");
+}
+
+function openLetterBook() {
+  if (!font) return;
+  openModal("دفتر الحروف — PDF بالطباعة", `
+    <label>نطاق الدفتر</label>
+    <select id="bookScope">
+      <option value="arabic">العربي والأرقام والعلامات + الأساسي</option>
+      <option value="all">كل الحروف في الخط (حتى الكبيرة)</option>
+    </select>
+    <div class="bookStats" id="bookStats"></div>
+    <p class="hint">بتفتح نافذة طباعة أنيقة — اختار فيها
+    «حفظ كـ PDF» وطّلع دفتر خطك بجودة فيكتور كاملة.</p>
+    <div class="mbtns">
+      <button class="btn ok" data-act="book-print">افتح نسخة الطباعة</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+  const scopeEl = qs("#bookScope");
+  const statsEl = qs("#bookStats");
+  const refreshStats = () => {
+    const n = bookCellList(scopeEl.value).length;
+    statsEl.innerHTML = "الحروف المفروضة في الدفتر: <b>" + n + "</b> رسمة" +
+      " · الخط: <b>" + esc(fontLabel || "") + "</b>";
+  };
+  scopeEl.addEventListener("change", refreshStats);
+  refreshStats();
+}
+
+/* ================================================================
+   § 28-د — ملف المشروع الكامل (حفظ / استعادة)
+   أرشيف واحد لكل حاجة: ملفات الخطوط المصدرية + كل رسمات المستخدم
+   + التعيينات + القواميس والأزواج وكلمات المدمجة — يُفتح تاني
+   على أي جهاز بنفس الحالة بالظبط.
+   ================================================================ */
+function bufferToB64(buf) {
+  const u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  let out = "";
+  const CH = 0x8000;
+  for (let i = 0; i < u8.length; i += CH) {
+    out += String.fromCharCode.apply(null, u8.subarray(i, i + CH));
+  }
+  return btoa(out);
+}
+
+function b64ToBuffer(b64) {
+  const bin = atob(String(b64 || ""));
+  const u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8.buffer;
+}
+
+function glyphCpsOf(g) {
+  return (g.unicodes && g.unicodes.length)
+    ? g.unicodes : (g.unicode !== undefined ? [g.unicode] : []);
+}
+
+async function projectSave() {
+  if (!slots.length) {
+    toast("مفيش ملفات مفتوحة", true);
+    return;
+  }
+  statusEl.classList.remove("err");
+  statusEl.textContent = "جارٍ تجهيز ملف المشروع…";
+  try {
+    const data = {
+      type: "mihabarProject",
+      version: 1,
+      date: new Date().toISOString(),
+      build: MIHABAR_BUILD,
+      active: activeSlot,
+      slots: []
+    };
+
+    for (const slot of slots) {
+      const arr = slot.font.glyphs;
+
+      /* فهرس المصدر بالهوية (الاسم + الأكواد) لمطابقة 1:1 بلا تحويل ثقيل —
+         الحروف اللي مالتقوش بتتحفظ بأشكالها الكاملة */
+      let srcFont = null;
+      if (slot.ttfSource) {
+        try { srcFont = opentype.parse(slot.ttfSource); } catch (e) { srcFont = null; }
+      }
+      const srcByKey = new Map();
+      if (srcFont) {
+        for (let i = 0; i < srcFont.numGlyphs; i++) {
+          let g2 = null;
+          try { g2 = srcFont.glyphs.get(i); } catch (err) { continue; }
+          if (!g2) continue;
+          const us2 = glyphCpsOf(g2);
+          const key = (g2.name || "") + "|" + us2.join(",");
+          if (!srcByKey.has(key)) srcByKey.set(key, []);
+          srcByKey.get(key).push(i);
+        }
+      }
+
+      const glyphs = [];
+      const consumed = new Map();
+      for (let i = 0; i < arr.length; i++) {
+        const g = arr[i];
+        const us = glyphCpsOf(g);
+        const base = {
+          u: us,
+          a: Math.round(g.advanceWidth || 0),
+          n: g.name || ""
+        };
+        const needFull = g.userInk || !srcFont;
+        let si = null;
+        if (!needFull) {
+          const key = (g.name || "") + "|" + us.join(",");
+          const lst = srcByKey.get(key);
+          if (lst && lst.length) {
+            const used2 = consumed.get(key) || [];
+            si = lst.find((x) => used2.indexOf(x) === -1);
+            if (si !== undefined) {
+              used2.push(si);
+              consumed.set(key, used2);
+            } else {
+              si = null;
+            }
+          }
+        }
+        if (needFull || si === null) {
+          glyphs.push(Object.assign(base, {
+            k: 1,
+            c: JSON.parse(JSON.stringify(g.path ? g.path.commands : []))
+          }));
+        } else {
+          glyphs.push(Object.assign(base, { si: si }));
+        }
+      }
+
+      data.slots.push({
+        name: slot.name,
+        fileName: slot.fileName || slot.name,
+        engine: slot.engine || "",
+        upm: slot.font.unitsPerEm || 1000,
+        asc: slot.font.ascender,
+        desc: slot.font.descender,
+        gap: slot.font.lineGap,
+        names: JSON.parse(JSON.stringify(slot.font.names || {})),
+        ttfSourceB64: slot.ttfSource ? bufferToB64(slot.ttfSource) : null,
+        glyphs: glyphs,
+        dict: slot.dict || {},
+        pairs: slot.pairs || {},
+        embed: slot.embed || null,
+        colorDisabled: Object.assign({}, slot.font._mhColorDisabled || {})
+      });
+    }
+
+    const fname = "mihabar-project-" + new Date().toISOString().slice(0, 10) + ".json";
+    downloadBuffer(JSON.stringify(data), fname, "application/json");
+    toast("ملف المشروع اتحفظ ✓ (" + data.slots.length + " ملف/ملفات)");
+  } catch (e) {
+    console.error(e);
+    await uiAlert("حفظ المشروع فشل: " + e.message);
+  } finally {
+    defaultStatus();
+  }
+}
+
+async function projectOpenFile(file) {
+  statusEl.classList.remove("err");
+  statusEl.textContent = "جارٍ فتح المشروع…";
+  try {
+    const txt = await file.text();
+    const data = JSON.parse(txt);
+    if (!data || data.type !== "mihabarProject" || !Array.isArray(data.slots)) {
+      throw new Error("صيغة ملف المشروع غير صحيحة");
+    }
+
+    let restored = 0;
+    for (const sd of data.slots) {
+      let fontObj = null;
+      let ttfBytes = null;
+
+      if (sd.ttfSourceB64) {
+        try {
+          ttfBytes = b64ToBuffer(sd.ttfSourceB64);
+          const res = await decodeFont(ttfBytes);
+          fontObj = res.font;
+          ttfBytes = res.ttfBytes || ttfBytes;
+          normalizeGlyphs(fontObj);
+          fontObj._mhColorDisabled = Object.assign({}, sd.colorDisabled || {});
+        } catch (e) {
+          console.warn("استرجاع الخط المصدر فشل — بنبني من الأشكال المحفوظة:", e.message);
+          fontObj = null;
+        }
+      }
+
+      const outArr = [];
+      for (let i = 0; i < sd.glyphs.length; i++) {
+        const sg = sd.glyphs[i];
+        if (sg.c) {
+          const path = new opentype.Path();
+          path.commands = JSON.parse(JSON.stringify(sg.c));
+          const g = new opentype.Glyph({
+            name: sg.n || ("glyph" + i),
+            unicode: sg.u && sg.u.length ? sg.u[0] : undefined,
+            unicodes: sg.u || [],
+            advanceWidth: (typeof sg.a === "number") ? sg.a : 0,
+            path: path
+          });
+          g.unicodes = (sg.u || []).slice();
+          g.unicode = sg.u && sg.u.length ? sg.u[0] : undefined;
+          g.userInk = !!sg.k;
+          g.index = i;
+          outArr.push(g);
+        } else if (fontObj && typeof sg.si === "number" && sg.si < fontObj.numGlyphs) {
+          let src = null;
+          try { src = fontObj.glyphs.get(sg.si); } catch (err) { src = null; }
+          if (!src) { continue; }
+          if (sg.u && sg.u.length) { src.unicodes = sg.u.slice(); src.unicode = sg.u[0]; }
+          if (typeof sg.a === "number") src.advanceWidth = sg.a;
+          if (sg.n) src.name = sg.n;
+          src.index = i;
+          outArr.push(src);
+        } else {
+          const g = new opentype.Glyph({
+            name: sg.n || ("glyph" + i),
+            advanceWidth: (typeof sg.a === "number") ? sg.a : 500,
+            path: new opentype.Path()
+          });
+          g.unicodes = (sg.u || []).slice();
+          g.unicode = sg.u && sg.u.length ? sg.u[0] : undefined;
+          g.index = i;
+          outArr.push(g);
+        }
+      }
+      outArr.get = function (i2) { return this[i2]; };
+
+      if (!fontObj) {
+        /* مفيش مصدر — بنبني خط بسيط من الأشكال المحفوظة */
+        fontObj = {
+          glyphs: outArr,
+          numGlyphs: outArr.length,
+          unitsPerEm: sd.upm || 1000,
+          ascender: (sd.asc != null) ? sd.asc : 800,
+          descender: (sd.desc != null) ? sd.desc : -200,
+          lineGap: sd.gap || 0,
+          names: JSON.parse(JSON.stringify(sd.names || {})),
+          glyphIndexMap: {}
+        };
+      } else {
+        fontObj.glyphs = outArr;
+        fontObj.numGlyphs = outArr.length;
+        if (sd.names) fontObj.names = JSON.parse(JSON.stringify(sd.names));
+        if (sd.asc != null) fontObj.ascender = sd.asc;
+        if (sd.desc != null) fontObj.descender = sd.desc;
+        if (sd.gap != null) fontObj.lineGap = sd.gap;
+      }
+      fontObj.glyphs = outArr;
+      fontObj.numGlyphs = outArr.length;
+
+      /* خريطة الأكواد من الحالة المستعادة — على مرحلتين زي جلسة الشغل
+         الحية بالظبط: المصدر أول-بأول، ورسمات المستخدم (المضافة/المعاد
+         رسمها) بتتخطى أي تعارض من حروف المصدر الفاضية بنفس الكود */
+      fontObj.glyphIndexMap = {};
+      outArr.forEach((g2, i2) => {
+        glyphCpsOf(g2).forEach((u2) => {
+          if (fontObj.glyphIndexMap[u2] === undefined) fontObj.glyphIndexMap[u2] = i2;
+        });
+      });
+      sd.glyphs.forEach((sg, i2) => {
+        if (!sg.c || !sg.u || !sg.u.length) return;
+        sg.u.forEach((u2) => { fontObj.glyphIndexMap[u2] = i2; });
+      });
+
+      fontObj._mhColorDisabled = Object.assign({}, sd.colorDisabled || fontObj._mhColorDisabled || {});
+      const name = sd.name || sd.fileName || ("project-" + (restored + 1));
+      try {
+        if (sd.dict && Object.keys(sd.dict).length) {
+          localStorage.setItem(dictKeyFor(name), JSON.stringify(sd.dict));
+        }
+        if (sd.pairs && Object.keys(sd.pairs).length) {
+          localStorage.setItem(pairKeyFor(name), JSON.stringify(sd.pairs));
+        }
+        if (sd.embed) {
+          localStorage.setItem(embedKeyFor(name), JSON.stringify(sd.embed));
+        }
+      } catch (e) { /* التخزين ممكن يكون ملى — مش حرج */ }
+
+      slots.push({
+        name: name,
+        font: fontObj,
+        engine: sd.engine || "opentype.js",
+        empties: 0,
+        fileName: sd.fileName || name,
+        fileSize: ttfBytes ? ttfBytes.byteLength : 0,
+        dict: sd.dict || loadSavedDictFor(name),
+        pairs: sd.pairs || loadSavedPairsFor(name),
+        embed: sd.embed || loadSavedEmbedFor(name),
+        ttfSource: ttfBytes,
+        structChanged: false,
+        undo: []
+      });
+      restored++;
+    }
+
+    if (!restored) throw new Error("المشروع فاضي");
+    updateEmptyState();
+    const wantActive = (typeof data.active === "number") ? data.active : 0;
+    activateSlot(slots.length - restored + Math.max(0, Math.min(wantActive, restored - 1)));
+    toast("المشروع اترجّع ✓ — " + restored + " ملف/ملفات");
+  } catch (e) {
+    console.error(e);
+    await uiAlert("فتح المشروع فشل: " + e.message);
+  } finally {
+    defaultStatus();
+    updateEmptyState();
+  }
+}
+
+(function initProjectInput() {
+  if (document.getElementById("projFileInput")) return;
+  const fi = document.createElement("input");
+  fi.type = "file";
+  fi.id = "projFileInput";
+  fi.accept = ".json,application/json";
+  fi.style.display = "none";
+  document.body.appendChild(fi);
+  fi.addEventListener("change", () => {
+    const file = fi.files && fi.files[0];
+    fi.value = "";
+    if (!file) return;
+    projectOpenFile(file);
+  });
+})();
+
+/* ================================================================
+   § 29 — مقارنة خطين
+   ================================================================ */
+let cmpState = { cp: null };
+
+function openCompare() {
+  const others = [];
+  slots.forEach((slot, i) => {
+    if (i !== activeSlot) others.push({ slot: slot, index: i });
+  });
+
+  if (!others.length) {
+    uiAlert("افتح خطًا تاني من زر فتح — المقارنة محتاجة ملفين على الأقل.");
+    return;
+  }
+
+  let othersHtml = "";
+  others.forEach((x) => {
+    othersHtml += "<button class='btn' data-act='cmp-slot' data-slot='" + x.index + "'>" +
+      esc(x.slot.name) + " (" + liveGlyphCountOf(x.slot.font) + ")</button>";
+  });
+
+  openModal("مقارنة خطين", `
+    <label>الخط الحالي: ${esc(fontLabel)}</label>
+    <label>اختر الخط الثاني للمقارنة</label>
+    <div class="mbtns" style="margin-top:6px">${othersHtml}</div>
+    <div class="mbtns">
+      <button class="btn ok" data-act="imp-open">فتح ملف جديد للمقارنة</button>
+      <button class="btn ghost" data-act="close-modal">إلغاء</button>
+    </div>
+  `);
+}
+
+function startCompare(slotIdx) {
+  const otherSlot = slots[slotIdx];
+  if (!otherSlot) return;
+
+  openModal("مقارنة الحروف", `
+    <p class="hint">
+      اكتب كود أو حرف — سيظهر الرسم من
+      <b>(الخط الحالي — حد استوديو متصل)</b>
+      و<b>(الخط الثاني — حد متقطع)</b> جنب بعض،
+      واضغط على اللي عاجبك لتعتمده في خطك.
+    </p>
+
+    <div class="charRow">
+      <input id="cmpChar" dir="ltr" placeholder="0628 أو ب" value="0628">
+    </div>
+
+    <div id="cmpResults"></div>
+
+    <div class="mbtns">
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  const input = qs("#cmpChar");
+  const results = qs("#cmpResults");
+
+  const render = () => {
+    const cp = parseCharInput(input.value);
+    results.innerHTML = "";
+
+    if (cp === undefined || cp === null) {
+      results.innerHTML = "<p class='hint'>اكتب كودًا صالحًا.</p>";
+      return;
+    }
+
+    cmpState.cp = cp;
+
+    const hex = "U+" + cp.toString(16).toUpperCase().padStart(4, "0");
+    const ch = String.fromCodePoint(cp);
+
+    const idxA = (font.glyphIndexMap || {})[cp];
+    const idxB = (otherSlot.font.glyphIndexMap || {})[cp];
+
+    results.innerHTML = `
+      <div class="cmpRow">
+        <div class="cmpCell pickA" data-act="cmp-apply-a" ${idxA === undefined ? "style='opacity:.4'" : ""}>
+          <canvas id="cmpA" width="400" height="400"></canvas>
+          <div class="cmpLbl">الحالي ${idxA !== undefined ? "G" + idxA : "غير موجود"}</div>
+        </div>
+        <div class="cmpCell pickB" data-act="cmp-apply-b" ${idxB === undefined ? "style='opacity:.4'" : ""}>
+          <canvas id="cmpB" width="400" height="400"></canvas>
+          <div class="cmpLbl">${esc(otherSlot.name)} ${idxB !== undefined ? "G" + idxB : "غير موجود"}</div>
+        </div>
+      </div>
+      <p class="hint">الحرف: ${esc(ch)} (${hex}) — اضغط على الرسمة التي تريد اعتمادها.</p>
+    `;
+
+    if (idxA !== undefined) {
+      drawGlyphToCanvas(font.glyphs.get(idxA), qs("#cmpA"));
+    }
+    if (idxB !== undefined) {
+      drawGlyphToCanvas(otherSlot.font.glyphs.get(idxB), qs("#cmpB"));
+    }
+  };
+
+  input.addEventListener("input", render);
+  render();
+
+  ACTIONS["cmp-apply-a"] = async () => {
+    const idxA = (font.glyphIndexMap || {})[cmpState.cp];
+    if (idxA === undefined) {
+      toast("الخط الحالي مفيهوش الرسمة دي", true);
+      return;
+    }
+    toast("الرسمة دي أصلًا من خطك ✓");
+  };
+
+  ACTIONS["cmp-apply-b"] = async () => {
+    const idxB = (otherSlot.font.glyphIndexMap || {})[cmpState.cp];
+    if (idxB === undefined) {
+      toast("الخط الثاني مفيهوش الرسمة دي", true);
+      return;
+    }
+
+    const ex = (font.glyphIndexMap || {})[cmpState.cp];
+    const msg = ex !== undefined
+      ? "ستستبدل الرسمة الموجودة في خطك برسمة الخط الثاني؟"
+      : "ستضيف الرسمة من الخط الثاني لخطك؟";
+
+    const ok = await uiConfirm(msg, {
+      title: "تطبيق المقارنة",
+      okText: ex !== undefined ? "استبدال" : "إضافة"
+    });
+    if (!ok) return;
+
+    pushUndo();
+    const src = otherSlot.font.glyphs.get(idxB);
+
+    if (ex !== undefined) {
+      replaceGlyphAt(ex, src, otherSlot.font);
+    } else {
+      appendGlyph(makeGlyphFromImport(src, cmpState.cp, otherSlot.font));
+    }
+
+    toast("تم ✓");
+    closeModal();
+    renderAll();
+  };
+}
+
+/* ================================================================
+   § 30 — الاستيراد من خط آخر
+   ================================================================ */
+function openImport() {
+  if (!font) return;
+
+  importSelSet.clear();
+  const swapping = (swapTargetIndex !== null);
+
+  const others = [];
+  slots.forEach((slot, i) => {
+    if (i !== activeSlot) others.push({ slot: slot, index: i });
+  });
+
+  let html = "";
+
+  if (swapping) {
+    html += "<p class='hint warn'>وضع تغيير الرسمة: اختر الملف المصدر.</p>";
+  }
+
+  if (others.length) {
+    html += "<label>من الملفات المفتوحة</label><div class='mbtns' style='margin-top:6px'>";
+    others.forEach((x) => {
+      html += "<button class='btn' data-act='imp-slot' data-slot='" + x.index + "'>" +
+        esc(x.slot.name) + " (" + liveGlyphCountOf(x.slot.font) + ")</button>";
+    });
+    html += "</div>";
+  } else {
+    html += "<p class='hint'>لا ملفات أخرى مفتوحة — افتح ملفًا جديدًا.</p>";
+  }
+
+  html += `
+    <div class="mbtns">
+      <button class="btn ok" data-act="imp-open">فتح ملف جديد</button>
+      ${swapping
+        ? "<button class='btn ghost' data-act='swap-cancel'>إلغاء الوضع</button>"
+        : "<button class='btn ghost' data-act='close-modal'>إلغاء</button>"}
+    </div>`;
+
+  openModal(swapping
+    ? "تغيير رسمة الحرف " + swapTargetIndex
+    : "استيراد حرف من خط آخر", html);
+}
+
+async function loadImportFiles(fileList) {
+  const files = Array.from(fileList || []);
+  if (!files.length) return;
+
+  for (const file of files) {
+    statusEl.classList.remove("err");
+    statusEl.textContent = "قراءة: " + file.name + " …";
+    try {
+      const raw = await file.arrayBuffer();
+      const res = await decodeFont(raw, file.name);
+      normalizeGlyphs(res.font);
+      slots.push({
+        name: file.name,
+        font: res.font,
+        engine: res.engine,
+        empties: res.empties || 0,
+        fileName: file.name,
+        fileSize: file.size || 0,
+        dict: loadSavedDictFor(file.name),
+        pairs: loadSavedPairsFor(file.name),
+        ttfSource: res.ttfBytes || null,
+        structChanged: false,
+        undo: []
+      });
+      importSlotIndex = slots.length - 1;
+      toast("تم فتح: " + file.name);
+    } catch (e) {
+      console.error(e);
+      await uiAlert(
+        "الملف: " + file.name +
+        "\nالسبب: " + (e && e.message ? e.message : String(e)),
+        "تعذر الفتح"
+      );
+    }
+  }
+
+  renderTabs();
+  updateEmptyState();
+  if (importSlotIndex >= 0) renderImportList();
+  else if (font) defaultStatus();
+}
+
+function renderImportList() {
+  const slot = slots[importSlotIndex];
+  if (!slot || slot.font === font) {
+    openImport();
+    return;
+  }
+
+  const srcFont = slot.font;
+  const total = srcFont.numGlyphs || 0;
+  const swapping = (swapTargetIndex !== null);
+
+  importSelSet.clear();
+
+  openModal((swapping ? "تغيير من: " : "استيراد من: ") + slot.name, `
+    <div class="charRow">
+      <input id="impSearch" placeholder="بحث…">
+      <button class="btn" data-act="imp-open" style="white-space:nowrap;flex-shrink:0">فتح آخر</button>
+    </div>
+
+    ${swapping ? "" : `
+    <div class="impSelBar">
+      <span class="selCount" id="impSelCount">0 محدد</span>
+      <button class="btn sm" data-act="imp-select-all">تحديد الكل</button>
+      <button class="btn sm" data-act="imp-clear-select">إلغاء التحديد</button>
+      <button class="btn sm ok" data-act="imp-add-selected" id="impAddSelected" disabled>إضافة المحدد</button>
+    </div>`}
+
+    <div class="impGrid" id="impGrid"></div>
+    <p class="hint">${swapping
+      ? "اضغط الرسمة التي ستبدّل بها الحرف " + swapTargetIndex + "."
+      : "اضغط على الرسومات لتحديد أكثر من حرف، ثم اختر «إضافة المحدد» لإضافتها كلها مرة واحدة."}</p>
+    <div class="mbtns">
+      <button class="btn ghost" data-act="imp-back">↩ رجوع</button>
+      <button class="btn ghost" data-act="close-modal">إغلاق</button>
+    </div>
+  `);
+
+  const grid = qs("#impGrid");
+  let i = 0;
+
+  (function chunk() {
+    const frag = document.createDocumentFragment();
+    const end = Math.min(i + CHUNK, total);
+
+    for (; i < end; i++) {
+      let g = null;
+      try { g = srcFont.glyphs.get(i); } catch (e) { /* تجاهل */ }
+      if (!g) continue;
+
+      const u = g.unicode !== undefined ? g.unicode : (g.unicodes && g.unicodes[0]);
+      const word = srcFont.wordByGid ? srcFont.wordByGid[i] : null;
+
+      const item = document.createElement("div");
+      item.className = "impItem";
+      item.dataset.i = i;
+      item.dataset.uni = u !== undefined ? u.toString(16) : "";
+      item.dataset.name = g.name || "";
+      item.dataset.word = word || "";
+
+      const cv = document.createElement("canvas");
+      cv.width = 256;
+      cv.height = 256;
+      drawGlyphToCanvas(g, cv, srcFont);
+
+      const info = document.createElement("div");
+      info.className = "info";
+      if (word) {
+        info.textContent = word;
+        info.style.direction = "rtl";
+        info.style.fontFamily = "var(--sans)";
+        info.style.fontWeight = "700";
+        info.style.fontSize = "9px";
+        info.style.color = "var(--accent2)";
+      } else {
+        info.textContent = u !== undefined
+          ? "U+" + u.toString(16).toUpperCase().padStart(4, "0") : "G" + i;
+      }
+
+      item.appendChild(cv);
+      item.appendChild(info);
+
+      item.addEventListener("click", () => {
+        const idx = +item.dataset.i;
+        if (swapTargetIndex !== null) {
+          renderImportActions(idx);
+          return;
+        }
+        if (importSelSet.has(idx)) {
+          importSelSet.delete(idx);
+          item.classList.remove("import-selected");
+        } else {
+          importSelSet.add(idx);
+          item.classList.add("import-selected");
+        }
+        updateImportSelectionUI();
+      });
+      frag.appendChild(item);
+    }
+
+    grid.appendChild(frag);
+    if (i < total) requestAnimationFrame(chunk);
+  })();
+
+  qs("#impSearch").addEventListener("input", function () {
+    const q = this.value.trim().toLowerCase();
+    grid.querySelectorAll(".impItem").forEach((el) => {
+      if (!q) { el.style.display = ""; return; }
+      const hay = (el.dataset.i + " " + el.dataset.uni + " " +
+        el.dataset.name + " " + (el.dataset.word || "")).toLowerCase();
+      let ok = hay.indexOf(q) > -1;
+      if (!ok && q.length === 1) {
+        ok = el.dataset.uni.indexOf(q.codePointAt(0).toString(16)) > -1;
+      }
+      el.style.display = ok ? "" : "none";
+    });
+  });
+}
+
+function updateImportSelectionUI() {
+  const count = qs("#impSelCount");
+  const addBtn = qs("#impAddSelected");
+  if (count) count.textContent = importSelSet.size + " محدد";
+  if (addBtn) addBtn.disabled = importSelSet.size === 0;
+}
+
+function toggleAllImportVisible() {
+  const grid = qs("#impGrid");
+  if (!grid) return;
+  const items = Array.from(grid.querySelectorAll(".impItem"))
+    .filter((el) => el.style.display !== "none");
+
+  if (!items.length) return;
+
+  const allSelected = items.every((el) => importSelSet.has(+el.dataset.i));
+  items.forEach((el) => {
+    const idx = +el.dataset.i;
+    if (allSelected) importSelSet.delete(idx);
+    else importSelSet.add(idx);
+    el.classList.toggle("import-selected", !allSelected);
+  });
+  updateImportSelectionUI();
+}
+
+function clearImportSelection() {
+  importSelSet.clear();
+  const grid = qs("#impGrid");
+  if (grid) grid.querySelectorAll(".impItem.import-selected")
+    .forEach((el) => el.classList.remove("import-selected"));
+  updateImportSelectionUI();
+}
+
+async function addSelectedImports() {
+  const slot = slots[importSlotIndex];
+  if (!slot || slot.font === font) {
+    toast("انتهت جلسة الاستيراد", true);
+    return;
+  }
+  if (!importSelSet.size) {
+    toast("حدد حرفًا واحدًا على الأقل", true);
+    return;
+  }
+
+  const selected = Array.from(importSelSet).sort((a, b) => a - b);
+  const prepared = [];
+  const reserved = new Set(); /* أكواد PUA اتحجزت في نفس الدفعة قبل appendGlyph */
+  let assignedPua = 0;
+  let duplicates = 0;
+
+  for (const srcIndex of selected) {
+    let src = null;
+    try { src = slot.font.glyphs.get(srcIndex); } catch (e) { src = null; }
+    if (!src) continue;
+
+    let cp = src.unicode !== undefined
+      ? src.unicode
+      : (src.unicodes && src.unicodes.length ? src.unicodes[0] : undefined);
+
+    let wasNoCode = false;
+    if (cp === undefined || cp === null) {
+      wasNoCode = true;
+      cp = findFreePuaCp(reserved);
+      if (cp === null) continue; /* مفيش أكواد PUA حرة خالص */
+    }
+
+    if ((font.glyphIndexMap || {})[cp] !== undefined || reserved.has(cp)) {
+      if (!wasNoCode) { duplicates++; continue; }
+      /* نادرًا: كود PUA المقترح اتحجز بالفعل — جرّب واحد تاني */
+      cp = findFreePuaCp(reserved);
+      if (cp === null) continue;
+    }
+
+    if (wasNoCode) { reserved.add(cp); assignedPua++; }
+    prepared.push({ src, cp });
+  }
+
+  if (!prepared.length) {
+    const parts = [];
+    if (duplicates) parts.push(duplicates + " موجود بالفعل");
+    await uiAlert("لم تتم إضافة أي حرف." + (parts.length ? "\n" + parts.join(" • ") : ""));
+    return;
+  }
+
+  const ok = await uiConfirm(
+    "إضافة " + prepared.length + " حرف محدد إلى خطك؟" +
+    (duplicates ? "\nسيتم تجاهل " + duplicates + " حرف موجود بالفعل." : ""),
+    { title: "استيراد جماعي", okText: "إضافة الكل" }
+  );
+  if (!ok) return;
+
+  pushUndo();
+  prepared.forEach(({ src, cp }) => {
+    appendGlyph(makeGlyphFromImport(src, cp, slot.font));
+  });
+
+  importSelSet.clear();
+  toast(
+    "تم استيراد " + prepared.length + " حرف" +
+    (duplicates ? " • تم تخطي " + duplicates + " موجود بالفعل" : "") +
+    (assignedPua ? " • " + assignedPua + " منهم بلا كود أصلي (تم تعيين كود PUA تلقائي)" : "")
+  );
+  renderAll();
+  renderImportList();
+}
+
+function renderImportActions(srcIndex) {
+  const slot = slots[importSlotIndex];
+  if (!slot) {
+    toast("انتهت جلسة الاستيراد", true);
+    openImport();
+    return;
+  }
+  const srcFont = slot.font;
+
+  let src = null;
+  try { src = srcFont.glyphs.get(srcIndex); } catch (e) { src = null; }
+  if (!src) {
+    toast("الرسمة غير متاحة", true);
+    return;
+  }
+
+  const su = src.unicode !== undefined ? src.unicode : (src.unicodes && src.unicodes[0]);
+  const def = su !== undefined ? su.toString(16).toUpperCase().padStart(4, "0") : "";
+  const shex = su !== undefined
+    ? "U+" + su.toString(16).toUpperCase().padStart(4, "0") : "بدون تعيين";
+  const srcWord = srcFont.wordByGid ? srcFont.wordByGid[srcIndex] : null;
+
+  if (swapTargetIndex !== null) {
+    const targetIdx = swapTargetIndex;
+
+    openModal("استبدال رسمة الحرف " + targetIdx, `
+      <div class="prevWrap"><canvas id="iaPrev" width="600" height="600"></canvas></div>
+      <div class="roGrid" style="margin-top:12px">
+        <span class="k">من</span>
+        <span class="v">${esc(slot.name)} • G${srcIndex}${srcWord ? " • " + esc(srcWord) : ""}</span>
+        <span class="k">إلى</span>
+        <span class="v">الحرف ${targetIdx} — المكان والكود كما هما</span>
+      </div>
+      <div class="mbtns">
+        <button class="btn ok" data-act="ia-swap">استبدال</button>
+        <button class="btn ghost" data-act="imp-back">↩ رجوع</button>
+      </div>
+    `);
+
+    drawGlyphToCanvas(src, qs("#iaPrev"), srcFont);
+
+    ACTIONS["ia-swap"] = async () => {
+      const ok = await uiConfirm(
+        "استبدال رسمة الحرف " + targetIdx + " بهذه؟",
+        { title: "تأكيد", okText: "استبدال" }
+      );
+      if (!ok) return;
+
+      pushUndo();
+      replaceGlyphAt(targetIdx, src, srcFont);
+      toast("تم التبديل");
+      closeModal();
+      renderAll(targetIdx);
+    };
+
+    return;
+  }
+
+  openModal("استيراد رسمة من " + slot.name, `
+    <div class="prevWrap"><canvas id="iaPrev" width="600" height="600"></canvas></div>
+    <div class="roGrid" style="margin-top:12px">
+      <span class="k">المصدر</span>
+      <span class="v">G${srcIndex} • ${esc(shex)}${srcWord ? " • " + esc(srcWord) : ""}</span>
+    </div>
+    <label>الكود في خطك</label>
+    <div class="charRow">
+      <input id="iaChar" dir="ltr" value="${esc(def)}" placeholder="ب أو 0628">
+      <div class="charPrevBox" id="iaPrevBox">
+        <canvas width="192" height="192"></canvas>
+        <div class="cpLabel">—</div>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn ok" data-act="ia-add">إضافة كحرف جديد</button>
+      <button class="btn" data-act="ia-replace" id="iaReplaceBtn" disabled>استبدال الموجود</button>
+      <button class="btn ghost" data-act="imp-back">↩ رجوع</button>
+    </div>
+  `);
+
+  drawGlyphToCanvas(src, qs("#iaPrev"), srcFont);
+  bindCharPreview(qs("#iaChar"), qs("#iaPrevBox"));
+
+  const chInput = qs("#iaChar");
+  const rBtn = qs("#iaReplaceBtn");
+
+  const refresh = () => {
+    const cp = parseCharInput(chInput.value);
+    rBtn.disabled = !(cp !== undefined && cp !== null &&
+      (font.glyphIndexMap || {})[cp] !== undefined);
+  };
+
+  chInput.addEventListener("input", refresh);
+  refresh();
+
+  ACTIONS["ia-add"] = async () => {
+    const cp = parseCharInput(qs("#iaChar").value);
+    if (cp === undefined || cp === null) { await uiAlert("اكتب كودًا صالحًا."); return; }
+    const ex = (font.glyphIndexMap || {})[cp];
+    if (ex !== undefined) {
+      const ok = await uiConfirm("الكود مستخدم — تضيف نسخة؟", { okText: "إضافة" });
+      if (!ok) return;
+    }
+    pushUndo();
+    appendGlyph(makeGlyphFromImport(src, cp, srcFont));
+    toast("تم الاستيراد");
+    renderAll();
+    renderImportList();
+  };
+
+  ACTIONS["ia-replace"] = async () => {
+    const cp = parseCharInput(qs("#iaChar").value);
+    if (cp === undefined || cp === null) { await uiAlert("اكتب كودًا."); return; }
+    const ex = (font.glyphIndexMap || {})[cp];
+    if (ex === undefined) { await uiAlert("غير موجود — استخدم الإضافة."); return; }
+    const ok = await uiConfirm("استبدال رسمة الحرف؟ المكان يبقى كما هو.", { okText: "استبدال" });
+    if (!ok) return;
+    pushUndo();
+    replaceGlyphAt(ex, src, srcFont);
+    toast("تم الاستبدال");
+    renderAll();
+    renderImportList();
+  };
+}
+
+/* بناء الخط النضيف من حالة المحرر الحالية */
+/* ================================================================
+   § 30-ت — توليد أشكال مواضع الالتحام (أول/وسط/آخر) من رسمة أساسية
+   «الحروف مقطوعة والضـ حـ ي مش مرصقة في فوتوشوب»: الخطوط اللي مفيهاش
+   أشكال عرض (0xFExx) ولا GSUB شغال — بنولّد شكل الموضع الناقص من
+   الرسمة الأساسية نفسها بمدّ وصلة خط الأساس لحد حافة الاختراق:
+     أول/وسط ← وصلة من أقصى حبر لحد x=0 (الجاي بيبدأ من عند الـ advance)
+     آخر/وسط ← وصلة من أقصى حبر لحد الـ advance (اللي فات بينتهي عندنا)
+   قواعد GSUB الأصلية بتشتغل الأول — قواعدنا بتسد الفراغ بس.
+   ================================================================ */
+let mhSynthLamAlef = false; /* ولّدنا رسمة لام-ألف — GSUB الأصلي مفيهوش rlig */
+
+/* تجميع لام-ألف من رسمتي لام وألف (كونتورات لام + ألف مترجمة) */
+function composeLamAlefPath(lamG, alefG) {
+  const p = new opentype.Path();
+  ((lamG.path && lamG.path.commands) || []).forEach((c) => {
+    p.commands.push(Object.assign({}, c));
+  });
+  const dx = Math.round(lamG.advanceWidth || 0);
+  ((alefG.path && alefG.path.commands) || []).forEach((c) => {
+    const c2 = Object.assign({}, c);
+    if (c2.x !== undefined) c2.x += dx;
+    if (c2.x1 !== undefined) c2.x1 += dx;
+    if (c2.x2 !== undefined) c2.x2 += dx;
+    p.commands.push(c2);
+  });
+  return {
+    path: p,
+    advance: dx + Math.round(alefG.advanceWidth || 0)
+  };
+}
+
+/* تقدير وصلة الاتصال: ن brightness حبر الحافة جوه نطاق خط الأساس */
+function __edgeJoin(cmds, band, upm) {
+  const zoneLo = -0.12 * upm, zoneHi = 0.36 * upm;
+  const ys = [];
+  cmds.forEach((c) => {
+    const push = (x, y) => {
+      if (x === undefined || y === undefined) return;
+      if (x >= band[0] && x <= band[1] && y >= zoneLo && y <= zoneHi) ys.push(y);
+    };
+    push(c.x, c.y); push(c.x1, c.y1); push(c.x2, c.y2);
+  });
+  if (!ys.length) return { y: 0.06 * upm, t: 0.07 * upm };
+  let mn = ys[0], mxv = ys[0], sum = 0;
+  ys.forEach((y) => { if (y < mn) mn = y; if (y > mxv) mxv = y; sum += y; });
+  const t = Math.max(upm * 0.045, Math.min(upm * 0.13, (mxv - mn) * 1.5 || upm * 0.07));
+  return { y: sum / ys.length, t: t };
+}
+
+function mhSynthFormGlyph(srcG, fi, upm) {
+  try {
+    if (!srcG || !srcG.path || !srcG.path.commands || !srcG.path.commands.length) return null;
+    const bb = srcG.path.getBoundingBox();
+    if (!isFinite(bb.x1) || !isFinite(bb.y1) || bb.x2 <= bb.x1) return null;
+    const adv = Math.max(1, Math.round(srcG.advanceWidth || (bb.x2 - bb.x1)));
+    const cmds = srcG.path.commands;
+    const bw = bb.x2 - bb.x1;
+    const bandW = Math.max(1, bw * 0.16);
+    const p = new opentype.Path();
+    cmds.forEach((c) => {
+      switch (c.type) {
+        case "M": p.moveTo(c.x, c.y); break;
+        case "L": p.lineTo(c.x, c.y); break;
+        case "C": p.bezierCurveTo(c.x1, c.y1, c.x2, c.y2, c.x, c.y); break;
+        case "Q": p.quadraticCurveTo(c.x1, c.y1, c.x, c.y); break;
+        case "Z": p.close(); break;
+      }
+    });
+    const bar = (x1, x2, j) => {
+      const lo = Math.round(Math.min(x1, x2)), hi = Math.round(Math.max(x1, x2));
+      if (hi - lo < 1) return;
+      const y1 = Math.round(j.y - j.t / 2), y2 = Math.round(j.y + j.t / 2);
+      p.moveTo(lo, y1);
+      p.lineTo(hi, y1);
+      p.lineTo(hi, y2);
+      p.lineTo(lo, y2);
+      p.close();
+    };
+    /* أول(2)/وسط(3): وصل لحد x=0 — آخر(1)/وسط(3): وصل لحد الـ advance */
+    if (fi === 2 || fi === 3) bar(bb.x1, 0, __edgeJoin(cmds, [bb.x1, bb.x1 + bandW], upm));
+    if (fi === 1 || fi === 3) bar(bb.x2, adv, __edgeJoin(cmds, [bb.x2 - bandW, bb.x2], upm));
+    return new opentype.Glyph({
+      name: "mihbar.synth", advanceWidth: adv, path: p
+    });
+  } catch (e) { return null; }
+}
+
+function buildPureFont() {
+  if (!font) return { empty: true };
+  const arr = glyphsArr();
+  const upm = font.unitsPerEm || 1000;
+
+  /* ١ — رسمات المستخدم */
+  const userGids = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] && arr[i].userInk) userGids.push(i);
+  }
+
+  /* ٢ — أهداف القاموس (ممكن تكون رسمات أصلية مربوطة بالكلمة) */
+  const dict = activeDict();
+  const targetGids = [];
+  const seen = new Set(userGids);
+  for (const w in dict) {
+    const v = normDictVal(dict[w]);
+    if (!v.c) continue;
+    const r = resolveBindingGid(v.c);
+    if (r.gid === undefined || seen.has(r.gid)) continue;
+    seen.add(r.gid);
+    targetGids.push(r.gid);
+  }
+
+  /* ٢-ب — أهداف أشكال الأزواج — بدائل الجيران لازم تعيش في الخط النضيف */
+  const pairsTbl0 = activePairs();
+  for (const pw in pairsTbl0) {
+    const ent = pairsTbl0[pw] || {};
+    [ent.v1, ent.v2].forEach((code) => {
+      if (!code) return;
+      const r = resolveBindingGid(code);
+      if (r.gid === undefined || seen.has(r.gid)) return;
+      seen.add(r.gid);
+      targetGids.push(r.gid);
+    });
+  }
+
+  if (!userGids.length && !targetGids.length) return { empty: true };
+
+  const glyphs = [new opentype.Glyph({
+    name: ".notdef", advanceWidth: Math.round(upm / 2), path: new opentype.Path()
+  })];
+  const gidRemap = new Map(); /* GID قديم → GID جديد */
+  const usedCps = new Set();
+
+  const cpsOf = (g, srcGid) => {
+    const out = [];
+    const push = (cp) => {
+      if (Number.isFinite(cp) && !out.includes(cp)) out.push(cp);
+    };
+    if (g) {
+      if (g.unicodes && g.unicodes.length) g.unicodes.forEach(push);
+      if (g.unicode !== undefined) push(g.unicode);
+    }
+    /* أهم إصلاح: cmap قد يحتوي aliases إضافية لا يحتفظ بها opentype.js
+       داخل glyph.unicodes. ضمّها حتى تظل الرموز العربية واللاتينية كلها قابلة للكتابة بعد التصدير. */
+    const cmap = font.glyphIndexMap || {};
+    for (const k in cmap) {
+      const cp = +k;
+      if (cmap[k] === srcGid) push(cp);
+    }
+    return out;
+  };
+
+  const addFrom = (srcGid) => {
+    const g = arr[srcGid];
+    if (!g) return;
+    const path = new opentype.Path();
+    path.commands = (g.path ? g.path.commands : []).map((c) => Object.assign({}, c));
+    const cps = cpsOf(g, srcGid).filter((cp) => Number.isFinite(cp) && !usedCps.has(cp));
+    cps.forEach((cp) => usedCps.add(cp));
+    /* الحركات/العلامات: العرض صفر دايمًا في التصدير —
+       كده محرك التشكيل بره (HarfBuzz/Uniscribe) بيركّبها فوق الحرف
+       مش بيحرك القلم — دي علّة «الحركات بتاخد مساحة في المونتاج» */
+    const allMarks = cps.length && cps.every((cp) => isMarkCp(cp));
+    const ng = new opentype.Glyph({
+      name: g.name || (cps.length ? cpName(cps[0]) : "mihbar" + srcGid),
+      unicode: cps.length ? cps[0] : undefined,
+      unicodes: cps,
+      advanceWidth: allMarks ? 0 : Math.max(0, Math.round(g.advanceWidth || upm / 2)),
+      path: path
+    });
+    /* ⚠ opentype.js 1.3.4 بيهمل unicodes الممررة ويستبدلها بـ [unicode] —
+       نفرض المصفوفة كاملة بعد الإنشاء */
+    ng.unicodes = cps.slice();
+    ng.unicode = cps.length ? cps[0] : undefined;
+    ng.userInk = !!g.userInk;
+    glyphs.push(ng);
+    gidRemap.set(srcGid, glyphs.length - 1);
+  };
+
+  userGids.forEach(addFrom);
+  targetGids.forEach(addFrom);
+
+  /* ٢-ج — الحروف المضافة/المعاد رسمها: الخام + كل شكل عرض على رسمته
+     هو (ولو الشكل مش مرسوم يرجع للرسمة الأساسية) — عشان الالتحام بره:
+     لوك أب init/medi/fina بيحوّل الخام لأشكال المواضع المرسومة.
+     الأولوية: رسمة الشكل نفسه ← الشكل المقطوع ← أول رسمة موجودة */
+  const inkForms = {}; /* base → [مقطوع، آخر، أول، وسط] = ng */
+  for (const srcGid of userGids) {
+    const g = arr[srcGid];
+    const ng = glyphs[gidRemap.get(srcGid)];
+    if (!g || !ng) continue;
+    const us2 = cpsOf(g, srcGid);
+    for (let k2 = 0; k2 < us2.length; k2++) {
+      const u = us2[k2];
+      let base = null, fi = 0;
+      if (AR_FORMS[u]) { base = u; fi = 0; }
+      else if (FORM_TO_BASE[u]) {
+        /* روابط لام-ألف (FEF5-FEFC) مش أشكال ألف — ممنوع توليد أشكال ألف من رسمة ﻼ */
+        if (u >= 0xFEF5 && u <= 0xFEFC) continue;
+        base = FORM_TO_BASE[u].base; fi = FORM_TO_BASE[u].form;
+      }
+      if (base === null) continue; /* مش حرف عربي */
+      if (inkForms[base] === undefined) inkForms[base] = [null, null, null, null];
+      if (!inkForms[base][fi]) inkForms[base][fi] = ng;
+    }
+  }
+  let inkClaims = 0;
+  /* ٢-ج٢ — توليد أشكال المواضع الناقصة (أول/وسط/آخر) من الرسمة الأساسية
+     «طب نضيف حروف اول و نصف و اخر»: لو المستخدم رسم الشكل المقطوع بس،
+     بنولّد الباقي بوصلة خط الأساس — فالالتحام بيشتغل في أي برنامج */
+  for (const baseS in inkForms) {
+    const base = +baseS;
+    const forms = AR_FORMS[base];
+    const forms4 = inkForms[baseS];
+    const src = forms4[0] || forms4.find(Boolean);
+    if (!src || !forms) continue;
+    for (let fi = 1; fi < 4; fi++) {
+      const fcp = forms[fi];
+      if (fcp === null || fcp === undefined || forms4[fi]) continue;
+      const sg = mhSynthFormGlyph(src, fi, upm);
+      if (!sg) continue;
+      sg.name = "mihbar.s" + base.toString(16) + "." + fi;
+      glyphs.push(sg);
+      forms4[fi] = sg;
+    }
+  }
+  for (const baseS in inkForms) {
+    const base = +baseS;
+    const forms4 = inkForms[baseS];
+    const primary = forms4[0] || forms4.find(Boolean);
+    if (!primary) continue;
+    const claim = (cp, ng) => {
+      if (usedCps.has(cp)) return;
+      usedCps.add(cp);
+      if (!Array.isArray(ng.unicodes)) ng.unicodes = [];
+      if (ng.unicodes.indexOf(cp) === -1) ng.unicodes.push(cp);
+      inkClaims++;
+    };
+    claim(base, primary); /* الخام */
+    const forms = AR_FORMS[base];
+    if (forms) {
+      for (let fi = 0; fi < 4; fi++) {
+        if (forms[fi] === null || forms[fi] === undefined) continue;
+        claim(forms[fi], forms4[fi] || primary);
+      }
+    }
+  }
+
+  /* ٢-د — لام-ألف: لو المستخدم رسم لام وألف، نركّب رسمة لام-ألف
+     (كونتورات لام + ألف مترجمة) — «لا» في أي برنامج تطلع متلزقة
+     مش حرفين منفصلين، ولو رسم ﭑ بنفسه هيطلع زي ما هو */
+  if (inkForms[0x0644] && inkForms[0x0627] && !usedCps.has(0xFEFB)) {
+    const lamG = inkForms[0x0644][0] || inkForms[0x0644].find(Boolean);
+    const alefG = inkForms[0x0627][0] || inkForms[0x0627].find(Boolean);
+    if (lamG && alefG) {
+      const cmp2 = composeLamAlefPath(lamG, alefG);
+      const laG = new opentype.Glyph({
+        name: "mihbar.lamalef",
+        unicode: 0xFEFB, unicodes: [0xFEFB, 0xFEFC],
+        advanceWidth: cmp2.advance,
+        path: cmp2.path
+      });
+      laG.unicodes = [0xFEFB, 0xFEFC];
+      laG.unicode = 0xFEFB;
+      glyphs.push(laG);
+      usedCps.add(0xFEFB);
+      usedCps.add(0xFEFC);
+    }
+  }
+
+  /* ٣ — بلانك مخصوص لكل حرف في كلمات القاموس (متطابقات GSUB الدقيقة)
+     مع أكواد المتغيرات الإملائية (ى/ي، أ/إ/آ→ا، ة/ه) */
+  const wordCps = new Set();
+  for (const w in dict) {
+    const v = normDictVal(dict[w]);
+    if (!v.c) continue;
+    [...String(w)].forEach((ch) => {
+      const cp = ch.codePointAt(0);
+      if (isMarkCp(cp)) return;
+      wordCps.add(cp);
+      if (cp === 0x0649) wordCps.add(0x064A);
+      if (cp === 0x064A) wordCps.add(0x0649);
+      if (cp === 0x0622 || cp === 0x0623 || cp === 0x0625 || cp === 0x0671) wordCps.add(0x0627);
+      if (cp === 0x0629) wordCps.add(0x0647);
+    });
+  }
+  let wordBlanks = 0;
+  wordCps.forEach((cp) => {
+    if (usedCps.has(cp)) return;
+    glyphs.push(new opentype.Glyph({
+      name: "blank" + cp.toString(16).toUpperCase().padStart(4, "0"),
+      unicode: cp, unicodes: [cp],
+      advanceWidth: 0, path: new opentype.Path()
+    }));
+    usedCps.add(cp);
+    wordBlanks++;
+  });
+
+  /* ٤ — مفيش بلانك شامل ولا علب ناقصة!
+     ⚠ إصلاح «الحروف بتختفي في التصدير»: قبل كده كنا بنعمل بلانك/علب
+     لكل الحروف العربية غير المرسومة. ده كان بيخلي الحروف تظهر فاضية
+     أو كعلب بدل ما البرنامج يستخدم الخط البديل (fallback).
+     دلوقتي: مفيش أي أكواد في cmap غير اللي المستخدم رسمها + كلمات القاموس.
+     أي حرف مش موجود → البرنامج بيستخدم خط النظام تلقائيًا. */
+  /* ضمان جليف مسافة حقيقي (U+0020 + NBSP) — ضروري عشان الكتابة.
+     العرض من إعداد استوديو المسافة المحفوظ لهذا الخط (لو مفيش إعداد = 0.26em
+     زي ما كان) — عشان «الفراغ يختلف بين خط و خط» ما يترجعش في التصدير النضيف */
+  {
+    const spaceCps = [0x20, 0xA0].filter((cp) => !usedCps.has(cp));
+    if (spaceCps.length) {
+      const spg = new opentype.Glyph({
+        name: "space.mihbar",
+        unicode: spaceCps[0], unicodes: spaceCps,
+        advanceWidth: Math.round(upm * __mhSpaceEm()), path: new opentype.Path()
+      });
+      spg.unicodes = spaceCps.slice();
+      spg.unicode = spaceCps[0];
+      glyphs.push(spg);
+      spaceCps.forEach((cp) => usedCps.add(cp));
+    }
+  }
+
+  const fam = pureFamilyName();
+  const ps = purePSName();
+  const pf = new opentype.Font({
+    familyName: fam,
+    styleName: "Regular",
+    unitsPerEm: upm,
+    ascender: font.ascender != null ? font.ascender : Math.round(upm * 0.8),
+    descender: font.descender != null ? font.descender : -Math.round(upm * 0.2),
+    lineGap: font.lineGap || 0,
+    glyphs: glyphs
+  });
+  pf.names = {
+    fontFamily: { en: fam },
+    fontSubfamily: { en: "Regular" },
+    fullName: { en: fam },
+    postScriptName: { en: ps },
+    version: { en: "Version 1.000" }
+  };
+  pf.postScriptName = ps;
+  pf.glyphIndexMap = Object.create(null);
+  glyphs.forEach((g, gi) => {
+    (g.unicodes || []).forEach((u) => {
+      if (pf.glyphIndexMap[u] === undefined) pf.glyphIndexMap[u] = gi;
+    });
+  });
+  pf.numGlyphs = glyphs.length;
+  pf.outlinesFormat = "truetype";
+  pf.wordLigatures = {};  /* كلمات المصمم الأصلية = من الخط الأصلي — بره */
+  pf.wordByGid = {};
+
+  return {
+    empty: false,
+    pureFont: pf,
+    glyphs: glyphs,
+    gidRemap: gidRemap,
+    userCount: userGids.length,
+    targetCount: targetGids.length,
+    wordBlanks: wordBlanks,
+    sharedBlank: 0,
+    family: fam,
+    psName: ps
+  };
+}
+
+/* إعادة توجيه مراجع G في نسخة مؤقتة من القاموس لأرقام الخط النضيف */
+function remapPureDict(dict, gidRemap) {
+  const out = {};
+  for (const w in (dict || {})) {
+    const v = normDictVal(dict[w]);
+    const m = /^G(\d+)$/i.exec(String(v.c || "").trim());
+    if (m) {
+      const nw = gidRemap.get(parseInt(m[1], 10));
+      out[w] = { c: nw !== undefined ? "G" + nw : v.c, s: v.s };
+    } else {
+      out[w] = { c: v.c, s: v.s };
+    }
+  }
+  return out;
+}
+
+/* نفس الفكرة لأشكال الأزواج: البديل المربوط بـ GID من الخط الأصلي
+   لازم يتوجه لرقمه الجديد في الخط النضيف —
+   والربط بالأكواد (U+FExx) بيتحل لوحده لأن الرسمة بتحمل أكوادها */
+function remapPurePairs(pairs, gidRemap) {
+  const out = {};
+  for (const pw in (pairs || {})) {
+    const ent = pairs[pw] || {};
+    const fix = (code) => {
+      const m = /^G(\d+)$/i.exec(String(code || "").trim());
+      if (!m) return code;
+      const nw = gidRemap.get(parseInt(m[1], 10));
+      return nw !== undefined ? "G" + nw : code;
+    };
+    out[pw] = { v1: fix(ent.v1), v2: fix(ent.v2) };
+  }
+  return out;
+}
+
+/* ================================================================
+   § 31 — التصدير
+   ================================================================ */
+function downloadBuffer(data, filename, mime) {
+  const blob = new Blob([data], { type: mime });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ================================================================
+   § 31-ب — التصدير النضيف
+   المستخدم كان شاكٍ إن الخط المركّب على الموقع بيدخل جوّه الملف
+   المصدَّر ويأثر عليه. الحل: نبني خط TrueType جديد من الصفر فيه:
+     ١) الرسمات اللي رسمها المستخدم (علامة userInk)
+     ٢) رسمات أهداف القاموس (لو مربوطة برسمة موجودة)
+     ٣) بلانك صامت مخصوص لكل حرف في كلمات القاموس (عشان قواعد GSUB
+        تطابق بالظبط وتشتغل في أي برنامج)
+     ٤) بلانك شامل لكل نطاقات الكتابة الشائعة — الكتابة العادية
+        تطلع فاضية بدل مكعبات .notdef أو حروف الخط الأصلي
+   الخط الأصلي نفسه: خارج الملف تمامًا — لا رسمات ولا جداول ولا اسم
+   ================================================================ */
+const PURE_COVERAGE_RANGES = [
+  /* Basic Latin (0x20-0x7E) و NBSP (0x00A0) تم حذفهم من التغطية النضيفة:
+     كانوا بيطلعوا رسومات فاضية (blank) في التصدير النضيف فالحروف اللاتينية
+     والأرقام والترقيم كانت بتختفي في البرامج الخارجية. دلوقتي الأكواد دي
+     مش في الـ cmap، فالبرامج بتستخدم الخط البديل (fallback) للنظام
+     فالحروف والأرقام بتظهر طبيعي. جليف المسافة (U+0020 + U+00A0)
+     لسه بيتعمل بشكل صحيح في خطوة المسافة تحت. */
+  [0x0600, 0x06FF],   /* Arabic */
+  [0x200C, 0x200D],   /* ZWNJ / ZWJ */
+  [0xFB50, 0xFDFF],   /* Arabic Presentation Forms-A */
+  [0xFE70, 0xFEFF]    /* Arabic Presentation Forms-B */
+];
+
+/* مسار opentype → كونتورات TrueType (نقاط on/off curve) */
+function pathToContours(commands, tol) {
+  const contours = [];
+  let cur = null;
+  let cx = 0, cy = 0, sx = 0, sy = 0;
+
+  const pushPt = (x, y, on) => {
+    cur.push([Math.round(x), Math.round(y), on ? 1 : 0]);
+  };
+
+  for (const c of commands) {
+    switch (c.type) {
+      case "M":
+        if (cur && cur.length >= 2) contours.push(cur);
+        cur = [];
+        cx = sx = c.x; cy = sy = c.y;
+        pushPt(cx, cy, true);
+        break;
+      case "L":
+        if (!cur) { cur = []; cx = sx = c.x; cy = sy = c.y; pushPt(cx, cy, true); break; }
+        pushPt(c.x, c.y, true); cx = c.x; cy = c.y;
+        break;
+      case "Q":
+        pushPt(c.x1, c.y1, false); pushPt(c.x, c.y, true);
+        cx = c.x; cy = c.y;
+        break;
+      case "C": {
+        if (!cur) { cur = []; cx = sx = c.x1; cy = sy = c.y1; }
+        const quads = [];
+        cubicToQuads(cx, cy, c.x1, c.y1, c.x2, c.y2, c.x, c.y, tol, quads, 0);
+        quads.forEach((q) => { pushPt(q.x1, q.y1, false); pushPt(q.x, q.y, true); });
+        cx = c.x; cy = c.y;
+        break;
+      }
+      case "Z":
+        if (cur && cur.length >= 2) { contours.push(cur); cur = null; }
+        cx = sx; cy = sy;
+        break;
+    }
+  }
+  if (cur && cur.length >= 2) contours.push(cur);
+
+  /* كونتور TrueType مينفعش يقفل على off-curve وهو بادئ على-curve:
+     نضيف نقطة الوسط الضمنية */
+  contours.forEach((pts) => {
+    if (pts.length > 1 && !pts[pts.length - 1][2] && pts[0][2]) {
+      const lx = pts[pts.length - 1][0], ly = pts[pts.length - 1][1];
+      const fx = pts[0][0], fy = pts[0][1];
+      pts.push([Math.round((lx + fx) / 2), Math.round((ly + fy) / 2), 1]);
+    }
+  });
+  return contours;
+}
+
+function pureFamilyName() {
+  let fam = "";
+  try { fam = (font.names && pickLang(font.names.fontFamily)) || ""; } catch (e) { fam = ""; }
+  if (!fam) fam = font.familyName || fileBase || "Font";
+  return (fam + " مِحبر").trim();
+}
+
+function purePSName() {
+  const base = (typeof psName === "function" ? psName(fileBase) : "") || "Font";
+  return ("Mihbar-" + base).replace(/[^A-Za-z0-9-]/g, "").slice(0, 60) || "Mihbar-Font";
+}
+
+/* ================================================================
+   § 31-ت — ضمان أشكال الالتحام قبل التصدير (وضع الدمج)
+   الخط اللي مفيهوش أشكال عرض (0xFExx) في cmap — بنولّدها من
+   الرسمة/الحرف الأساسي، ولام-ألف لو ناقصة. الجليفات بتتضاف في
+   الآخر فأرقام GID الأصلية ثابتة والـ GSUB المدمج يفضل سليم.
+   ================================================================ */
+function ensureJoiningForms() {
+  if (!font || typeof opentype === "undefined") return 0;
+  const upm = font.unitsPerEm || 1000;
+  const map = font.glyphIndexMap = (font.glyphIndexMap || {});
+  let added = 0;
+  for (const bk in AR_FORMS) {
+    const base = +bk;
+    const bg = map[base];
+    if (bg === undefined) continue;
+    let srcG = null;
+    try { srcG = font.glyphs.get(bg); } catch (e) { srcG = null; }
+    if (!srcG) continue;
+    const forms = AR_FORMS[base];
+    for (let fi = 1; fi < 4; fi++) {
+      const fcp = forms[fi];
+      if (fcp === null || fcp === undefined || map[fcp] !== undefined) continue;
+      const sg = mhSynthFormGlyph(srcG, fi, upm);
+      if (!sg) continue;
+      sg.name = "mihbar.s" + base.toString(16) + "." + fi;
+      sg.unicodes = [fcp]; sg.unicode = fcp;
+      const arr = glyphsArr();
+      arr.push(sg);
+      sg.index = arr.length - 1;
+      map[fcp] = sg.index;
+      added++;
+    }
+  }
+  /* لام-ألف: لو الخط مفيهوش رسمة FEFB — نركّبها من لام وألف */
+  if (map[0x0644] !== undefined && map[0x0627] !== undefined && map[0xFEFB] === undefined) {
+    let lamG = null, alefG = null;
+    try { lamG = font.glyphs.get(map[0x0644]); } catch (e) { lamG = null; }
+    try { alefG = font.glyphs.get(map[0x0627]); } catch (e) { alefG = null; }
+    if (lamG && alefG && lamG.path && lamG.path.commands && lamG.path.commands.length &&
+        alefG.path && alefG.path.commands && alefG.path.commands.length) {
+      const cmp2 = composeLamAlefPath(lamG, alefG);
+      const laG = new opentype.Glyph({
+        name: "mihbar.lamalef", unicode: 0xFEFB,
+        unicodes: [0xFEFB, 0xFEFC],
+        advanceWidth: Math.max(1, cmp2.advance), path: cmp2.path
+      });
+      const arr = glyphsArr();
+      arr.push(laG);
+      laG.index = arr.length - 1;
+      map[0xFEFB] = laG.index;
+      map[0xFEFC] = laG.index;
+      mhSynthLamAlef = true;
+      added++;
+    }
+  }
+  if (added) {
+    font.numGlyphs = glyphsArr().length;
+    markStructChanged(); /* جليفات اتضافت — الكتابة عبر opentype.js */
+  }
+  return added;
+}
+
+async function doExport(asWoff2) {
+  if (!font) return;
+
+  /* ⚠ تحذير قبل التصدير: رسومات جوّه الخط عندها رسم فعلي بس من غير
+     أي unicode مرتبط بيها — هتتصدّر لكن هتفضل مخفية لما حد يكتب
+     الرقم/الحرف المفروض يستدعيها (لازم "تعيين الحرف" الأول). */
+  try {
+    const total = glyphsArr().length;
+    let unmapped = 0;
+    for (let i = 1; i < total; i++) { /* i=0 هو .notdef، بنستثنيه */
+      const g = font.glyphs.get(i);
+      const hasDrawing = g && g.path && g.path.commands && g.path.commands.length;
+      const hasUnicode = g && g.unicodes && g.unicodes.length;
+      if (hasDrawing && !hasUnicode) unmapped++;
+    }
+    if (unmapped > 0) {
+      const proceed = await uiConfirm(
+        "فيه " + unmapped + " رسمة عندها رسم لكن من غير رقم أو حرف مربوط بيها — هتتصدّر لكن هتفضل مخفية لحد ما تربطها بـ«تعيين الحرف».\nتكمل التصدير كده؟",
+        { title: "رسومات بدون تعيين", okText: "كمّل التصدير", cancelText: "إلغاء" }
+      );
+      if (!proceed) return;
+    }
+  } catch (e) { /* أي خطأ في الفحص نفسه ما يمنعش التصدير الطبيعي */ }
+
+  /* التصدير النضيف هو الافتراضي: رسومات المستخدم والقاموس بس —
+     الخط المركّب على الموقع خارج الملف تمامًا.
+     "fallback" = نكمل تحت بالوضع العادي */
+  if (pureExportEnabled()) {
+    const r = await doPureExport(asWoff2);
+    if (r === "done" || r === "cancel") return;
+  }
+
+  const slot0 = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot] : null;
+  /* توليد أشكال الالتحام الناقصة (أول/وسط/آخر + لام-ألف) — قبل حساب
+     canUseSource لأنه ممكن يضيف جليفات ويلزم إعادة كتابة الجليف */
+  try { ensureJoiningForms(); } catch (e) { console.warn("توليد أشكال الالتحام فشل:", e); }
+  /* لو البنية سليمة (مفيش حذف/تحريك/تغيير رسمات) نبني على بايتات
+     الخط الأصلي مباشرة — glyf/hinting/GDEF/GPOS/kern كلها أصلًا جاهزة
+     وبدون تحويل CFF اللي opentype.js بيعمله. وغير كده إعادة بناء */
+  const canUseSource = !!(slot0 && slot0.ttfSource && !slot0.structChanged);
+
+  if (!canUseSource && font.outlinesFormat && font.outlinesFormat !== "truetype") {
+    await uiAlert("خط CFF — التصدير TrueType فقط.");
+    return;
+  }
+
+  statusEl.classList.remove("err");
+  statusEl.textContent = "جارٍ التصدير…";
+  try {
+    const built = await buildFullTtfBuffer({ canUseSource, slot: slot0 });
+    if (built.error) {
+      statusEl.classList.add("err");
+      await uiAlert(
+        "القاموس ما اتحطش في الخط المصدَّر!\n\nالسبب: " + built.error +
+        "\n\nالخط هيتم تنزيله بدون قواعد الكلمات.",
+        "فشل تضمين القاموس"
+      );
+    }
+    const ttfBuffer = built.buffer;
+    const gsubNote = built.gsubNote + (built.error ? " ⚠ " + built.error : "");
+    const restored = built.restored;
+
+    const base = (fileBase || "font") + "-mihabar";
+
+    if (asWoff2) {
+      let lib = null;
+      try { lib = await getWoff2Lib(); } catch (e) { lib = null; }
+      if (!lib || typeof lib.compress !== "function") {
+        await uiAlert("مكتبة WOFF2 غير متاحة — صدّر TTF.");
+        defaultStatus();
+        return;
+      }
+      const out = await lib.compress(new Uint8Array(ttfBuffer));
+      downloadBuffer(out, base + ".woff2", "font/woff2");
+    } else {
+      downloadBuffer(ttfBuffer, base + ".ttf", "font/ttf");
+    }
+
+    defaultStatus();
+    statusEl.textContent = "تم التصدير ✓" + gsubNote;
+    toast("تم التصدير ✓" + gsubNote);
+  } catch (e) {
+    console.error(e);
+    showError("فشل التصدير: " + e.message);
+  }
+}
+
+/* ================================================================
+   § 31-ب-2 — بناء buffer الخط الكامل (TTF بالقواعد المضمَّنة)
+   استُخرجت من doExport عشان تتشارك بين "تصدير TTF/WOFF2" الحقيقي
+   وبين "معاينة نص بصفحات" (native @font-face) — الاتنين لازم
+   يبنوا على نفس القواعد بالظبط (القاموس + أشكال الأزواج + السياقات)
+   وإلا المعاينة تبان مختلفة عن الملف اللي فعلًا هيتنزّل.
+   بترجع { buffer, gsubNote, restored } أو { error }
+   ================================================================ */
+async function buildFullTtfBuffer(opts) {
+  const canUseSource = opts.canUseSource;
+  const slot0 = opts.slot;
+  const total = glyphsArr().length;
+  for (let i = 0; i < total; i++) {
+    const g = font.glyphs.get(i);
+    if (!g.name) g.name = "glyph" + i;
+  }
+
+  let ttfBuffer = null;
+  let gsubNote = canUseSource ? " (على أساس الخط الأصلي)" : "";
+  const slot = slot0;
+
+  if (canUseSource) {
+    ttfBuffer = slot0.ttfSource.slice(0);
+  } else {
+    /* opentype.js مش بيعرف يكتب GSUB type 5/6 (سياقي) وبيضيّع أنواع
+       من GPOS/GDEF — «فشل التصدير» عند خطوط التشكيل المركّبة.
+       بنشيل الجداول دي من الكتابة وبنرجّعها بايتات من المصدر بعد الكتابة */
+    const strippedTables = [];
+    ["gsub", "gpos", "GDEF", "kern"].forEach((t) => {
+      if (font.tables && font.tables[t] !== undefined) {
+        strippedTables.push([t, font.tables[t]]);
+        delete font.tables[t];
+      }
+    });
+    try {
+      ttfBuffer = font.toArrayBuffer();
+    } finally {
+      strippedTables.forEach(([t, v]) => { font.tables[t] = v; });
+    }
+  }
+
+  /* ١ — استرجاع الجداول الأصلية التي opentype.js لا يكتبها
+     (GDEF/GPOS/kern) حتى يبقى التشكيل والكيرنينج شغالين خارجيًا.
+     الرسم على حروف (structChanged) ما بيكسّرش أرقام GID — فالاسترجاع
+     شغال كمان؛ اللي بيوقفه: حذف/تحريك حروف (gidsShifted) */
+  let restored = [];
+  if (slot && slot.ttfSource && !slot.gidsShifted) {
+    const srcU8 = new Uint8Array(slot.ttfSource);
+    ["GDEF", "GPOS", "kern"].forEach((tag) => {
+      if (!sfntHasTable(ttfBuffer, tag)) {
+        const orig = extractTable(srcU8, tag);
+        if (orig) {
+          try {
+            ttfBuffer = injectTableIntoTTF(ttfBuffer, tag, orig);
+            restored.push(tag);
+          } catch (e) { console.warn("استرجاع " + tag + " فشل:", e); }
+        }
+      }
+    });
+  }
+
+  /* ٢ — cmap كامل من glyphIndexMap: opentype.js بيكتب كود واحد لكل
+     رسمة فبتضيع الأكواد الإضافية (مهم جدًا لخطوط أشكال العرض) */
+  try {
+    const cmapBytes = buildCmapTable(font.glyphIndexMap || {});
+    if (cmapBytes) {
+      ttfBuffer = injectTableIntoTTF(ttfBuffer, "cmap", cmapBytes);
+    }
+  } catch (e) { console.warn("بناء cmap فشل:", e); }
+
+  /* ٣ — GSUB دايمًا (مش شرط القاموس): أشكال الالتحام init/medi/fina
+     + لام-ألف + قواعد الكلمات (لو مفعلة) — ودمج GSUB الأصلي بايت-بايت.
+     الخطوط من غير تشكيل أصلي بتطلع بتلتحم، والخطوط بتشكيل أصلي
+     بيفضل تشكيلها زي ما هو */
+  {
+    try {
+      const res = await buildWordGSUB({ skipDict: !dictEmbedEnabled() });
+      if (res && res.bytes) {
+        ttfBuffer = injectTableIntoTTF(ttfBuffer, "GSUB", res.bytes);
+        gsubNote += " + القاموس مضمَّن ✓ (" + (res.ruleCount || 0) + " قاعدة" +
+          (res.words ? " / " + res.words + " كلمة" : "") + ")" +
+          (res.merged ? " والتشكيل الأصلي محفوظ ✓" : "");
+      } else if (slot0 && slot0.ttfSource && !slot0.gidsShifted) {
+        /* مفيش قواعد مطلوبة — بس نحفظ GSUB الأصلي زي ما هو */
+        const orig = extractTable(new Uint8Array(slot0.ttfSource), "GSUB");
+        if (orig) {
+          ttfBuffer = injectTableIntoTTF(ttfBuffer, "GSUB", orig);
+          gsubNote += " + GSUB الأصلي محفوظ ✓";
+        }
+      } else if (res && res.error) {
+        return { buffer: ttfBuffer, gsubNote: gsubNote, restored: restored, error: res.error };
+      }
+    } catch (e) {
+      console.warn("فشل بناء GSUB:", e);
+      gsubNote += " ⚠ فشل بناء قواعد GSUB: " + e.message;
+    }
+  }
+
+  if (restored.length) {
+    const names = { GDEF: "العلامات", GPOS: "التموضع", kern: "الكيرنينج" };
+    gsubNote += " واستُرجع " + restored.map((t) => names[t] || t).join("، ") + " ✓";
+  }
+
+  return { buffer: ttfBuffer, gsubNote: gsubNote, restored: restored };
+}
+
+/* ================================================================
+   § 31-ج — كاتب TrueType خفيف للخط النضيف
+   opentype.js 1.3.4 بيكتب OTTO/CFF دايمًا — فبنكتب glyf/loca/هيدر
+   بنفسنا: TTF حقيقي صغير بمجموعات اختبارية سليمة
+   ================================================================ */
+function assembleSFNT(tables) {
+  const entries = tables.slice().sort((a, b) =>
+    (a.tag < b.tag ? -1 : a.tag > b.tag ? 1 : 0));
+  const numTables = entries.length;
+  let es = 0;
+  while ((1 << (es + 1)) <= numTables) es++;
+  const searchRange = (1 << es) * 16;
+  const rangeShift = numTables * 16 - searchRange;
+
+  let cursor = 12 + numTables * 16;
+  entries.forEach((t) => {
+    t.off = cursor;
+    cursor += t.bytes.length + ((4 - (t.bytes.length % 4)) % 4);
+  });
+  const total = cursor;
+
+  const out = new Uint8Array(total);
+  const dv = new DataView(out.buffer);
+  dv.setUint32(0, 0x00010000);
+  dv.setUint16(4, numTables);
+  dv.setUint16(6, searchRange);
+  dv.setUint16(8, es);
+  dv.setUint16(10, rangeShift);
+  entries.forEach((t) => out.set(t.bytes, t.off));
+
+  const csum = (start, len) => {
+    let sum = 0;
+    for (let i = 0; i < len; i += 4) {
+      const b = (j) => (start + j < total) ? out[start + j] : 0;
+      sum = (sum + (((b(i) << 24) | (b(i + 1) << 16) | (b(i + 2) << 8) | b(i + 3)) >>> 0)) >>> 0;
+    }
+    return sum >>> 0;
+  };
+  entries.forEach((t) => { t.csum = csum(t.off, t.bytes.length); });
+  entries.forEach((t, i) => {
+    const o = 12 + i * 16;
+    for (let j = 0; j < 4; j++) out[o + j] = t.tag.charCodeAt(j) & 255;
+    dv.setUint32(o + 4, t.csum);
+    dv.setUint32(o + 8, t.off);
+    dv.setUint32(o + 12, t.bytes.length);
+  });
+
+  const head = entries.find((t) => t.tag === "head");
+  if (head) {
+    const adj = head.off + 8;
+    dv.setUint32(adj, 0);
+    const fileSum = csum(0, total);
+    dv.setUint32(adj, (0xB1B0AFBA - fileSum) >>> 0);
+    const hi = entries.indexOf(head);
+    dv.setUint32(12 + hi * 16 + 4, csum(head.off, head.bytes.length));
+  }
+  return out.buffer;
+}
+
+function buildNameTable(recs) {
+  /* recs: [{pid, eid, lid, nid, str}] — سجل الاسم القياسي */
+  const u16 = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+  const strBytes = (r) => {
+    if (r.pid === 3) {
+      let s = "";
+      [...r.str].forEach((ch) => { s += u16(ch.charCodeAt(0)); });
+      return s;
+    }
+    let s = "";
+    [...r.str].forEach((ch) => {
+      const c = ch.charCodeAt(0);
+      s += String.fromCharCode((c >= 32 && c <= 126) ? c : 63);
+    });
+    return s;
+  };
+
+  const enc = recs.map((r) => ({ r: r, b: strBytes(r) }));
+  /* المواصفة: السجلات مرتبة صعوديًا (platform, encoding, language, nameID) */
+  enc.sort((a, b) => a.r.pid - b.r.pid || a.r.eid - b.r.eid ||
+    a.r.lid - b.r.lid || a.r.nid - b.r.nid);
+  const count = enc.length;
+  const strOff = 6 + count * 12;
+  let cursor = strOff;
+  /* إزاحات السلاسل نسبية لمنطقة التخزين (أول سلسلة = 0) زي المواصفة */
+  enc.forEach((e) => { e.off = cursor - strOff; cursor += e.b.length; });
+
+  let t = u16(0) + u16(count) + u16(strOff);
+  enc.forEach((e) => {
+    t += u16(e.r.pid) + u16(e.r.eid) + u16(e.r.lid) + u16(e.r.nid) +
+      u16(e.b.length) + u16(e.off);
+  });
+  enc.forEach((e) => { t += e.b; });
+
+  const bytes = new Uint8Array(t.length);
+  for (let i = 0; i < t.length; i++) bytes[i] = t.charCodeAt(i) & 255;
+  return bytes;
+}
+
+function writePureTTF(built) {
+  const glyphs = built.glyphs;
+  const pf = built.pureFont;
+  const upm = pf.unitsPerEm || 1000;
+  const n = glyphs.length;
+  const tol = Math.max(0.05, upm / 2000);
+
+  const u16s = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+  const s16s = (v) => u16s(((v % 65536) + 65536) % 65536);
+  const u32s = (v) => String.fromCharCode(
+    (v >>> 24) & 255, (v >>> 16) & 255, (v >>> 8) & 255, v & 255);
+
+  /* نقاط كل رسمة */
+  const per = glyphs.map((g) => {
+    const contours = pathToContours(g.path ? g.path.commands : [], tol);
+    let xMin = Infinity, yMin = Infinity, xMax = -Infinity, yMax = -Infinity;
+    let pts = 0;
+    contours.forEach((c) => c.forEach((p) => {
+      pts++;
+      if (p[0] < xMin) xMin = p[0];
+      if (p[0] > xMax) xMax = p[0];
+      if (p[1] < yMin) yMin = p[1];
+      if (p[1] > yMax) yMax = p[1];
+    }));
+    const empty = !pts;
+    const cl = (v) => Math.max(-32768, Math.min(32767, Math.round(v)));
+    return {
+      contours: empty ? [] : contours,
+      advance: Math.max(0, Math.min(0xFFFF, Math.round(g.advanceWidth || 0))),
+      xMin: empty ? 0 : cl(xMin), yMin: empty ? 0 : cl(yMin),
+      xMax: empty ? 0 : cl(xMax), yMax: empty ? 0 : cl(yMax),
+      nPoints: pts,
+      nContours: empty ? 0 : contours.length
+    };
+  });
+
+  /* ---- glyf + loca ---- */
+  let glyf = "";
+  const locaOffs = [];
+  per.forEach((gd) => {
+    locaOffs.push(glyf.length);
+    if (!gd.nContours) return;
+    let t = s16s(gd.nContours) + s16s(gd.xMin) + s16s(gd.yMin) +
+      s16s(gd.xMax) + s16s(gd.yMax);
+    let acc = 0;
+    gd.contours.forEach((c) => { acc += c.length; t += u16s(acc - 1); });
+    t += u16s(0); /* instructionLength — بلا هنتينج */
+    /* الأعلام بايت واحد لكل نقطة (on-curve = 0x01) */
+    gd.contours.forEach((c) => c.forEach((p) => { t += p[2] ? "\x01" : "\x00"; }));
+    let px = 0, py = 0;
+    gd.contours.forEach((c) => c.forEach((p) => { t += s16s(p[0] - px); px = p[0]; }));
+    gd.contours.forEach((c) => c.forEach((p) => { t += s16s(p[1] - py); py = p[1]; }));
+    glyf += t;
+  });
+  /* نهاية الرسمات قبل حشو المحاذاة — الحشو للجدول مش لرسمة */
+  const glyfEnd = glyf.length;
+  locaOffs.push(glyfEnd);
+  while (glyf.length % 4) glyf += "\0";
+  const loca = locaOffs.map((o) => u32s(o)).join("");
+
+  /* ---- قياسات عامة ---- */
+  let advMax = 0, minX = 0, minY = 0, maxX = 0, maxY = 0;
+  let minLSB = 0, minRSB = 0, xMaxExtent = 0;
+  let first = true;
+  per.forEach((gd) => {
+    advMax = Math.max(advMax, gd.advance);
+    if (gd.nContours) {
+      if (first) {
+        minX = gd.xMin; maxX = gd.xMax; minY = gd.yMin; maxY = gd.yMax;
+        minLSB = gd.xMin; minRSB = gd.advance - gd.xMax;
+        xMaxExtent = gd.xMax;
+        first = false;
+      } else {
+        minX = Math.min(minX, gd.xMin); maxX = Math.max(maxX, gd.xMax);
+        minY = Math.min(minY, gd.yMin); maxY = Math.max(maxY, gd.yMax);
+        minLSB = Math.min(minLSB, gd.xMin);
+        minRSB = Math.min(minRSB, gd.advance - gd.xMax);
+        xMaxExtent = Math.max(xMaxExtent, gd.xMax);
+      }
+    }
+  });
+
+  /* ---- head ---- */
+  const macEpoch = 2082844800; /* 1904 → 1970 بالثواني */
+  const nowSec = Math.floor(Date.now() / 1000) + macEpoch;
+  const lo = (nowSec % 4294967296), hi = Math.floor(nowSec / 4294967296);
+  const dt = u32s(hi) + u32s(lo);
+  let head = u32s(0x00010000) + u32s(0x00010000) + u32s(0) + u32s(0x5F0F3CF5) +
+    u16s(0x000B) + u16s(upm) + dt + dt +
+    s16s(minX) + s16s(minY) + s16s(maxX) + s16s(maxY) +
+    u16s(0) + u16s(8) + s16s(2) + s16s(1) + s16s(0);
+
+  /* ---- hhea ---- */
+  let hhea = u32s(0x00010000) +
+    s16s(pf.ascender != null ? pf.ascender : Math.round(upm * 0.8)) +
+    s16s(pf.descender != null ? pf.descender : -Math.round(upm * 0.2)) +
+    s16s(pf.lineGap || 0) +
+    u16s(advMax) + s16s(minLSB) + s16s(minRSB) + s16s(xMaxExtent) +
+    s16s(1) + s16s(0) + s16s(0) + s16s(0) + s16s(0) + s16s(0) + s16s(0) +
+    s16s(0) + u16s(n);
+
+  /* ---- maxp ---- */
+  let maxPoints = 0, maxContours = 0;
+  per.forEach((gd) => {
+    maxPoints = Math.max(maxPoints, gd.nPoints);
+    maxContours = Math.max(maxContours, gd.nContours);
+  });
+  let maxp = u32s(0x00010000) + u16s(n) + u16s(maxPoints) + u16s(maxContours) +
+    u16s(0) + u16s(0) + u16s(2) + u16s(0) + u16s(0) + u16s(0) +
+    u16s(0) + u16s(0) + u16s(0) + u16s(0) + u16s(0);
+
+  /* ---- hmtx ---- */
+  let hmtx = "";
+  per.forEach((gd) => { hmtx += u16s(gd.advance) + s16s(gd.xMin); });
+
+  /* ---- cmap من glyphIndexMap (fmt4 + fmt12) ---- */
+  const cmapBytes = buildCmapTable(pf.glyphIndexMap || {});
+
+  /* ---- OS/2 v1 ---- */
+  let avg = 0;
+  per.forEach((gd) => { avg += gd.advance; });
+  avg = n ? Math.round(avg / n) : 0;
+  const cRange = pf.glyphIndexMap || {};
+  const cpsAll = Object.keys(cRange).map(Number).filter((c) => c <= 0xFFFF);
+  const firstChar = cpsAll.length ? Math.min.apply(null, cpsAll) : 0x20;
+  const lastChar = cpsAll.length ? Math.max.apply(null, cpsAll) : 0x20;
+  const asc = pf.ascender != null ? pf.ascender : Math.round(upm * 0.8);
+  const desc = pf.descender != null ? pf.descender : -Math.round(upm * 0.2);
+  let os2 = u16s(1) + /* version 1 */
+    s16s(Math.max(-32768, Math.min(32767, avg))) +
+    u16s(400) + u16s(5) + u16s(0) +
+    s16s(Math.round(upm * 0.65)) + s16s(Math.round(upm * 0.7)) +
+    s16s(0) + s16s(Math.round(upm * 0.15)) +
+    s16s(Math.round(upm * 0.65)) + s16s(Math.round(upm * 0.7)) +
+    s16s(0) + s16s(Math.round(upm * 0.45)) +
+    s16s(Math.round(upm * 0.05)) + s16s(Math.round(upm * 0.22)) +
+    s16s(0) +
+    "\0\0\0\0\0\0\0\0\0\0" + /* panose */
+    u32s(0x2003) + u32s(0x03000000) + u32s(0) + u32s(0) +
+    "MHB1" +
+    u16s(0x0040) +
+    u16s(firstChar) + u16s(lastChar) +
+    s16s(asc) + s16s(desc) + s16s(pf.lineGap || 0) +
+    u16s(Math.max(0, Math.min(0xFFFF, Math.max(asc, maxY)))) +
+    u16s(Math.max(0, Math.min(0xFFFF, Math.abs(Math.min(desc, minY))))) +
+    u32s(0x41) + u32s(0); /* codepages: Latin-1 + Arabic-1256 */
+
+  /* ---- post v3 ---- */
+  let post = u32s(0x00030000) + u32s(0) +
+    s16s(-Math.round(upm * 0.1)) + s16s(Math.round(upm * 0.05)) +
+    u32s(0) + u32s(0) + u32s(0) + u32s(0) + u32s(0);
+
+  /* ---- name ---- */
+  const fam = built.family || pureFamilyName();
+  const ps = built.psName || purePSName();
+  const nameTable = buildNameTable([
+    { pid: 3, eid: 1, lid: 0x409, nid: 1, str: fam },
+    { pid: 3, eid: 1, lid: 0x409, nid: 2, str: "Regular" },
+    { pid: 3, eid: 1, lid: 0x409, nid: 3, str: fam + ";مِحبر-نضيف" },
+    { pid: 3, eid: 1, lid: 0x409, nid: 4, str: fam },
+    { pid: 3, eid: 1, lid: 0x409, nid: 6, str: ps },
+    { pid: 3, eid: 1, lid: 0x409, nid: 8, str: "مِحْبَر — محرر الخطوط الاستوديو" },
+    { pid: 1, eid: 0, lid: 0, nid: 1, str: ps },
+    { pid: 1, eid: 0, lid: 0, nid: 2, str: "Regular" },
+    { pid: 1, eid: 0, lid: 0, nid: 4, str: ps },
+    { pid: 1, eid: 0, lid: 0, nid: 6, str: ps }
+  ]);
+
+  /* ---- تجميع ---- */
+  const toBytes = (s) => {
+    const b = new Uint8Array(s.length);
+    for (let i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 255;
+    return b;
+  };
+  const tables = [
+    { tag: "glyf", bytes: toBytes(glyf) },
+    { tag: "loca", bytes: toBytes(loca) },
+    { tag: "head", bytes: toBytes(head) },
+    { tag: "hhea", bytes: toBytes(hhea) },
+    { tag: "maxp", bytes: toBytes(maxp) },
+    { tag: "hmtx", bytes: toBytes(hmtx) },
+    { tag: "name", bytes: nameTable },
+    { tag: "OS/2", bytes: toBytes(os2) },
+    { tag: "post", bytes: toBytes(post) }
+  ];
+  if (cmapBytes) tables.push({ tag: "cmap", bytes: cmapBytes });
+  return assembleSFNT(tables);
+}
+
+/* مسار التصدير النضيف — يرجع "done" أو "fallback" أو "cancel" */
+async function doPureExport(asWoff2) {
+  const slot = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot] : null;
+  statusEl.classList.remove("err");
+  statusEl.textContent = "جارٍ بناء التصدير النضيف…";
+
+  let built = null;
+  try {
+    built = buildPureFont();
+  } catch (e) {
+    console.error("بناء الخط النضيف فشل:", e);
+  }
+
+  if (!built || built.empty) {
+    const ok = await uiConfirm(
+      "التصدير النضيف بيطلّع ملف فيه رسوماتك وربط القاموس بس — من غير الخط المركّب على الموقع خالص.\n\n" +
+      "لكن الخط الحالي مفيهوش رسمات جديدة ولا كلمات مربوطة، فالملف النضيف هيطلع فاضي.\n\n" +
+      "تحب أصدره بالوضع العادي (الخط الأصلي جوّه الملف) بدلًا من كده؟",
+      { title: "التصدير النضيف — مفيش محتوى", okText: "صدّر عادي" });
+    return ok ? "fallback" : "cancel";
+  }
+
+  try {
+    /* القاموس والأزواج على الخط النضيف مع إعادة توجيه مراجع GID — ثم استرجاع كل شيء.
+       تبديل الخط مؤقتًا: كل حلول الأكواد تحصل ضد cmap الخط النضيف */
+    let gsubRes = null;
+    const savedFont = font;
+    const savedDict = slot ? slot.dict : null;
+    const savedPairs = slot ? slot.pairs : null;
+    try {
+      font = built.pureFont;
+      if (slot) slot.dict = remapPureDict(savedDict, built.gidRemap);
+      if (slot) slot.pairs = remapPurePairs(savedPairs, built.gidRemap);
+      if (dictEmbedEnabled()) {
+        gsubRes = await buildWordGSUB({ pure: true });
+      }
+    } finally {
+      font = savedFont;
+      if (slot) slot.dict = savedDict;
+      if (slot) slot.pairs = savedPairs;
+    }
+
+    let ttfBuffer = writePureTTF(built);
+
+    try {
+      const cmapBytes = buildCmapTable(built.pureFont.glyphIndexMap || {});
+      if (cmapBytes) ttfBuffer = injectTableIntoTTF(ttfBuffer, "cmap", cmapBytes);
+    } catch (e) { console.warn("cmap النضيف فشل:", e); }
+
+    let gsubNote = "";
+    if (gsubRes && gsubRes.bytes) {
+      ttfBuffer = injectTableIntoTTF(ttfBuffer, "GSUB", gsubRes.bytes);
+      gsubNote = " + القاموس مضمَّن ✓ (" + (gsubRes.ruleCount || 0) + " قاعدة" +
+        (gsubRes.words ? " / " + gsubRes.words + " كلمة" : "") + ")";
+    } else if (gsubRes && gsubRes.error) {
+      gsubNote = " ⚠ القاموس: " + gsubRes.error;
+    }
+
+    const base = (fileBase || "font") + "-نضيف";
+    if (asWoff2) {
+      let lib = null;
+      try { lib = await getWoff2Lib(); } catch (e) { lib = null; }
+      if (!lib || typeof lib.compress !== "function") {
+        await uiAlert("مكتبة WOFF2 غير متاحة — صدّر TTF.");
+        defaultStatus();
+        return "cancel";
+      }
+      const out = await lib.compress(new Uint8Array(ttfBuffer));
+      downloadBuffer(out, base + ".woff2", "font/woff2");
+    } else {
+      downloadBuffer(ttfBuffer, base + ".ttf", "font/ttf");
+    }
+
+    defaultStatus();
+    const msg = "تصدير نضيف ✓ — " + built.userCount + " رسمة بتاعتك" +
+      (built.targetCount ? " + " + built.targetCount + " رسمة مربوطة" : "") +
+      gsubNote + " — الخط الأصلي خارج الملف تمامًا";
+    statusEl.textContent = msg;
+    toast(msg);
+    return "done";
+  } catch (e) {
+    console.error(e);
+    const ok = await uiConfirm(
+      "التصدير النضيف فشل: " + e.message + "\n\nتحب أطلعه بالوضع العادي؟",
+      { title: "فشل التصدير النضيف", okText: "صدّر عادي" });
+    return ok ? "fallback" : "cancel";
+  }
+}
+
+/* ================================================================
+   § 32 — قواعد الكلمات + بناء/دمج GSUB
+   الفكرة: قواعد القاموس (كلمة ← رسمة) تُبنى لوك أب LigatureSubst،
+   ثم تُدمج جراحيًا داخل GSUB الأصلي للخط (إن وجد) مع الحفاظ على
+   كل قواعد التشكيل الأصلية بايت-بايت — أو GSUB جديد للخطوط الفقيرة.
+   ================================================================ */
+
+/* قراءة دليل جداول sfnt */
+function sfntEntries(buf) {
+  const u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  if (u8.length < 12) return null;
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  const num = dv.getUint16(4);
+  if (!num || num > 512) return null;
+  const out = [];
+  for (let i = 0; i < num; i++) {
+    const off = 12 + i * 16;
+    if (off + 16 > u8.length) return null;
+    let tag = "";
+    for (let j = 0; j < 4; j++) tag += String.fromCharCode(u8[off + j]);
+    out.push({ tag: tag, offset: dv.getUint32(off + 8), length: dv.getUint32(off + 12) });
+  }
+  return out;
+}
+
+function extractTable(buf, tag) {
+  const entries = sfntEntries(buf);
+  if (!entries) return null;
+  const t = entries.find((e) => e.tag === tag);
+  if (!t || !t.length) return null;
+  const u8 = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  if (t.offset + t.length > u8.length) return null;
+  return u8.slice(t.offset, t.offset + t.length);
+}
+
+function sfntHasTable(buf, tag) {
+  const entries = sfntEntries(buf);
+  return !!(entries && entries.some((e) => e.tag === tag));
+}
+
+/* تسلسل لوك أب LigatureSubst واحد (LookupType 4) من قواعد متتابعات
+   rules: [{ seq: [gid, ...], lig: gid }] — يدعم متتابع مكوّن واحد */
+function serializeLigatureLookup(rules) {
+  const u16 = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+
+  /* إزالة التكرار — نفس المتتابع مرة واحدة */
+  const seen = new Set();
+  const uniq = [];
+  rules.forEach((r) => {
+    const key = r.seq.join(",") + ">" + r.lig;
+    if (seen.has(key)) return;
+    seen.add(key);
+    uniq.push(r);
+  });
+
+  const byFirst = new Map();
+  uniq.forEach((r) => {
+    const first = r.seq[0];
+    if (!byFirst.has(first)) byFirst.set(first, []);
+    byFirst.get(first).push({ comps: r.seq.slice(1), lig: r.lig });
+  });
+
+  const firsts = [...byFirst.keys()].sort((a, b) => a - b);
+  firsts.forEach((g) => {
+    byFirst.get(g).sort((a, b) => b.comps.length - a.comps.length);
+  });
+
+  const setBodies = firsts.map((g) => {
+    const ligs = byFirst.get(g);
+    const count = ligs.length;
+    const headerSize = 2 + 2 * count;
+    let cursor = headerSize;
+    const items = ligs.map((r) => {
+      const size = 4 + 2 * r.comps.length; /* ligGlyph + compCount + comps */
+      const o = cursor;
+      cursor += size;
+      return { r: r, offset: o };
+    });
+    let s = u16(count);
+    items.forEach((L) => { s += u16(L.offset); });
+    items.forEach((L) => {
+      s += u16(L.r.lig);
+      s += u16(L.r.comps.length + 1); /* عدد المكوّنات يشمل الأول */
+      L.r.comps.forEach((gid) => { s += u16(gid); });
+    });
+    return { body: s, size: cursor };
+  });
+
+  const ligSubstHeaderSize = 6 + 2 * firsts.length;
+  const coverageSize = 4 + 2 * firsts.length;
+  const coverageOffset = ligSubstHeaderSize;
+  let setCursor = coverageOffset + coverageSize;
+  const setOffsets = setBodies.map((sb) => {
+    const o = setCursor;
+    setCursor += sb.size;
+    return o;
+  });
+
+  let sub = u16(1) + u16(coverageOffset) + u16(firsts.length);
+  setOffsets.forEach((o) => { sub += u16(o); });
+  sub += u16(1) + u16(firsts.length); /* Coverage format 1 + glyphCount */
+  firsts.forEach((g) => { sub += u16(g); });
+  setBodies.forEach((sb) => { sub += sb.body; });
+
+  /* Lookup: type=4، flag=IgnoreMarks (الحركات/الشدد متقطعش المطابقة —
+     والي بها يقفز على الحركات المتخطاة ويربطها بالرسمة الناتجة)، subtable واحد */
+  const lookupBody = u16(4) + u16(0x0008) + u16(1) + u16(8) + sub;
+  const bytes = new Uint8Array(lookupBody.length);
+  for (let i = 0; i < lookupBody.length; i++) bytes[i] = lookupBody.charCodeAt(i) & 255;
+  return bytes;
+}
+
+/* GSUB جديد نظيف (للخطوط بدون GSUB أصلي) — لوك أب لكل ميزة،
+   والميزات المتشابهة بتتجمّع في ميزة واحدة بمؤشرات متعددة
+   (HarfBuzz بيطبق أول ميزة بنفس الوسم بس — فالتجميع ضروري) */
+function buildFreshGSUB(lookups) {
+  const u16 = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+  const n = lookups.length;
+  if (!n) return null;
+
+  /* تجميع اللوك أب حسب الوسم مع الحفاظ على الترتيب */
+  const feats = [];
+  const tagFeatIdx = new Map();
+  lookups.forEach((l, i) => {
+    const tag = l.tag || "calt";
+    if (!tagFeatIdx.has(tag)) {
+      tagFeatIdx.set(tag, feats.length);
+      feats.push({ tag: tag, idx: [] });
+    }
+    feats[tagFeatIdx.get(tag)].idx.push(i);
+  });
+  const nf = feats.length;
+
+  /* LookupList */
+  let cur = 2 + 2 * n;
+  const lkOffs = lookups.map((l) => { const o = cur; cur += l.bytes.length; return o; });
+  let ll = u16(n);
+  lkOffs.forEach((o) => { ll += u16(o); });
+  lookups.forEach((l) => {
+    for (let i = 0; i < l.bytes.length; i++) ll += String.fromCharCode(l.bytes[i]);
+  });
+
+  /* FeatureList — ميزة لكل وسم (اللوك أب المتشابهة الوسم جوه ميزة واحدة)
+     ⚠ حجم جدول الميزة متغير: 4 + 2×عدد الفهارس — الإزاحات تتحسب عليه */
+  let fcur = 2 + 6 * nf;
+  const featOffs = feats.map((f) => { const o = fcur; fcur += 4 + 2 * f.idx.length; return o; });
+  let fl = u16(nf);
+  feats.forEach((f, i) => { fl += f.tag + u16(featOffs[i]); });
+  feats.forEach((f, i) => {
+    fl += u16(0) + u16(f.idx.length);
+    f.idx.forEach((li) => { fl += u16(li); });
+  });
+
+  /* ScriptList: DFLT + arab يشتركان LangSys واحد يشير لكل الميزات
+     — إزاحة arab تُحسب فعليًا (كانت 26 ثابتة وتبوظ مع أكثر من لوك أب!) */
+  const langSysLen = 6 + 2 * nf;
+  const dfltScriptOff = 14;
+  const arabScriptOff = dfltScriptOff + 4 + langSysLen;
+  const langSys = u16(0) + u16(0xFFFF) + u16(nf)
+    + feats.map((f, i) => u16(i)).join("");
+  const scriptTable = u16(4) + u16(0);
+  const scriptList = u16(2)
+    + "DFLT" + u16(dfltScriptOff)
+    + "arab" + u16(arabScriptOff)
+    + scriptTable + langSys
+    + scriptTable + langSys;
+
+  const scriptListOffset = 10;
+  const featureListOffset = scriptListOffset + scriptList.length;
+  const lookupListOffset = featureListOffset + fl.length;
+
+  const gsub = u16(1) + u16(0)
+    + u16(scriptListOffset)
+    + u16(featureListOffset)
+    + u16(lookupListOffset)
+    + scriptList + fl + ll;
+
+  const bytes = new Uint8Array(gsub.length);
+  for (let i = 0; i < gsub.length; i++) bytes[i] = gsub.charCodeAt(i) & 255;
+  return bytes;
+}
+
+/* دليل تغطية Coverage Format 1 من مجموعة GIDs */
+function serializeCoverage(gids) {
+  const u16 = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+  const sorted = [...new Set(gids)].sort((a, b) => a - b);
+  let s = u16(1) + u16(sorted.length);
+  sorted.forEach((g) => { s += u16(g); });
+  return s;
+}
+
+/* محارف تعتبر حدود كلمة لنطاق «لوحدها» في التصدير */
+const WORD_BOUNDARY_GIDS = [0x20, 0xA0, 0x2000, 0x2001, 0x2002, 0x2003,
+  0x2004, 0x2005, 0x2006, 0x2009, 0x200A, 0x202F, 0x205F, 0x3000,
+  0x2E, 0x2C, 0x3A, 0x3B, 0x21, 0x3F, 0x2D, 0xAB, 0xBB, 0x2026,
+  0x60C, 0x61B, 0x61F, 0x640, 0x200C, 0x200D, 0x28, 0x29];
+
+/* لوك أب ChainContextSubstFormat3 (نوع 6) لنطاق «لوحدها»:
+   لكل متتابعة كلمة: مسافة/علامة قبل + الكلمة موضعًا بموضع + مسافة/علامة بعد،
+   وبعدها لوك أب ليجاتشر متداخل ينفّذ الاستبدال.
+   seqs: [[gid,...],...] — nestedLookupIndex فهرس لوك أب الليجاتشر المطلق
+   boundaryGids: GIDs محارف الحدود المحلولة من cmap الخط نفسه */
+function serializeChainLookup(seqs, nestedLookupIndex, boundaryGids) {
+  const u16 = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+
+  /* إزالة التكرار */
+  const seen = new Set();
+  const uniq = [];
+  seqs.forEach((s) => {
+    const key = s.join(",");
+    if (seen.has(key) || s.length < 1) return;
+    seen.add(key);
+    uniq.push(s);
+  });
+  if (!uniq.length) return null;
+
+  const bounds = (boundaryGids && boundaryGids.length)
+    ? boundaryGids : WORD_BOUNDARY_GIDS;
+  const boundsCov = serializeCoverage(bounds);
+
+  /* كل متتابعة = جدول فرعي مستقل بإزاحاته النسبية لنفسه */
+  const makeSub = (s) => {
+    const n = s.length;
+    const hdr = 2 + 2 + 2 + 2 + 2 * n + 2 + 2 + 2 + 4; /* fmt..record */
+    const bOff = hdr;
+    let cur = hdr + boundsCov.length;
+    const iOffs = s.map((g) => {
+      const o = cur; cur += serializeCoverage([g]).length; return o;
+    });
+    const lOff = cur;
+
+    let t = u16(3);
+    t += u16(1) + u16(bOff);
+    t += u16(n) + iOffs.map((o) => u16(o)).join("");
+    t += u16(1) + u16(lOff);
+    t += u16(1) + u16(0) + u16(nestedLookupIndex);
+    t += boundsCov;
+    s.forEach((g) => { t += serializeCoverage([g]); });
+    t += boundsCov;
+    return t;
+  };
+
+  let subs = "";
+  uniq.forEach((s) => { subs += makeSub(s); });
+
+  /* Lookup هيدر: type+flag+count (6 بايت) + جدول إزاحات (2×العدد) */
+  const subOffsets = [];
+  let so = 6 + 2 * uniq.length;
+  uniq.forEach((s) => {
+    subOffsets.push(so);
+    so += makeSub(s).length;
+  });
+  let lookupBody = u16(6) + u16(0x0008) + u16(uniq.length);
+  subOffsets.forEach((o) => { lookupBody += u16(o); });
+  uniq.forEach((s) => { lookupBody += makeSub(s); });
+  const bytes = new Uint8Array(lookupBody.length);
+  for (let i = 0; i < lookupBody.length; i++) bytes[i] = lookupBody.charCodeAt(i) & 255;
+
+  /* مواضع فهرس اللوك أب المتداخل داخل البايتات — مسار الدمج بيرقّعها
+     بتحويلها من نسبية إلى مطلقة ( LookupList) */
+  const nestedOffsets = [];
+  let recScan = 6 + 2 * uniq.length;
+  uniq.forEach((s) => {
+    /* داخل كل جدول فرعي: السجل عند هيدر 2+2+2+2+2n+2+2+2 — الفهرس آخر بايتين */
+    nestedOffsets.push(recScan + (2 + 2 + 2 + 2 + 2 * s.length + 2 + 2 + 2) + 2);
+    recScan += makeSub(s).length;
+  });
+
+  return { bytes: bytes, nestedOffsets: nestedOffsets };
+}
+
+/* بناء قواعد التحام المواضع (خام ← أول/وسط/آخر) من أشكال العرض الموجودة
+   في cmap — قلب إصلاح «خربان المونتاج»: أي خط بيترصد بدون GSUB أصلي
+   (نضيف أو إعادة بناء) الحروف فيه بتقف متقطعة، وكمان الحروف المضافة
+   في وضع الدمج ما كانتش بتلتحق خالص. النتيجة لوك أب لكل ميزة أو null */
+function buildImfRuleSets(bases, cmap) {
+  const mk = (fi) => {
+    const pairs = [];
+    bases.forEach((base) => {
+      const forms = AR_FORMS[base];
+      if (!forms) return;
+      const fcp = forms[fi];
+      if (fcp === null || fcp === undefined) return;
+      const from = cmap[base], to = cmap[fcp];
+      if (from === undefined || to === undefined || from === to) return;
+      pairs.push([from, to]);
+    });
+    return pairs.length ? serializeSingleSubLookup(pairs) : null;
+  };
+  /* fina = شكل 1، init = شكل 2، medi = شكل 3 */
+  return { init: mk(2), medi: mk(3), fina: mk(1) };
+}
+
+/* لوك أب SingleSubstFormat1 (نوع 1) لبدائل الأزواج:
+   subPairs: [[gid, variantGid], ...] — كل حرف إدخال بيتبديل برسمة الزوج */
+function serializeSingleSubLookup(subPairs) {
+  const u16 = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+
+  const seen = new Set();
+  const uniq = [];
+  subPairs.forEach((pr) => {
+    if (seen.has(pr[0])) return;
+    seen.add(pr[0]);
+    uniq.push(pr);
+  });
+  if (!uniq.length) return null;
+  uniq.sort((a, b) => a[0] - b[0]);
+
+  /* الإزاحة من بداية الجدول الفرعي: fmt(2) + covOff(2) + count(2) + بدائل 2n */
+  const substOffset = 6 + 2 * uniq.length;
+  let sub = u16(2) + u16(substOffset) + u16(uniq.length);
+  uniq.forEach((pr) => { sub += u16(pr[1]); });
+  sub += u16(1) + u16(uniq.length); /* Coverage format 1 + count */
+  uniq.forEach((pr) => { sub += u16(pr[0]); });
+
+  const lookupBody = u16(1) + u16(0x0008) + u16(1) + u16(8) + sub;
+  const bytes = new Uint8Array(lookupBody.length);
+  for (let i = 0; i < lookupBody.length; i++) bytes[i] = lookupBody.charCodeAt(i) & 255;
+  return bytes;
+}
+
+/* لوك أب ChainContextSubstFormat3 معمم لبدائل الأزواج:
+   كل قاعدة = { bt: [تغطيات قبل], in: [تغطيات إدخال], la: [تغطيات بعد], sub: [[gid,variant],...] }
+   وكل قاعدة ليها لوك أب single-sub متداخل بفهرسها في nestedIdxList */
+function serializePairChainLookup(rules, nestedIdxList) {
+  const u16 = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+
+  const bodies = rules.map((r, k) => {
+    const b = r.bt.length, n = r.in.length, l = r.la.length;
+    /* fmt(2)+btCount(2)+btOffs(2b)+inCount(2)+inOffs(2n)+laCount(2)+laOffs(2l)+seqCount(2)+السجل(4)
+       = 14 + 2b + 2n + 2l — التغطيات بتبدأ بعد السجل مباشرة */
+    const hdr = 14 + 2 * b + 2 * n + 2 * l;
+    let cur = hdr;
+    const offs = (covs) => covs.map((cov) => {
+      const o = cur; cur += serializeCoverage(cov).length; return o;
+    });
+    const btOffs = offs(r.bt), inOffs = offs(r.in), laOffs = offs(r.la);
+
+    let t = u16(3);
+    t += u16(b) + btOffs.map((o) => u16(o)).join("");
+    t += u16(n) + inOffs.map((o) => u16(o)).join("");
+    t += u16(l) + laOffs.map((o) => u16(o)).join("");
+    t += u16(1) + u16(0) + u16(nestedIdxList[k]); /* SeqLookupRecord: index 0 + اللوك أب المتداخل */
+    r.bt.forEach((cov) => { t += serializeCoverage(cov); });
+    r.in.forEach((cov) => { t += serializeCoverage(cov); });
+    r.la.forEach((cov) => { t += serializeCoverage(cov); });
+    return { body: t, hdr: hdr };
+  });
+
+  const subOffsets = [];
+  let so = 6 + 2 * rules.length;
+  bodies.forEach((bd) => { subOffsets.push(so); so += bd.body.length; });
+
+  let lookupBody = u16(6) + u16(0x0008) + u16(rules.length);
+  subOffsets.forEach((o) => { lookupBody += u16(o); });
+  bodies.forEach((bd) => { lookupBody += bd.body; });
+
+  /* مواضع فهرس اللوك أب المتداخل في كل جدول فرعي — مسار الدمج بيرقّعها
+     السجل = [seqIdx(2), lookupIdx(2)] بيبدأ عند hdr-4 → الفهرس عند hdr-2 */
+  const nestedOffsets = [];
+  let recScan = 6 + 2 * rules.length;
+  bodies.forEach((bd) => {
+    nestedOffsets.push(recScan + bd.hdr - 2);
+    recScan += bd.body.length;
+  });
+
+  const bytes = new Uint8Array(lookupBody.length);
+  for (let i = 0; i < lookupBody.length; i++) bytes[i] = lookupBody.charCodeAt(i) & 255;
+  return { bytes: bytes, nestedOffsets: nestedOffsets };
+}
+
+const latinTag = (u8, o) =>
+  String.fromCharCode(u8[o], u8[o + 1], u8[o + 2], u8[o + 3]);
+
+/* الدمج الجراحي: نزرع لوك أبنا في GSUB الأصلي مع الحفاظ الحرفي
+   على كل اللوك أب والقواعد الأصلية، وإضافة ميزاتنا لكل LangSys.
+   newLookups: [{ bytes: Uint8Array, tags: ["rlig","calt"] }]
+   — لكل وسم: لو فيه ميزة بنفس الوسم تُضاف فهرسة لوك أبنا إليها (grow)،
+   وإلا تُبنى ميزة جديدة وتُربط بكل LangSys (add). */
+/* ===== إزالة قواعد ليجاتشر (LookupType 4) من GSUB ثنائي —
+   لكلمات «الخط المدمجة» اللي المستخدم شالها أو عدّل ربطها:
+   لو قعدت جوه GSUB الأصلي، الخط بره هيفضل يرسم الكلمة القديمة
+   عكس المحرر. بنعيد بناء اللوك أب المتأثر بس (مع الحفاظ على
+   lookupFlag و markFilteringSet)، والباقي بايتات الأصل حرفيًا.
+   spec = { gids: Set<gid>, words: Set<word> }
+   النجاح = نسخة Uint8Array جديدة — أي شك = null (الأصل يفضل زي ما هو) */
+function stripLigatureEntries(orig, spec) {
+  try {
+    if (!(orig instanceof Uint8Array) || orig.length < 12) return null;
+    if (!spec || (!spec.gids.size && !spec.words.size)) return null;
+    const len = orig.length;
+    const dv = new DataView(orig.buffer, orig.byteOffset, orig.byteLength);
+    if (dv.getUint16(0) !== 1) return null;
+    const lookupOff = dv.getUint16(8);
+    if (!lookupOff || lookupOff + 2 > len) return null;
+    const lookupCount = dv.getUint16(lookupOff);
+    if (!lookupCount || lookupCount > 8192) return null;
+
+    /* خريطة GID ← حرف لتشكيل كلمة كل قاعدة (نفس منطق الاستخراج) */
+    const gidToChar = {};
+    const cim = (font && font.glyphIndexMap) || {};
+    Object.keys(cim).forEach((u) => {
+      const gid = cim[u];
+      if (gidToChar[gid] === undefined) gidToChar[gid] = String.fromCodePoint(+u);
+    });
+
+    const starts = [];
+    for (let i = 0; i < lookupCount; i++) {
+      const rel = dv.getUint16(lookupOff + 2 + i * 2);
+      if (!rel || lookupOff + rel >= len) return null;
+      starts.push(lookupOff + rel);
+    }
+    const sorted = starts.slice().sort((a, b) => a - b);
+
+    const u16s = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+
+    /* إعادة بناء لوك أب liga من قواعد ناجية — بشرية أصل المارك سِت */
+    const rebuildLigaLookup = (flag, markSet, rules) => {
+      const byFirst = new Map();
+      const seen = new Set();
+      rules.forEach((r) => {
+        const key = r.seq.join(",") + ">" + r.lig;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const first = r.seq[0];
+        if (!byFirst.has(first)) byFirst.set(first, []);
+        byFirst.get(first).push({ comps: r.seq.slice(1), lig: r.lig });
+      });
+      const firsts = [...byFirst.keys()].sort((a, b) => a - b);
+      firsts.forEach((g) => {
+        byFirst.get(g).sort((a, b) => b.comps.length - a.comps.length);
+      });
+
+      /* لوك أب فاضي (كل قواعده اتشالت) — بلا سبتابلز، والفهرس ثابت */
+      if (!firsts.length) {
+        let empty = u16s(4) + u16s(flag) + u16s(0);
+        if (flag & 0x0010) empty += u16s(markSet || 0);
+        const eb = new Uint8Array(empty.length);
+        for (let i = 0; i < empty.length; i++) eb[i] = empty.charCodeAt(i) & 255;
+        return eb;
+      }
+
+      const setBodies = firsts.map((g) => {
+        const ligs = byFirst.get(g);
+        const headerSize = 2 + 2 * ligs.length;
+        let cursor = headerSize;
+        const items = ligs.map((r) => {
+          const size = 4 + 2 * r.comps.length;
+          const o = cursor;
+          cursor += size;
+          return { r: r, offset: o };
+        });
+        let s = u16s(ligs.length);
+        items.forEach((L) => { s += u16s(L.offset); });
+        items.forEach((L) => {
+          s += u16s(L.r.lig);
+          s += u16s(L.r.comps.length + 1);
+          L.r.comps.forEach((gid) => { s += u16s(gid); });
+        });
+        return { body: s, size: cursor };
+      });
+
+      const subHdr = 6 + 2 * firsts.length;
+      const coverageSize = 4 + 2 * firsts.length;
+      let setCursor = subHdr + coverageSize;
+      const setOffsets = setBodies.map((sb) => {
+        const o = setCursor;
+        setCursor += sb.size;
+        return o;
+      });
+
+      let sub = u16s(1) + u16s(subHdr) + u16s(firsts.length);
+      setOffsets.forEach((o) => { sub += u16s(o); });
+      sub += u16s(1) + u16s(firsts.length); /* Coverage format 1 */
+      firsts.forEach((g) => { sub += u16s(g); });
+      setBodies.forEach((sb) => { sub += sb.body; });
+
+      const markBit = flag & 0x0010;
+      const hdrSize = 6 + 2 + (markBit ? 2 : 0);
+      let full = u16s(4) + u16s(flag) + u16s(1) + u16s(hdrSize);
+      if (markBit) full += u16s(markSet || 0);
+      full += sub;
+      const bytes = new Uint8Array(full.length);
+      for (let i = 0; i < full.length; i++) bytes[i] = full.charCodeAt(i) & 255;
+      return bytes;
+    };
+
+    const tables = new Array(lookupCount);
+    let changedAny = false;
+
+    for (let i = 0; i < lookupCount; i++) {
+      const st = starts[i];
+      const pos = sorted.indexOf(st);
+      const end = (pos + 1 < sorted.length) ? sorted[pos + 1] : len;
+
+      let keep = true;
+      let rebuild = null;
+
+      if (st + 6 <= end) {
+        const type = dv.getUint16(st);
+        const flag = dv.getUint16(st + 2);
+        const subCnt = dv.getUint16(st + 4);
+        if (type === 4 && subCnt > 0 && subCnt < 4096 &&
+            st + 6 + subCnt * 2 <= end) {
+          const markBit = flag & 0x0010;
+          const hdrSize = 6 + subCnt * 2 + (markBit ? 2 : 0);
+          if (st + hdrSize <= end) {
+            const markSet = markBit ? dv.getUint16(st + 6 + subCnt * 2) : 0;
+            let parseOk = true;
+            let strippedHere = false;
+            const rules = [];
+
+            for (let s = 0; s < subCnt && parseOk; s++) {
+              const rel = dv.getUint16(st + 6 + s * 2);
+              const sb = st + rel;
+              if (rel < hdrSize || sb + 6 > end) { parseOk = false; break; }
+              if (dv.getUint16(sb) !== 1) { parseOk = false; break; }
+              const covRel = dv.getUint16(sb + 2);
+              const ligCnt = dv.getUint16(sb + 4);
+              const cov = sb + covRel;
+              if (cov + 4 > end) { parseOk = false; break; }
+              const covFmt = dv.getUint16(cov);
+              const covGids = [];
+              if (covFmt === 1) {
+                const gcnt = dv.getUint16(cov + 2);
+                if (cov + 4 + gcnt * 2 > end) { parseOk = false; break; }
+                for (let g = 0; g < gcnt; g++) {
+                  covGids.push(dv.getUint16(cov + 4 + g * 2));
+                }
+              } else if (covFmt === 2) {
+                const rcnt = dv.getUint16(cov + 2);
+                if (cov + 4 + rcnt * 6 > end) { parseOk = false; break; }
+                for (let r = 0; r < rcnt && parseOk; r++) {
+                  const s0 = dv.getUint16(cov + 4 + r * 6);
+                  const e0 = dv.getUint16(cov + 6 + r * 6);
+                  if (e0 < s0) { parseOk = false; break; }
+                  for (let g = s0; g <= e0; g++) covGids.push(g);
+                  if (covGids.length > 65535) { parseOk = false; break; }
+                }
+              } else {
+                parseOk = false;
+                break;
+              }
+              if (!parseOk || ligCnt > covGids.length) { parseOk = false; break; }
+
+              for (let ls = 0; ls < ligCnt && parseOk; ls++) {
+                /* LigatureSet: عدّاد + إزاحات جداول الليجاتشر — طبقة
+                   بين السبتابل وجدول الليجاتشر نفسه */
+                const srel = dv.getUint16(sb + 6 + ls * 2);
+                const lset = sb + srel;
+                if (srel < 4 || lset + 2 > end) { parseOk = false; break; }
+                const ligCnt2 = dv.getUint16(lset);
+                if (ligCnt2 > 65535 || lset + 2 + ligCnt2 * 2 > end) {
+                  parseOk = false;
+                  break;
+                }
+                for (let j = 0; j < ligCnt2 && parseOk; j++) {
+                  const lrel = dv.getUint16(lset + 2 + j * 2);
+                  const lsb = lset + lrel;
+                  if (lsb + 4 > end) { parseOk = false; break; }
+                  const ligGlyph = dv.getUint16(lsb);
+                  const compCnt = dv.getUint16(lsb + 2);
+                  if (compCnt < 1 || lsb + 4 + (compCnt - 1) * 2 > end) {
+                    parseOk = false;
+                    break;
+                  }
+                  const comps = [covGids[ls]];
+                  for (let c = 1; c < compCnt; c++) {
+                    comps.push(dv.getUint16(lsb + 4 + (c - 1) * 2));
+                  }
+                  let word = "";
+                  for (let c = 0; c < comps.length; c++) {
+                    const ch = gidToChar[comps[c]];
+                    if (!ch) { word = null; break; }
+                    word += ch;
+                  }
+                  if (spec.gids.has(ligGlyph) ||
+                      (word !== null && spec.words.has(word))) {
+                    changedAny = true;
+                    strippedHere = true;
+                    continue; /* القاعدة دي تتشال */
+                  }
+                  rules.push({ seq: comps, lig: ligGlyph });
+                }
+              }
+            }
+
+            if (parseOk && strippedHere) {
+              keep = false;
+              rebuild = { flag: flag, markSet: markSet, rules: rules };
+            }
+          }
+        }
+      }
+
+      tables[i] = keep
+        ? orig.slice(st, end)
+        : rebuildLigaLookup(rebuild.flag, rebuild.markSet, rebuild.rules);
+    }
+
+    if (!changedAny) return null; /* مفيش حاجة اتشالت فعلًا */
+
+    /* GSUB الجديد: كل حاجة قبل LookupList تنسخ حرفيًا
+       (الهيدر + ScriptList + FeatureList — إزاحاتها الذاتية ثابتة) */
+    const origTablesPos = lookupOff + 2 + lookupCount * 2;
+    const head = orig.slice(0, origTablesPos);
+    let total = head.length + 2 + lookupCount * 2;
+    const places = new Array(lookupCount);
+    for (let i = 0; i < lookupCount; i++) {
+      if (total % 4) total += 4 - (total % 4);
+      places[i] = total;
+      total += tables[i].length;
+    }
+
+    const out = new Uint8Array(total);
+    out.set(head, 0);
+    const odv = new DataView(out.buffer);
+    odv.setUint16(lookupOff, lookupCount);
+    for (let i = 0; i < lookupCount; i++) {
+      odv.setUint16(lookupOff + 2 + i * 2, places[i] - lookupOff);
+      out.set(tables[i], places[i]);
+    }
+    return out;
+  } catch (e) {
+    console.warn("stripLigatureEntries:", e);
+    return null;
+  }
+}
+
+function mergeGSUBIntoOriginal(orig, newLookups) {
+  try {
+    if (!newLookups || !newLookups.length) return null;
+    const len = orig.length;
+    const dv = new DataView(orig.buffer, orig.byteOffset, orig.byteLength);
+    if (dv.getUint16(0) !== 1) return null;
+    const scriptOff = dv.getUint16(4);
+    const featOff = dv.getUint16(6);
+    const lookupOff = dv.getUint16(8);
+    if (!scriptOff || !featOff || !lookupOff ||
+        scriptOff >= len || featOff >= len || lookupOff >= len) return null;
+
+    /* ---- ScriptList ---- */
+    const scripts = [];
+    const scriptCount = dv.getUint16(scriptOff);
+    if (!scriptCount || scriptCount > 4096) return null;
+    for (let i = 0; i < scriptCount; i++) {
+      const rec = scriptOff + 2 + i * 6;
+      if (rec + 6 > len) return null;
+      const rel = dv.getUint16(rec + 4);
+      if (!rel) continue;
+      const st = scriptOff + rel;
+      if (st + 4 > len) return null;
+      const script = { tag: latinTag(orig, rec), dls: 0, lss: [] };
+      const drel = dv.getUint16(st);
+      script.dls = drel ? (st + drel) : 0; /* إزاحة مطلقة */
+      const lsc = dv.getUint16(st + 2);
+      if (st + 4 + lsc * 6 > len) return null;
+      for (let j = 0; j < lsc; j++) {
+        const lr = st + 4 + j * 6;
+        const lrel = dv.getUint16(lr + 4);
+        script.lss.push({ tag: latinTag(orig, lr), off: lrel ? st + lrel : 0 });
+      }
+      scripts.push(script);
+    }
+    if (!scripts.length) return null;
+
+    const readLangSys = (off) => {
+      if (!off || off + 6 > len) return null;
+      const required = dv.getUint16(off + 2);
+      const cnt = dv.getUint16(off + 4);
+      if (off + 6 + cnt * 2 > len) return null;
+      const idx = [];
+      for (let k = 0; k < cnt; k++) idx.push(dv.getUint16(off + 6 + k * 2));
+      return { required: required, idx: idx };
+    };
+
+    /* ---- FeatureList ---- */
+    const featCount = dv.getUint16(featOff);
+    if (!featCount || featCount > 8192) return null;
+    const feats = [];
+    for (let i = 0; i < featCount; i++) {
+      const rec = featOff + 2 + i * 6;
+      if (rec + 6 > len) return null;
+      const rel = dv.getUint16(rec + 4);
+      if (!rel) return null;
+      const ft = featOff + rel;
+      if (ft + 4 > len) return null;
+      const params = dv.getUint16(ft);
+      const cnt = dv.getUint16(ft + 2);
+      if (ft + 4 + cnt * 2 > len) return null;
+      const idx = [];
+      for (let k = 0; k < cnt; k++) idx.push(dv.getUint16(ft + 4 + k * 2));
+      feats.push({ tag: latinTag(orig, rec), params: params, idx: idx });
+    }
+
+    /* ---- LookupList — فحص السلامة ---- */
+    const lookupCount = dv.getUint16(lookupOff);
+    if (!lookupCount || lookupCount > 8192) return null;
+    for (let i = 0; i < lookupCount; i++) {
+      const rel = dv.getUint16(lookupOff + 2 + i * 2);
+      if (!rel || lookupOff + rel >= len) return null;
+    }
+
+    /* توزيع فهرسات لوك أبنا الجديدة على الأوسمة */
+    const M = newLookups.length;
+    const ourIdxBase = lookupCount;
+    const tagIndices = new Map(); /* tag -> [lookupIdx,...] */
+    newLookups.forEach((nl, k) => {
+      (nl.tags || []).forEach((tag) => {
+        if (!tagIndices.has(tag)) tagIndices.set(tag, []);
+        tagIndices.get(tag).push(ourIdxBase + k);
+      });
+    });
+
+    const growTags = [];
+    const addTags = [];
+    tagIndices.forEach((idxs, tag) => {
+      if (feats.some((f) => f.tag === tag)) growTags.push(tag);
+      else addTags.push(tag);
+    });
+    const newFeatCount = featCount + addTags.length;
+
+    /* فهرسة الميزات الجديدة (FeatureList) */
+    const newFeatIdxOf = new Map();
+    addTags.forEach((tag, k) => newFeatIdxOf.set(tag, featCount + k));
+
+    /* ===== حساب مواضع النسخة الجديدة ===== */
+    const SL = 10;
+    const origScriptSize = featOff - scriptOff;
+
+    let SLsize = origScriptSize;
+    const lsData = new Map();
+    if (addTags.length) {
+      /* كل LangSys هياخذ فهرس كل ميزة جديدة */
+      let addBytes = 0;
+      const seenLS = new Set();
+      const collect = (off) => {
+        if (!off || seenLS.has(off)) return;
+        seenLS.add(off);
+        const parsed = readLangSys(off);
+        if (!parsed) throw new Error("LangSys تالف");
+        lsData.set(off, parsed);
+        addBytes += 2 * addTags.length;
+      };
+      scripts.forEach((sc) => { collect(sc.dls); sc.lss.forEach((l) => collect(l.off)); });
+      SLsize = origScriptSize + addBytes;
+    }
+
+    let q = SL + SLsize;
+    if (q % 4) q += 4 - (q % 4);
+    const FL = q;
+    q += 2 + newFeatCount * 6;
+    /* جداول الميزات */
+    let ftsz = 0;
+    feats.forEach((f) => {
+      const extra = tagIndices.has(f.tag) ? 2 * tagIndices.get(f.tag).length : 0;
+      ftsz += 4 + (f.idx.length + extra) * 2;
+    });
+    addTags.forEach((tag) => {
+      ftsz += 4 + tagIndices.get(tag).length * 2;
+    });
+    let fq = FL + 2 + newFeatCount * 6 + ftsz;
+
+    if (fq % 4) fq += 4 - (fq % 4);
+    const LL = fq;
+    /* منطقة اللوك أب: [count][offsets (n+M)×2][الجداول الأصلية منزاحة +Δ][لوك أبنا ×M] */
+    const origTablesPos = lookupOff + 2 + lookupCount * 2;
+    const newTablesPos = LL + 2 + (lookupCount + M) * 2;
+    /* الإزاحة الموحدة: فرق مواضع منطقة الجداول + فرق قاعدة الإزاحات */
+    const SHIFT = (newTablesPos - origTablesPos) + (lookupOff - LL);
+    fq = newTablesPos + (len - origTablesPos);       /* نهاية الجداول المنقولة */
+    const ourLkPos = [];
+    newLookups.forEach((nl) => {
+      if (fq % 4) fq += 4 - (fq % 4);
+      ourLkPos.push(fq); fq += nl.bytes.length;
+    });
+    const total = fq;
+
+    /* ===== كتابة النسخة الجديدة ===== */
+    const out = new Uint8Array(total);
+    const odv = new DataView(out.buffer);
+    const w16 = (o, v) => odv.setUint16(o, v);
+    const wTag = (o, tag) => {
+      for (let i = 0; i < 4; i++) out[o + i] = tag.charCodeAt(i) & 255;
+    };
+
+    w16(0, 1); w16(2, 0);
+    w16(4, SL); w16(6, FL); w16(8, LL);
+
+    if (!addTags.length) {
+      /* ScriptList حرفيًا (الإزاحات الداخلية الذاتية تظل صحيحة) */
+      out.set(orig.subarray(scriptOff, featOff), SL);
+    } else {
+      /* إعادة بناء ScriptList مع إضافة فهرس كل ميزة جديدة لكل LangSys */
+      const lsPos = new Map();
+      w16(SL, scripts.length);
+      let p2 = SL + 2 + scripts.length * 6;
+      const stReal = [];
+      scripts.forEach((sc) => { stReal.push(p2); p2 += 4 + sc.lss.length * 6; });
+      scripts.forEach((sc) => {
+        const placeLS = (off) => {
+          if (!off || lsPos.has(off)) return;
+          lsPos.set(off, p2);
+          p2 += 6 + 2 * (lsData.get(off).idx.length + addTags.length);
+        };
+        placeLS(sc.dls);
+        sc.lss.forEach((l) => placeLS(l.off));
+      });
+      scripts.forEach((sc, i) => {
+        const rec = SL + 2 + i * 6;
+        wTag(rec, sc.tag);
+        w16(rec + 4, stReal[i] - SL);
+        const st = stReal[i];
+        w16(st, sc.dls ? (lsPos.get(sc.dls) - st) : 0);
+        w16(st + 2, sc.lss.length);
+        sc.lss.forEach((l, j) => {
+          const lr = st + 4 + j * 6;
+          wTag(lr, l.tag);
+          w16(lr + 4, l.off ? (lsPos.get(l.off) - st) : 0);
+        });
+      });
+      lsData.forEach((d, off) => {
+        const np = lsPos.get(off);
+        w16(np, 0); /* lookupOrder */
+        w16(np + 2, d.required);
+        let w = np + 4;
+        w16(w, d.idx.length + addTags.length); w += 2;
+        d.idx.forEach((fi) => { w16(w, fi); w += 2; });
+        /* فهرس الميزة الجديدة — مش فهرس اللوك أب (باج قديم!) */
+        addTags.forEach((tag) => { w16(w, newFeatIdxOf.get(tag)); w += 2; });
+      });
+    }
+
+    /* FeatureList */
+    w16(FL, newFeatCount);
+    let fcur = FL + 2 + newFeatCount * 6;
+    feats.forEach((f, fi) => {
+      const rec = FL + 2 + fi * 6;
+      wTag(rec, f.tag);
+      w16(rec + 4, fcur - FL);
+      const extraIdx = tagIndices.has(f.tag) ? tagIndices.get(f.tag) : [];
+      w16(fcur, f.params);
+      w16(fcur + 2, f.idx.length + extraIdx.length);
+      f.idx.forEach((li, k) => w16(fcur + 4 + k * 2, li));
+      extraIdx.forEach((li, k) => w16(fcur + 4 + (f.idx.length + k) * 2, li));
+      fcur += 4 + (f.idx.length + extraIdx.length) * 2;
+    });
+    addTags.forEach((tag) => {
+      const fi = feats.length + [...addTags].indexOf(tag);
+      const rec = FL + 2 + fi * 6;
+      wTag(rec, tag);
+      w16(rec + 4, fcur - FL);
+      const idxs = tagIndices.get(tag);
+      w16(fcur, 0);
+      w16(fcur + 2, idxs.length);
+      idxs.forEach((li, k) => w16(fcur + 4 + k * 2, li));
+      fcur += 4 + idxs.length * 2;
+    });
+
+    /* LookupList — العدّاد + الإزاحات المعدّلة + النسخ الموحّد */
+    w16(LL, lookupCount + M);
+    for (let i = 0; i < lookupCount; i++) {
+      const rel = dv.getUint16(lookupOff + 2 + i * 2);
+      w16(LL + 2 + i * 2, rel + SHIFT);
+    }
+    newLookups.forEach((nl, k) => {
+      w16(LL + 2 + (lookupCount + k) * 2, ourLkPos[k] - LL);
+    });
+    /* نسخ جداول اللوك أب الأصلية كتلة واحدة كما هي حرفيًا */
+    out.set(orig.subarray(origTablesPos, len), newTablesPos);
+    newLookups.forEach((nl, k) => {
+      out.set(nl.bytes, ourLkPos[k]);
+      /* ترقيع فهرس اللوك أب المتداخل في السلاسل السياقية: نسبي ← مطلق */
+      if (nl.nestedOffsets && nl.nestedOffsets.length) {
+        nl.nestedOffsets.forEach((p) => {
+          const at = ourLkPos[k] + p;
+          odv.setUint16(at, (odv.getUint16(at) + ourIdxBase) & 0xFFFF);
+        });
+      }
+    });
+
+    return out;
+  } catch (e) {
+    console.warn("mergeGSUBIntoOriginal:", e);
+    return null;
+  }
+}
+
+/* ===== فك كود الحرف مع أشكال العرض — جوهر إصلاح خطوط المصممين =====
+   خطوط كتير (مثل خطوط الرسومات الجاهزة) cmap فيها أشكال العرض FE70-FEFF
+   بس من غير الحروف الخام 0621-064A — فبنحل كل حرف لأول كود متاح:
+   الخام أولًا، وإلا معزول/بداية/وسط/نهاية */
+function resolveCharGid(ch) {
+  const cmap = (font && font.glyphIndexMap) || {};
+  const cp = ch.codePointAt(0);
+  if (cmap[cp] !== undefined) return cmap[cp];
+  const forms = AR_FORMS[cp];
+  if (forms) {
+    for (let i = 0; i < 4; i++) {
+      const f = forms[i];
+      if (f !== null && f !== undefined && cmap[f] !== undefined) return cmap[f];
+    }
+  }
+  return undefined;
+}
+
+/* متتابعة GIDs لخامات الكلمة (بدون حركات) — بمقاربات الأشكال المتاحة.
+   مهم: من غير دمج اللام-ألف هنا — البافر الحقيقي للنص الخام
+   فيه اللام والألف كجليفين منفصلين (الخطوط بدون GSUB مش بتكوّن لام-ألف)،
+   فالقاعدة لازم تطابق اللي في البافر فعلًا */
+function baseSeqGids(word) {
+  const chars = [...String(word || "")].filter((c) => !isMarkCp(c.codePointAt(0)));
+  const out = [];
+  for (let i = 0; i < chars.length; i++) {
+    const gid = resolveCharGid(chars[i]);
+    if (gid === undefined) return null; /* حرف مش موجود خالص في الخط */
+    out.push(gid);
+  }
+  return out.length ? out : null;
+}
+
+/* بناء قواعد الكلمات من القاموس + اختيار مسار الدمج المناسب
+   opts.pure = وضع التصدير النضيف: بدون GSUB الأصلي إطلاقًا —
+   كل الحلول ضد cmap الخط النضيف (font متبدل مؤقتًا) */
+async function buildWordGSUB(opts) {
+  const pureMode = !!(opts && opts.pure);
+  if (!font) return { error: "مفيش خط مفتوح" };
+  const slot = (activeSlot >= 0 && slots[activeSlot]) ? slots[activeSlot] : null;
+  /* skipDict: تصدير بدون قاموس — أشكال الالتحام بتتبني برضه */
+  const combined = (opts && opts.skipDict) ? {} : combinedDict2();
+
+  /* ١ — GSUB الأصلي (إن وجد) — بشرط عدم تغيّر ترتيب الحروف.
+     في الوضع النضيف مفيش أصل خالص.
+     ⚠ الرسم على حرف (structChanged) ما بيكسّرش أرقام GID —
+     GSUB بيفضل صحيح، فبنستمر بالتشكيل الأصلي (إصلاح «الربط بيتفكك
+     لما بجيب خط وارسم عليه حرف»). اللي بيكسّر فعلاً: حذف/تحريك
+     حروف (gidsShifted) أو خطوط من غير GSUB أصلًا */
+  let origGSUB = null;
+  if (!pureMode && slot && slot.ttfSource && !slot.gidsShifted) {
+    origGSUB = extractTable(new Uint8Array(slot.ttfSource), "GSUB");
+  }
+
+  /* كلمات «الخط المدمجة» اللي اتشالت أو اتعدل ربطها → قواعدها تتشال
+     من GSUB الأصلي — لو قعدت، الخط بره هيفضل يرسم الكلمة القديمة
+     عكس المحرر (أي شك = بنسيب الأصل زي ما هو مع تحذير) */
+  if (origGSUB) {
+    const strip = (typeof embedStripSpec === "function")
+      ? embedStripSpec()
+      : { gids: new Set(), words: new Set() };
+    if (strip.gids.size || strip.words.size) {
+      const stripped = stripLigatureEntries(origGSUB, strip);
+      if (stripped) {
+        origGSUB = stripped;
+      } else {
+        console.warn("تصدير: تعذر إزالة قواعد الكلمات المعدلة من GSUB الأصلي");
+      }
+    }
+  }
+
+  /* ٢ — متتابعات الأشكال عبر محرك fontkit الحقيقي لو أمكن */
+  let fkFont = null;
+  try {
+    if (origGSUB && slot.ttfSource) {
+      const fk = await getFontkit();
+      if (fk && typeof fk.create === "function") {
+        fkFont = fk.create(new Uint8Array(slot.ttfSource));
+      }
+    }
+  } catch (e) {
+    fkFont = null;
+    console.warn("قاموس: fontkit فشل:", e && e.message);
+  }
+
+  const layoutGids = (txt) => {
+    if (!fkFont) return null;
+    try {
+      const res = fkFont.layout(txt);
+      const gids = (res.glyphs || []).map((g) => g.id);
+      if (gids.length && gids.every((g) => typeof g === "number" && g >= 0)) {
+        return gids;
+      }
+    } catch (e) { /* تجاهل */ }
+    return null;
+  };
+
+  const cmap = font.glyphIndexMap || {};
+  const isRTLText = (txt) => [...String(txt || "")].some((c) => {
+    const cp = c.codePointAt(0);
+    return (cp >= 0x0600 && cp <= 0x06FF) || (cp >= 0xFB50 && cp <= 0xFDFF) ||
+           (cp >= 0xFE70 && cp <= 0xFEFF);
+  });
+  /* قاعدة عربية: نضيف المتتابع ومرتّبه المعكوس معًا — لأن ترتيب البافر
+     أثناء تطبيق الميزات (منطقي) قد يعاكس ترتيب مخرجات محرك التشكيل (بصري).
+     ⚠ في الوضع النضيف البافر = أكواد خام بترتيب منطقي دائمًا —
+     والقاعدة المعكوسة بتفعّل إنذارات كاذبة (مثل «ال» التعريف → رسمة «لا»)
+     فممنوعة هنا */
+  const addRule = (list, seq, lig, rtl) => {
+    if (!seq || !seq.length || seq.length > 31) return false;
+    if (seq.some((g) => g === undefined || g === null || g < 0)) return false;
+    list.push({ seq: seq.slice(), lig: lig });
+    if (seq.length > 1 && rtl && !pureMode) {
+      list.push({ seq: seq.slice().reverse(), lig: lig });
+    }
+    return true;
+  };
+
+  /* فهرسة GIDs المتاحة لحدود الكلمات (نطاق «لوحدها») */
+  const boundaryGids = WORD_BOUNDARY_GIDS
+    .map((cp) => cmap[cp])
+    .filter((g) => g !== undefined);
+  /* لو الخط مفيهوش حتى مسافة — نطاق «لوحدها» يستحيل يشتغل خارجيًا */
+  const hasSpace = cmap[0x20] !== undefined;
+
+  const anyLigRules = [];     /* نطاق أي حتة — ليجاتشر غير مشروط */
+  const aloneLigRules = [];   /* نطاق لوحدها — ليجاتشر للوك أب المتداخل */
+  const aloneSeqs = [];       /* متتابعات السلاسل السياقية لنطاق لوحدها */
+  const skipped = [];         /* كلمات ما تنفذش ولماذا */
+
+  /* شرخ الحركات من المفاتيح: القواعد تُبنى على الحروف الأساسية فقط
+     (fontkit يهنج مع الحركات، ومع IgnoreMarks مش محتاجينها في المكوّنات) */
+  const MARK_STRIP_RE = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g;
+
+  /* بدائل إملائية شائعة للمفتاح الواحد: ي↔ى، أ/إ/آ/ٱ→ا، ة→ه —
+     عشان الكلمة تشتغل مهما كان إملاء اللي بيكتبها */
+  const wordVariants = (w) => {
+    const set = new Set();
+    const add = (s) => { if (s) set.add(s); };
+    add(String(w || "").replace(MARK_STRIP_RE, ""));
+    [...set].forEach((s) => {
+      if (/[ىي]/.test(s)) {
+        /* استبدال بتمريرة واحدة — التسلسلي بيلغي نفسه! */
+        add(s.replace(/[ىي]/g, (m) => (m === "ى" ? "\u064A" : "\u0649")));
+      }
+      if (/[أإآٱ]/.test(s)) add(s.replace(/[أإآٱ]/g, "\u0627"));
+      if (/ة/.test(s)) add(s.replace(/ة/g, "\u0647"));
+    });
+    return [...set];
+  };
+
+  for (const word in combined) {
+    const ent = combined[word];
+    if (!ent || ent.gid === undefined || !isRenderable(ent.gid)) continue;
+    const isAlone = ent.scope === "alone";
+
+    for (const w of wordVariants(word)) {
+      const rtl = isRTLText(w);
+      let addedAny = false;
+
+      if (origGSUB) {
+        /* خط بتشكيل أصلي: قواعد بأشكال الكلمة النهائية — تعمل بعد rlig الخط */
+        let alone = layoutGids(w);
+        if (!alone || alone.some((g) => g === undefined || g === null)) {
+          const cps = cpsToGids(wordShapedCps(w, false));
+          alone = cps.some((g) => g === undefined) ? null : cps;
+        }
+        if (!alone) alone = baseSeqGids(w); /* آخر ملجأ: خامة مباشرة */
+        if (alone && addRule(isAlone ? aloneLigRules : anyLigRules, alone, ent.gid, rtl)) {
+          addedAny = true;
+          if (isAlone && hasSpace) aloneSeqs.push(alone, [...alone].reverse());
+        }
+
+        if (ent.scope === "any") {
+          let emb = layoutGids("\u0628" + w);
+          if (emb) {
+            addRule(anyLigRules, emb.slice(1), ent.gid, rtl);
+          } else {
+            const embC = cpsToGids(wordShapedCps(w, true));
+            if (embC.length && !embC.some((g) => g === undefined)) {
+              addRule(anyLigRules, embC.slice(1), ent.gid, rtl);
+            }
+          }
+        }
+      }
+
+      /* قواعد أشكال القاعدة — للخطوط بدون GSUB أو كخطط احتياط.
+         الإصلاح الجوهري: الحرف بيترجم لأول كود متاح (خام ← أشكال عرض)
+         فبقيت الخطوط اللي cmap فيها أشكال عرض بس شغالة! */
+      const base = baseSeqGids(w);
+      if (base && addRule(isAlone ? aloneLigRules : anyLigRules, base, ent.gid, rtl)) {
+        addedAny = true;
+        if (isAlone && hasSpace) {
+          /* منع التكرار مع متتابعة الأشكال لو مطابقة */
+          const key = base.join(",");
+          const revKey = [...base].reverse().join(",");
+          const have = new Set(aloneSeqs.map((s) => s.join(",")));
+          if (!have.has(key)) aloneSeqs.push(base);
+          if (!pureMode && !have.has(revKey)) aloneSeqs.push([...base].reverse());
+        }
+      }
+
+      /* المسارات بدون GSUB أصلي (نضيف/إعادة بناء) بتاخد لوك أب init/medi/fina —
+         البافر بره بيبقى بأشكال المواضع، فالمتتابعة الخام لوحدها مش بتوصل.
+         نضيف متتابعة مُشكَّلة كمان (والخام فاضل احتياط للمسارات بلا أشكال).
+         ⚠ كل رسمة في المتتابعة المُشكَّلة لازم تكون حقيقية — لو ركبت على
+         البلانك المشترك هتشتغل على أي حرف غير مرسوم (إنذار جماعي) */
+      if (!origGSUB) {
+        const shp = cpsToGids(wordShapedCps(w, false));
+        const shpOk = shp.length && shp.every((g) => {
+          let gg = null;
+          try { gg = font.glyphs.get(g); } catch (e) { gg = null; }
+          if (!gg) return true; /* مفيش وصول للرسمة (محرك fontkit الخام) — نعتبرها حقيقية */
+          return !(gg.name && String(gg.name).indexOf("blank") === 0);
+        });
+        if (shpOk &&
+            addRule(isAlone ? aloneLigRules : anyLigRules, shp, ent.gid, false)) {
+          addedAny = true;
+          if (isAlone && hasSpace) {
+            const have = new Set(aloneSeqs.map((s) => s.join(",")));
+            const key = shp.join(",");
+            if (!have.has(key)) aloneSeqs.push(shp);
+          }
+        }
+      }
+
+      if (!addedAny) skipped.push(word);
+    }
+  }
+
+  /* كلمات الخط المدمجة — الفعّال بعد طبقة الإضافة/الحذف/التعديل.
+     قاعدة صريحة بس لما GSUB الأصلي ما يغطيهاش:
+       - مش موجودة في أصل المصمم (مضافة، أو تعديل غيّر النص)
+       - أو رسمتها اتغيرت عن الأصل (تعديل الربط)
+     أما كلمات المصمم اللي على حالها فخطّها الأصلي هو اللي بيرسمها */
+  const builtinEff = (font && font.wordLigatures) || {};
+  const builtinBase = (font && font.wordLigaturesBase) || builtinEff;
+  for (const w in builtinEff) {
+    const effGid = builtinEff[w];
+    if (builtinBase[w] === effGid) continue; /* أصل المصمم مغطيها */
+    if (combined[w] && combined[w].gid !== effGid) continue; /* قاموس المستخدم أولويته */
+    const base = baseSeqGids(String(w).replace(MARK_STRIP_RE, ""));
+    if (base) addRule(anyLigRules, base, effGid, isRTLText(w));
+  }
+
+  /* ✅ أشكال الأزواج — بديل سياقي بالجار على مستوى الحروف الخام
+     (قاعدة ccmp بتشتغل قبل التشكيل خالص): نفس منطق المعاينة بالظبط —
+     الجار الخام + تخطي الحركات (IgnoreMarks) — ومش محتاجة أشكال
+     المواضع إطلاقًا (خطوط زي أميري بتشكّل لرموز داخلية مش في cmap،
+     و«لنا/عنع/ححنح» نونها وسطية كانت مش بتوصل لها أبدًا).
+     v2 = بديل التاني لما قبله الأول ← backtrack = خام الأول
+     v1 = بديل الأول لما بعده التاني ← lookahead = خام التاني
+     الشرط: الأول لازم يكون بيبتدي اتصال (زي المعاينة)،
+     وقواعد v2 كلها قبل v1 زي ترتيب المعاينة */
+  const pairsTbl = activePairs();
+  const pairRulesV2 = [];
+  const pairRulesV1 = [];
+  const pairRulesLate = []; /* قواعد مرحلة متأخرة (لام-ألف FEFC) — calt */
+  const bindGid = (code) => {
+    if (!code) return null;
+    const r = resolveBindingGid(code);
+    return (r.gid !== undefined && isRenderable(r.gid)) ? r.gid : null;
+  };
+  /* في الوضع النضيف الحروف غير المرسومة كلها بلانك مشترك واحد —
+     تغطية سياقية عليها بتطابق أي حرف = إنذارات كاذبة (بديل «لن»
+     بيشتغل بعد أي حرف!). نمنع الأزواج اللي سياقها حرف غير مرسوم.
+     (font.glyphs.get مباشرة — glyphsArr بيرجع فاضي للخط النضيف) */
+  const inkAt = (gid) => {
+    let g4 = null;
+    try { g4 = font.glyphs.get(gid); } catch (e) { g4 = null; }
+    return !!(g4 && g4.userInk);
+  };
+  const pureCtxOk = (cp) => {
+    if (!pureMode) return true;
+    return !!(cmap[cp] !== undefined && inkAt(cmap[cp]));
+  };
+
+  /* ✅ لام-ألف في المسارات بدون GSUB أصلي: «لا» كانت بتطلع لام وألف
+     منفصلين. نلزّم [لام][ألف] ← رسمة FEFB (بكل تركيبات مواضع اللام)،
+     وقاعدة سياقية: حرف متصل قبلها ← الشكل النهائي FEFC */
+  if ((!origGSUB || mhSynthLamAlef) && cmap[0x0644] !== undefined && cmap[0x0627] !== undefined &&
+      cmap[0xFEFB] !== undefined && cmap[0xFEFB] !== cmap[0x0644] &&
+      cmap[0xFEFB] !== cmap[0x0627]) {
+    const pureReal = (cp) => {
+      if (!pureMode) return true;
+      const g2 = cmap[cp];
+      return !!(g2 !== undefined && inkAt(g2));
+    };
+    if (pureReal(0x0644) && pureReal(0x0627)) {
+      const lamSet = [];
+      const pushG = (g2) => { if (g2 !== undefined && g2 !== null && lamSet.indexOf(g2) === -1) lamSet.push(g2); };
+      pushG(cmap[0x0644]);
+      const fL = AR_FORMS[0x0644];
+      if (fL) [fL[2], fL[3]].forEach((f) => {
+        if (f !== null && f !== undefined && cmap[f] !== undefined) pushG(cmap[f]);
+      });
+      const alefSet = [];
+      const pushA = (g2) => { if (g2 !== undefined && g2 !== null && alefSet.indexOf(g2) === -1) alefSet.push(g2); };
+      pushA(cmap[0x0627]);
+      const fAl = AR_FORMS[0x0627];
+      if (fAl && fAl[1] !== null && fAl[1] !== undefined && cmap[fAl[1]] !== undefined) {
+        pushA(cmap[fAl[1]]);
+      }
+      lamSet.forEach((lg) => {
+        alefSet.forEach((ag) => {
+          if (lg !== ag) anyLigRules.push({ seq: [lg, ag], lig: cmap[0xFEFB] });
+        });
+      });
+      /* الحالة المتصلة: حرف ملتصق قبل اللام ← رسمة FEFC النهائية */
+      if (cmap[0xFEFC] !== undefined && cmap[0xFEFC] !== cmap[0xFEFB]) {
+        const joinCov = [];
+        for (const b in AR_FORMS) {
+          const fB2 = AR_FORMS[b];
+          if (!fB2 || fB2[2] === null || fB2[2] === undefined) continue; /* مش بيبتدي اتصال */
+          [+b, fB2[0], fB2[1], fB2[2], fB2[3]].forEach((c) => {
+            const g2 = cmap[c];
+            if (g2 !== undefined && g2 !== null && joinCov.indexOf(g2) === -1) joinCov.push(g2);
+          });
+        }
+        if (joinCov.length) {
+          pairRulesLate.push({
+            bt: [joinCov], in: [[cmap[0xFEFB]]], la: [],
+            sub: [[cmap[0xFEFB], cmap[0xFEFC]]]
+          });
+        }
+      }
+    }
+  }
+
+  /* لو الكلمة مربوطة في القاموس وفيها الزوج ده جواها — القاموس أولوية
+     (زي المعاينة) فنمنع الزوج من سبقها (القاعدة الخام بتشتغل قبلها) */
+  const pairInDict = (cA, cB) => {
+    for (const w in combined) {
+      const chs = [...String(w)];
+      for (let i = 0; i + 1 < chs.length; i++) {
+        if (normCpForMatch(chs[i].codePointAt(0)) === normCpForMatch(cA) &&
+            normCpForMatch(chs[i + 1].codePointAt(0)) === normCpForMatch(cB)) return true;
+      }
+    }
+    return false;
+  };
+
+  for (const pw in pairsTbl) {
+    const ch = [...String(pw)];
+    if (ch.length !== 2) continue;
+    const ent = pairsTbl[pw] || {};
+    const cA = ch[0].codePointAt(0), cB = ch[1].codePointAt(0);
+    const gidA = cmap[cA], gidB = cmap[cB];
+    if (gidA === undefined || gidB === undefined) continue;
+    if (pairInDict(cA, cB)) continue;
+    const fA2 = AR_FORMS[cA];
+    const aJoins = !!(fA2 && fA2[2] !== null && fA2[2] !== undefined);
+
+    if (ent.v2 && aJoins) {
+      const vg = bindGid(ent.v2);
+      if (vg !== null && vg !== gidB && pureCtxOk(cA) && pureCtxOk(cB)) {
+        pairRulesV2.push({ bt: [[gidA]], in: [[gidB]], la: [], sub: [[gidB, vg]] });
+      }
+    }
+
+    if (ent.v1 && aJoins) {
+      const vg = bindGid(ent.v1);
+      if (vg !== null && vg !== gidA && pureCtxOk(cA) && pureCtxOk(cB)) {
+        pairRulesV1.push({ bt: [], in: [[gidA]], la: [[gidB]], sub: [[gidA, vg]] });
+      }
+    }
+  }
+  const pairRules = pairRulesV2.concat(pairRulesV1);
+
+  /* البدائل نفسها ممكن تبقى سياق لقاعدة بعدها («منم»: النون اتبدلت
+     برسمة الزوج والميم اللي بعدها عايزة تتأكد إن اللي قبلها نون) —
+     نضم كل رسمة بديلة لتغطية سياق حرفها، وإلا القاعدة التانية
+     مش هتشوف النون بعد ما اتبدلت */
+  if (pairRules.length) {
+    const varMap = new Map();
+    pairRules.forEach((r) => r.sub.forEach((pr) => {
+      if (!varMap.has(pr[0])) varMap.set(pr[0], []);
+      if (varMap.get(pr[0]).indexOf(pr[1]) === -1) varMap.get(pr[0]).push(pr[1]);
+    }));
+    const expand = (cov) => {
+      const out = cov.slice();
+      cov.forEach((g) => {
+        const vs = varMap.get(g);
+        if (vs) vs.forEach((v) => { if (out.indexOf(v) === -1) out.push(v); });
+      });
+      return out;
+    };
+    pairRules.forEach((r) => {
+      r.bt = r.bt.map(expand);
+      r.la = r.la.map(expand);
+    });
+  }
+
+  /* ٣ — ترتيب اللوك أب:
+     [أولًا] التحام المواضع init/medi/fina — جذر «خربان المونتاج»:
+             الخطوط المصدَّرة بدون GSUB أصلي (نضيف / إعادة بناء بعد تعديل
+             بنية) كانت الحروف فيها بتطلع متقطعة في أي برنامج خارجي،
+             والحروف المضافة في وضع الدمج ما كانتش بتلتحق أصلًا.
+     [بعد كده] أي حتة (ليجاتشر غير مشروط) ← ميزات rlig + calt
+     لوحدها (ليجاتشر) ← بدون ميزة! لا يمكن الوصول له إلا متداخلًا من السلسلة
+     لوحدها (سلسلة سياقية: مسافة/علامة قبل وبعد ← لوك أب متداخل) ← calt
+     الأزواج (سلسلة سياقية + لوك أب single-sub متداخلة لكل قاعدة) ← calt */
+  const newLookups = [];
+  let imfCount = 0;
+  {
+    /* font.glyphs.get مباشرة — glyphsArr بيرجع فاضي للخط النضيف المبني */
+    /* كل الحروف اللي ليها خام + شكل عرض مختلف — قواعد إضافية بتهاون:
+       GSUB الأصلي (لو موجود) بيشتغل الأول، وقواعدنا بتسد الفراغ بس —
+       فمفيش تعارض، وخطوط من غير تشكيل أصلي بتلتحق كلها */
+    const bases = [];
+    for (const b in AR_FORMS) {
+      const g3 = cmap[+b];
+      if (g3 === undefined) continue;
+      bases.push(+b);
+    }
+    const imf = buildImfRuleSets(bases, cmap);
+    [["init", imf.init], ["medi", imf.medi], ["fina", imf.fina]].forEach(([tag, bytes]) => {
+      if (bytes) { newLookups.push({ bytes: bytes, tags: [tag], freshTag: tag }); imfCount++; }
+    });
+  }
+
+  const totalRules = imfCount + anyLigRules.length + aloneLigRules.length +
+    pairRules.length + pairRulesLate.length;
+
+  if (!anyLigRules.length && !aloneLigRules.length && !pairRules.length &&
+      !pairRulesLate.length && !imfCount) {
+    const why = skipped.length
+      ? "حروف الكلمات دي مش موجودة في خريطة الخط إطلاقًا (لا خام ولا أشكال): " +
+        skipped.slice(0, 5).join("، ")
+      : "القاموس فاضي أو الرسم غير قابل للرسم";
+    return { error: why, ruleCount: 0 };
+  }
+
+  /* ٣ — ترتيب اللوك أب:
+     [0] أي حتة (ليجاتشر غير مشروط) ← ميزات rlig + calt
+     [1] لوحدها (ليجاتشر) ← بدون ميزة! لا يمكن الوصول له إلا متداخلًا من السلسلة
+         (في GSUB الجديد بنخيله تحت ميزة dlig المطفاة عشان ميتطبقش لوحده)
+     [2] لوحدها (سلسلة سياقية: مسافة/علامة قبل وبعد ← لوك أب [1]) ← calt */
+
+  if (anyLigRules.length) {
+    newLookups.push({
+      bytes: serializeLigatureLookup(anyLigRules),
+      tags: ["rlig", "calt"],
+      freshTag: "ccmp"
+    });
+  }
+
+  if (aloneLigRules.length) {
+    newLookups.push({ bytes: serializeLigatureLookup(aloneLigRules), tags: [], freshTag: "dlig" });
+    if (aloneSeqs.length && boundaryGids.length) {
+      /* فهرس اللوك أب المتداخل نسبيًا بين لوك أبنا — مسار الدمج بيرقّعه
+         لِلمطلق (lookupCount + النسبي) والمسار الجديد يسيبه زي ما هو.
+         لوك أب الالتحام بتوعنا قبلهم يزحزح الفهرس النسبي */
+      const chainNested = (anyLigRules.length ? 1 : 0) + imfCount;
+      const chainBytes = serializeChainLookup(aloneSeqs, chainNested, boundaryGids);
+      if (chainBytes) newLookups.push({
+        bytes: chainBytes.bytes,
+        nestedOffsets: chainBytes.nestedOffsets,
+        tags: ["calt"],
+        freshTag: "calt"
+      });
+    }
+  }
+
+  /* لوك أب الأزواج الخام: ccmp — قبل التشكيل وبعد قواعد القاموس
+     أي حتة (القاموس أولوية) + لوك أب single-sub متداخل لكل قاعدة.
+     والمتأخرة (FEFC بعد حرف متصل) على calt بعد التشكيل */
+  if (pairRules.length) {
+    const chainIdx = newLookups.length;
+    const subIdx = pairRules.map((r, k) => chainIdx + 1 + k);
+    const pairChain = serializePairChainLookup(pairRules, subIdx);
+    if (pairChain) {
+      newLookups.push({
+        bytes: pairChain.bytes,
+        nestedOffsets: pairChain.nestedOffsets,
+        tags: ["ccmp"],
+        freshTag: "ccmp"
+      });
+      pairRules.forEach((r) => {
+        const sb = serializeSingleSubLookup(r.sub);
+        if (sb) newLookups.push({ bytes: sb, tags: [], freshTag: "dlig" });
+      });
+    }
+  }
+
+  if (pairRulesLate.length) {
+    const lateIdx = newLookups.length;
+    const lateSubIdx = pairRulesLate.map((r, k) => lateIdx + 1 + k);
+    const lateChain = serializePairChainLookup(pairRulesLate, lateSubIdx);
+    if (lateChain) {
+      newLookups.push({
+        bytes: lateChain.bytes,
+        nestedOffsets: lateChain.nestedOffsets,
+        tags: ["calt"],
+        freshTag: "calt"
+      });
+      pairRulesLate.forEach((r) => {
+        const sb = serializeSingleSubLookup(r.sub);
+        if (sb) newLookups.push({ bytes: sb, tags: [], freshTag: "dlig" });
+      });
+    }
+  }
+
+  /* ٤ — الدمج مع الأصلي أو GSUB نظيف جديد */
+  if (origGSUB) {
+    const gsub = mergeGSUBIntoOriginal(origGSUB, newLookups);
+    if (gsub) {
+      return {
+        bytes: gsub,
+        merged: true,
+        ruleCount: totalRules,
+        words: Object.keys(combined).length
+      };
+    }
+    console.warn("دمج GSUB الأصلي فشل — نستخدم GSUB مستقل بأشكال القاعدة");
+  }
+
+  const fresh = buildFreshGSUB(newLookups.map((nl) => ({
+    tag: nl.freshTag || "calt",
+    bytes: nl.bytes
+  })));
+  if (!fresh) return { error: "فشل بناء GSUB جديد", ruleCount: 0 };
+  return { bytes: fresh, merged: false, ruleCount: totalRules, words: Object.keys(combined).length };
+}
+
+/* حقن جدول في ملف TTF — مع إعادة حساب المجاميع الاختبارية */
+function injectTableIntoTTF(ttfBuffer, newTag, newBytes) {
+  const src = new Uint8Array(ttfBuffer);
+  const dv = new DataView(ttfBuffer);
+  const numOld = dv.getUint16(4);
+
+  const oldTables = [];
+  for (let i = 0; i < numOld; i++) {
+    const off = 12 + i * 16;
+    let tag = "";
+    for (let j = 0; j < 4; j++) tag += String.fromCharCode(src[off + j]);
+    oldTables.push({
+      tag: tag,
+      offset: dv.getUint32(off + 8),
+      length: dv.getUint32(off + 12)
+    });
+  }
+
+  const entries = oldTables
+    .filter((t) => t.tag !== newTag)
+    .map((t) => ({
+      tag: t.tag,
+      bytes: new Uint8Array(src.slice(t.offset, t.offset + t.length))
+    }));
+
+  entries.push({ tag: newTag, bytes: newBytes });
+  entries.sort((a, b) => (a.tag < b.tag ? -1 : a.tag > b.tag ? 1 : 0));
+
+  const numTables = entries.length;
+
+  let entrySelector = 0;
+  while ((1 << (entrySelector + 1)) <= numTables) entrySelector++;
+  const searchRange = (1 << entrySelector) * 16;
+  const rangeShift = numTables * 16 - searchRange;
+
+  let cursor = 12 + numTables * 16;
+  entries.forEach((t) => {
+    t.outOffset = cursor;
+    cursor += t.bytes.length + ((4 - (t.bytes.length % 4)) % 4);
+  });
+  const totalSize = cursor;
+
+  const out = new Uint8Array(totalSize);
+  const odv = new DataView(out.buffer);
+
+  out[0] = src[0]; out[1] = src[1]; out[2] = src[2]; out[3] = src[3];
+  odv.setUint16(4, numTables);
+  odv.setUint16(6, searchRange);
+  odv.setUint16(8, entrySelector);
+  odv.setUint16(10, rangeShift);
+
+  entries.forEach((t) => out.set(t.bytes, t.outOffset));
+
+  const calcChecksum = (start, len) => {
+    let sum = 0;
+    for (let i = 0; i < len; i += 4) {
+      const b0 = out[start + i] || 0;
+      const b1 = (start + i + 1 < totalSize) ? out[start + i + 1] : 0;
+      const b2 = (start + i + 2 < totalSize) ? out[start + i + 2] : 0;
+      const b3 = (start + i + 3 < totalSize) ? out[start + i + 3] : 0;
+      sum = (sum + (((b0 << 24) | (b1 << 16) | (b2 << 8) | b3) >>> 0)) >>> 0;
+    }
+    return sum >>> 0;
+  };
+
+  entries.forEach((t) => { t.checksum = calcChecksum(t.outOffset, t.bytes.length); });
+
+  entries.forEach((t, i) => {
+    const off = 12 + i * 16;
+    for (let j = 0; j < 4; j++) out[off + j] = t.tag.charCodeAt(j) & 255;
+    odv.setUint32(off + 4, t.checksum);
+    odv.setUint32(off + 8, t.outOffset);
+    odv.setUint32(off + 12, t.bytes.length);
+  });
+
+  const head = entries.find((t) => t.tag === "head");
+  if (head) {
+    const adjOff = head.outOffset + 8;
+    odv.setUint32(adjOff, 0);
+    const fileSum = calcChecksum(0, totalSize);
+    odv.setUint32(adjOff, (0xB1B0AFBA - fileSum) >>> 0);
+
+    head.checksum = calcChecksum(head.outOffset, head.bytes.length);
+    const headIdx = entries.indexOf(head);
+    odv.setUint32(12 + headIdx * 16 + 4, head.checksum);
+  }
+
+  return out.buffer;
+}
+
+/* ================================================================
+   § 32-ب — إصلاح cmap عند التصدير
+   opentype.js يكتب كودًا واحدًا لكل رسمة (glyph.unicode) — فبتضيع
+   كل الأكواد الإضافية. نبني cmap كامل من glyphIndexMap (كل الأكواد):
+   Format 4 لـ BMP + Format 12 للباقي، مع مجموعات متصلة مصغّرة
+   ================================================================ */
+function buildCmapTable(map) {
+  const BE = (v) => String.fromCharCode((v >> 8) & 255, v & 255);
+  const BE32 = (v) => String.fromCharCode((v >>> 24) & 255, (v >>> 16) & 255, (v >>> 8) & 255, v & 255);
+  const S16 = (v) => BE(((v % 65536) + 65536) % 65536);
+
+  const pairs = [];
+  for (const k in map) {
+    const cp = +k;
+    const gid = map[k];
+    if (!Number.isFinite(cp) || cp < 0 || cp > 0x10FFFF) continue;
+    if (!Number.isFinite(gid) || gid < 0 || gid > 0xFFFF) continue;
+    pairs.push([cp, gid]);
+  }
+  if (!pairs.length) return null;
+  pairs.sort((a, b) => a[0] - b[0]);
+
+  /* نوعا المجموعات:
+     delta — أكواد متتالية بدلتا ثابتة (gid - cp) تتسع في int16
+     same  — أكواد متتالية لنفس الرسمة (أو دلتا متفجرة) — تُكتب
+             مباشرة في glyphIdArray عبر idRangeOffset */
+  const groups = [];
+  let i = 0;
+  while (i < pairs.length) {
+    const [s0, g0] = pairs[i];
+    /* مدى نفس الرسمة */
+    let j = i + 1;
+    while (j < pairs.length && pairs[j][0] === pairs[j - 1][0] + 1 && pairs[j][1] === g0) j++;
+    if (j > i + 1) { groups.push({ s: s0, e: pairs[j - 1][0], same: g0 }); i = j; continue; }
+    /* مدى دلتا ثابتة */
+    const d0 = g0 - s0;
+    j = i + 1;
+    while (j < pairs.length && pairs[j][0] === pairs[j - 1][0] + 1 &&
+           pairs[j][1] - pairs[j][0] === d0) j++;
+    groups.push({ s: s0, e: pairs[j - 1][0], d: d0 });
+    i = j;
+  }
+
+  /* ---- Format 4 (BMP) ---- */
+  const segs = []; /* {s, e, d?, same?} */
+  groups.forEach((g) => {
+    if (g.s > 0xFFFF) return;
+    const e = Math.min(g.e, 0xFFFF);
+    if (g.same !== undefined) {
+      segs.push({ s: g.s, e: e, same: g.same, run: e - g.s + 1 });
+    } else if (Math.abs(g.d) <= 0x7FFF) {
+      segs.push({ s: g.s, e: e, d: g.d });
+    } else {
+      /* دلتا متفجرة — نفكها لمدى نفس الرسمة كودًا كودًا */
+      for (let cp = g.s; cp <= e; cp++) {
+        segs.push({ s: cp, e: cp, same: cp + g.d, run: 1 });
+      }
+    }
+  });
+  segs.sort((a, b) => a.s - b.s);
+  if (!segs.length || segs[segs.length - 1].e !== 0xFFFF) {
+    segs.push({ s: 0xFFFF, e: 0xFFFF, d: 1 });
+  }
+  const segCount = segs.length;
+  const esel = Math.floor(Math.log2(Math.max(segCount, 1)));
+  const searchRange = (1 << esel) * 2;
+  const rangeShift = segCount * 2 - searchRange;
+
+  /* glyphIdArray: مدايات «نفس الرسمة» بالترتيب */
+  const runs = segs.filter((sg) => sg.same !== undefined);
+  let gidArrayLen = 0;
+  runs.forEach((sg) => { gidArrayLen += sg.run; });
+  const idRangeArrOff = 14 + segCount * 8 + 2; /* بعد reservedPad */
+  const gidArrOff = idRangeArrOff + segCount * 2;
+
+  const segSlotStart = new Map(); /* seg -> فهرس أول خانة له في glyphIdArray */
+  let slotAcc = 0;
+  segs.forEach((sg) => {
+    if (sg.same !== undefined) { segSlotStart.set(sg, slotAcc); slotAcc += sg.run; }
+  });
+
+  const f4len = 14 + segCount * 8 + 2 + gidArrayLen * 2;
+  let f4 = BE(4) + BE(f4len) + BE(0) + BE(segCount * 2) +
+    BE(searchRange) + BE(esel) + BE(rangeShift);
+  segs.forEach((sg) => { f4 += BE(sg.e); });
+  f4 += BE(0); /* reservedPad */
+  segs.forEach((sg) => { f4 += BE(sg.s); });
+  segs.forEach((sg) => { f4 += (sg.same !== undefined) ? S16(0) : S16(sg.d); });
+  segs.forEach((sg, si) => {
+    if (sg.same === undefined) { f4 += BE(0); return; }
+    /* الإزاحة بالبايتات من خانة idRangeOffset بتاعتي (فهرس si)
+       لأول خانة لي في glyphIdArray — نسبية لموضع الخانة نفسها */
+    const slot = segSlotStart.get(sg);
+    f4 += BE((gidArrOff - idRangeArrOff) + 2 * (slot - si));
+  });
+  /* glyphIdArray نفسها */
+  segs.forEach((sg) => {
+    if (sg.same === undefined) return;
+    for (let k = 0; k < sg.run; k++) f4 += BE(sg.same);
+  });
+
+  /* ---- Format 12 (كل النطاقات) ---- */
+  const f12recs = [];
+  groups.forEach((g) => {
+    if (g.same !== undefined) {
+      for (let cp = g.s; cp <= g.e; cp++) f12recs.push([cp, cp, g.same]);
+    } else {
+      f12recs.push([g.s, g.e, (((g.s + g.d) % 0x100000000) + 0x100000000) % 0x100000000]);
+    }
+  });
+  const f12len = 16 + f12recs.length * 12;
+  let f12 = BE(12) + BE(0) + BE32(f12len) + BE32(0) + BE32(f12recs.length);
+  f12recs.forEach(([s, e, sg]) => { f12 += BE32(s) + BE32(e) + BE32(sg); });
+
+  /* cmap هيدر: version + numTables + سجلات + الجداول */
+  const encodings = [
+    [0, 3, f4], [0, 4, f12], [3, 1, f4], [3, 10, f12]
+  ];
+  const headerLen = 4 + encodings.length * 8;
+  const offsets = [];
+  let cur = headerLen;
+  encodings.forEach(([, , body]) => { offsets.push(cur); cur += body.length; });
+
+  let out = BE(0) + BE(encodings.length);
+  encodings.forEach(([p, e], i) => { out += BE(p) + BE(e) + BE32(offsets[i]); });
+  encodings.forEach(([, , body]) => { out += body; });
+
+  const bytes = new Uint8Array(out.length);
+  for (let i = 0; i < out.length; i++) bytes[i] = out.charCodeAt(i) & 255;
+  return bytes;
+}
+
+/* ================================================================
+   § 32-ج — إصلاح الحروف الخام العربية في الخطوط اللي فيها أشكال عرض بس
+   لكل حرف خام 0621-064A مش موجود في cmap: نوجّهه لرسمة شكله المعزول
+   (أو أول شكل متاح) — يخلي الكتابة الخام تشتغل في أي برنامج
+   وفيه القواعد المضمنة تلاقي الحروف
+   ================================================================ */
+function repairArabicCmap(f) {
+  try {
+    if (!f || !AR_FORMS) return;
+    const map = f.glyphIndexMap = (f.glyphIndexMap || {});
+    for (const rawS in AR_FORMS) {
+      const raw = +rawS;
+      if (map[raw] !== undefined) continue;
+      const forms = AR_FORMS[rawS];
+      for (let i = 0; i < forms.length; i++) {
+        const fcp = forms[i];
+        if (fcp === null || fcp === undefined || map[fcp] === undefined) continue;
+        const gid = map[fcp];
+        map[raw] = gid;
+        let g = null;
+        try { g = f.glyphs.get(gid); } catch (e) { g = null; }
+        if (g) {
+          if (!Array.isArray(g.unicodes)) {
+            g.unicodes = (g.unicode !== undefined ? [g.unicode] : []);
+          }
+          if (!g.unicodes.includes(raw)) g.unicodes.push(raw);
+        }
+        break;
+      }
+    }
+  } catch (e) { console.warn("repairArabicCmap:", e); }
+}
+
+/* ================================================================
+   § 32.5 — Unicode Range Studio — REAL GLYPH IMPORT
+   يضيف الكود + ينسخ الرسمة الحقيقية من أحد الخطوط المفتوحة.
+   ================================================================ */
+(function(){
+  const blocks=[[0xFB50,0xFDFF,"Arabic Presentation Forms-A"],[0xFE70,0xFEFF,"Arabic Presentation Forms-B"],[0x0600,0x06FF,"Arabic"],[0x0750,0x077F,"Arabic Supplement"],[0x08A0,0x08FF,"Arabic Extended-A"],[0x2000,0x206F,"General Punctuation"],[0x2100,0x214F,"Letterlike Symbols"],[0x2190,0x21FF,"Arrows"],[0x2200,0x22FF,"Mathematical Operators"],[0x2500,0x257F,"Box Drawing"],[0x25A0,0x25FF,"Geometric Shapes"],[0x2600,0x26FF,"Miscellaneous Symbols"],[0x2700,0x27BF,"Dingbats"]];
+  const hex=c=>"U+"+c.toString(16).toUpperCase().padStart(4,"0");
+  const block=c=>(blocks.find(b=>c>=b[0]&&c<=b[1])||[0,0,"Unicode"])[2];
+  function parse(v){
+    let q=String(v||"").toUpperCase().replace(/\s+/g,"").replace(/^U\+/,"").replace(/U\+/g,"");
+    let p=q.split(/[-:…]+/); if(!q||p.length>2) throw Error("صيغة النطاق غير صحيحة.");
+    let a=parseInt(p[0],16), b=p.length===2?parseInt(p[1],16):null;
+    if(!Number.isInteger(a)||a<0||a>0x10FFFF) throw Error("كود البداية غير صالح.");
+    if(b===null){let z=blocks.find(x=>a>=x[0]&&a<=x[1]);b=z?z[1]:a}
+    if(!Number.isInteger(b)||b<a||b>0x10FFFF) throw Error("كود النهاية غير صالح.");
+    if(b-a+1>4096) throw Error("النطاق كبير جدًا؛ الحد الأقصى 4096 رمزًا.");
+    return {a,b,n:b-a+1};
+  }
+  const gid=cp=>font&&font.glyphIndexMap&&font.glyphIndexMap[cp]!==undefined?font.glyphIndexMap[cp]:undefined;
+
+  /* ابحث عن رسمة حقيقية لنفس Unicode في كل الخطوط المفتوحة.
+     الخط النشط لا يُستخدم كمصدر حتى لا ننسخ رسمة فارغة منه. */
+  function findSource(cp){
+    for(let i=0;i<slots.length;i++){
+      const sl=slots[i]; if(!sl||!sl.font||sl.font===font) continue;
+      const sf=sl.font, map=sf.glyphIndexMap||{};
+      const gi=map[cp];
+      if(gi===undefined) continue;
+      let g=null; try{g=sf.glyphs.get(gi)}catch(e){g=null}
+      if(g&&g.path&&Array.isArray(g.path.commands)&&g.path.commands.length) return {glyph:g,font:sf,name:sl.name||("الخط "+(i+1)),index:i};
+    }
+    return null;
+  }
+
+  function sourceForRow(cp){
+    const s=findSource(cp);
+    return s?s.name:null;
+  }
+
+  function rows(r){
+    let out=[];
+    for(let cp=r.a;cp<=r.b;cp++){
+      let g=gid(cp),o=g!==undefined?font.glyphs.get(g):null,src=findSource(cp);
+      out.push({cp,gid:g,name:o&&o.name?o.name:cpName(cp),exists:g!==undefined,source:src});
+    }
+    return out;
+  }
+
+  function preview(){
+    let inp=qs("#urRange"),tb=qs("#urTableBody"); if(!inp||!tb)return;
+    try{
+      let r=parse(inp.value),rs=rows(r),ex=rs.filter(x=>x.exists).length,src=rs.filter(x=>!x.exists&&x.source).length;
+      qs("#urCount").textContent=r.n;
+      qs("#urMissing").textContent=r.n-ex;
+      qs("#urExisting").textContent=ex;
+      qs("#urBlock").textContent=block(r.a);
+      qs("#urMeta").textContent="النطاق: "+hex(r.a)+" → "+hex(r.b)+" • "+r.n+" نقطة • رسومات جاهزة من خطوط مفتوحة: "+src+" • بدون مصدر: "+(r.n-ex-src);
+      tb.innerHTML=rs.map(x=>`<tr><td class="ur-char">${esc(String.fromCodePoint(x.cp))}</td><td class="ur-code">${hex(x.cp)}</td><td>${x.cp}</td><td class="ur-name">${esc(x.name)}</td><td class="${x.exists?'ur-skip':x.source?'ur-source':'ur-ok'}">${x.exists?'موجود G'+x.gid:(x.source?'جاهز من '+esc(x.source):'لا توجد رسمة مصدر')}</td></tr>`).join("");
+    }catch(e){
+      ["urCount","urMissing","urExisting"].forEach(id=>{let x=qs("#"+id);if(x)x.textContent="—"});
+      let b=qs("#urBlock");if(b)b.textContent="غير صالح";
+      tb.innerHTML=`<tr><td colspan="5" style="padding:18px;text-align:center;color:var(--bad)">${esc(e.message||String(e))}</td></tr>`;
+      let m=qs("#urMeta");if(m)m.textContent="صحّح النطاق ثم جرّب.";
+    }
+  }
+
+  async function add(){
+    if(!font){toast("افتح خطًا أولًا",true);return}
+    let r; try{r=parse(qs("#urRange").value)}catch(e){toast(e.message,true);return}
+    let rs=rows(r),missing=rs.filter(x=>!x.exists),reuse=!!qs("#urIncludeExisting")?.checked;
+    const ready=missing.filter(x=>x.source).length, empty=missing.length-ready;
+    if(!missing.length&&!reuse){toast("كل الرموز موجودة بالفعل.");return}
+    if(!await uiConfirm("إضافة "+(reuse?r.n:missing.length)+" رمزًا؟\nسيتم نسخ الرسومات الحقيقية من الخطوط المفتوحة عند توفرها."+(empty?"\n"+empty+" رمزًا بلا رسمة مصدر وسيُضاف فارغًا.":""),{title:"إضافة نطاق Unicode",okText:"إضافة النطاق"}))return;
+    pushUndo();
+    let added=0,skip=0,reused=0,copied=0,emptyAdded=0;
+    for(let x of rs){
+      let old=gid(x.cp);
+      if(old!==undefined){
+        if(reuse){
+          let g=font.glyphs.get(old),src=x.source;
+          if(src){
+            const made=makeGlyphFromImport(src.glyph,x.cp,src.font);
+            g.path=made.path; g.advanceWidth=made.advanceWidth; g.name=cpName(x.cp); g.unicodes=Array.from(new Set([...(g.unicodes||[]),x.cp])); g.unicode=x.cp; markUserInk(g);
+            const bb=g.path.getBoundingBox(); if(isFinite(bb.x1)){g.xMin=bb.x1;g.xMax=bb.x2;g.yMin=bb.y1;g.yMax=bb.y2}
+          } else {g.unicodes=Array.from(new Set([...(g.unicodes||[]),x.cp]));g.unicode=x.cp;g.name=cpName(x.cp);markUserInk(g)}
+          reused++
+        }else skip++;
+        continue;
+      }
+      if(x.source){appendGlyph(makeGlyphFromImport(x.source.glyph,x.cp,x.source.font));copied++;}
+      else {appendGlyph(makeEmptyGlyph(x.cp));emptyAdded++;}
+      added++;
+    }
+    rebuildGlyphIndexMap(); markStructChanged(); renderAll(); preview();
+    toast("تم ✓ إضافة "+added+" • رسومات حقيقية "+copied+" • فارغ "+emptyAdded+(skip?" • موجود "+skip:"")+(reused?" • محدث "+reused:""));
+  }
+
+  function open(){
+    if(!font){toast("افتح خطًا أولًا",true);return}
+    openModal("Unicode Range Studio",`<div class="ur-wrap" dir="rtl">
+      <section class="ur-hero"><div class="ur-kicker">UNICODE / RANGE</div><div class="ur-title">إضافة نطاق Unicode بالرسومات الحقيقية</div>
+      <div class="ur-sub">اكتب U+FB50 لإضافة FB50–FDFF. إذا كان هناك خط آخر مفتوح يحتوي على نفس الكود، سيتم نسخ الـGlyph والـPath والـmetrics منه.</div>
+      <div class="ur-input-row"><input id="urRange" class="ur-input" value="U+FB50" spellcheck="false" placeholder="U+FB50 أو U+FB50-FDFF"><button class="btn ok" data-act="ur-preview">فحص</button></div>
+      <div class="ur-presets"><button class="ur-preset" data-ur="U+FB50-FDFF">FB50–FDFF</button><button class="ur-preset" data-ur="U+FE70-FEFF">FE70–FEFF</button><button class="ur-preset" data-ur="U+0600-06FF">0600–06FF</button></div>
+      <div class="ur-preview"><div class="ur-stat"><b id="urCount">—</b><span>إجمالي</span></div><div class="ur-stat"><b id="urMissing">—</b><span>ناقص</span></div><div class="ur-stat"><b id="urExisting">—</b><span>موجود</span></div><div class="ur-stat"><b id="urBlock">—</b><span>البلوك</span></div></div></section>
+      <label class="ur-option"><input id="urIncludeExisting" type="checkbox"><span>تحديث الموجود أيضًا: انسخ له الرسمة من المصدر إن وجدت</span></label>
+      <div class="ur-table-wrap"><table class="ur-table"><thead><tr><th>الرمز</th><th>Unicode</th><th>Decimal</th><th>Glyph</th><th>الحالة</th></tr></thead><tbody id="urTableBody"></tbody></table></div>
+      <div class="ur-note" id="urMeta">—</div><div class="ur-actions"><button class="btn ok" data-act="ur-add">إضافة كل الرموز والرسومات</button><button class="btn ghost" data-act="close-modal">إغلاق</button></div>
+    </div>`);
+    let i=qs("#urRange");i.addEventListener("input",preview);
+    modalBox.querySelectorAll("[data-ur]").forEach(b=>b.addEventListener("click",()=>{i.value=b.dataset.ur;preview()}));
+    preview();
+  }
+  window.__mihabarUnicodeRangeStudio={open,add,preview};
+})();
+
+/* ================================================================
+   § 33 — خريطة الأوامر
+   ================================================================ */
+function runActionByName(name, btn) {
+  const fn = ACTIONS[name];
+  if (typeof fn !== "function") {
+    console.warn("أمر غير مسجل:", name);
+    return;
+  }
+  try {
+    fn(btn);
+  } catch (e) {
+    console.error(e);
+    showError(e.message);
+  }
+}
+
+/* ================================================================
+   تحليل استخدام Glyph حتى لو ملوش Unicode أو اسم أو كلمة مدمجة
+   ================================================================ */
+function __mhUsageCoverageIds(cov) {
+  try {
+    const a = coverageGlyphs(cov);
+    return Array.isArray(a) ? a.filter(Number.isFinite) : [];
+  } catch (e) { return []; }
+}
+
+function __mhUsageAdd(map, gid, type, detail) {
+  if (!Number.isFinite(gid)) return;
+  const k = String(gid);
+  if (!map[k]) map[k] = [];
+  const key = type + "|" + detail;
+  if (!map[k].some(x => x.key === key)) map[k].push({type, detail, key});
+}
+
+function __mhScanGsubForGlyph(fontObj, targetGid) {
+  const hits = [];
+  const gsub = fontObj && fontObj.tables && fontObj.tables.gsub;
+  if (!gsub || !Array.isArray(gsub.lookups)) return hits;
+
+  const seen = new WeakSet();
+  const add = (type, detail) => hits.push({type, detail});
+  const scanSubtable = (st, lookupIndex, subIndex, inheritedType) => {
+    if (!st || typeof st !== "object") return;
+    const prefix = "Lookup " + lookupIndex + " / Subtable " + subIndex;
+    const type = inheritedType || "GSUB";
+
+    /* Coverage: glyphs الداخلة في الاستبدال/السياق */
+    for (const gid of __mhUsageCoverageIds(st.coverage)) {
+      if (gid === targetGid) add("مدخل / Coverage", prefix + " — GID " + gid);
+    }
+    if (Array.isArray(st.coverages)) {
+      st.coverages.forEach((cv, ci) => {
+        for (const gid of __mhUsageCoverageIds(cv)) {
+          if (gid === targetGid) add("مدخل / Coverage", prefix + " — Coverage " + (ci + 1) + " — GID " + gid);
+        }
+      });
+    }
+
+    /* Single substitution */
+    if (Array.isArray(st.substitute)) st.substitute.forEach((gid, i) => {
+      if (gid === targetGid) add("ناتج استبدال", prefix + " — substitute[" + i + "] → GID " + gid);
+    });
+
+    /* Multiple substitution */
+    if (Array.isArray(st.sequences)) st.sequences.forEach((seq, i) => {
+      if (Array.isArray(seq) && seq.includes(targetGid)) {
+        add("جزء من استبدال متعدد", prefix + " — sequence[" + i + "] → GID " + targetGid);
+      }
+    });
+
+    /* Alternate substitution */
+    if (Array.isArray(st.alternateSets)) st.alternateSets.forEach((set, i) => {
+      if (Array.isArray(set) && set.includes(targetGid)) {
+        add("بديل", prefix + " — alternateSet[" + i + "] → GID " + targetGid);
+      }
+    });
+
+    /* Ligatures: المكوّنات + الرسم النهائي */
+    if (Array.isArray(st.ligatureSets)) st.ligatureSets.forEach((set, si) => {
+      const first = __mhUsageCoverageIds(st.coverage)[si];
+      (set || []).forEach((lig, li) => {
+        if (!lig) return;
+        const out = lig.ligGlyph;
+        const comps = Array.isArray(lig.components) ? lig.components : [];
+        if (out === targetGid) add("ناتج Ligature", prefix + " — ligatureSet[" + si + "] item " + li + " → GID " + out);
+        if (comps.includes(targetGid)) add("مكوّن Ligature", prefix + " — ligatureSet[" + si + "] item " + li + " يحتوي GID " + targetGid);
+        if (first === targetGid) add("أول مكوّن Ligature", prefix + " — coverage first → GID " + targetGid);
+      });
+    });
+
+    /* Contextual substitutions: الإدخال + lookups المرتبطة */
+    const ruleSets = st.ruleSets || st.chainRuleSets || st.chainClassSet;
+    if (Array.isArray(ruleSets)) ruleSets.forEach((set, si) => {
+      (set || []).forEach((rule, ri) => {
+        const groups = [rule.input, rule.backtrack, rule.lookahead];
+        groups.forEach((arr, gi) => {
+          if (Array.isArray(arr) && arr.includes(targetGid)) {
+            const names = ["input", "backtrack", "lookahead"];
+            add("سياق GSUB", prefix + " — " + names[gi] + " rule " + ri + " يحتوي GID " + targetGid);
+          }
+        });
+        if (Array.isArray(rule.lookupRecords)) {
+          rule.lookupRecords.forEach(r => {
+            if (r && Number.isFinite(r.lookupListIndex)) {
+              /* نعرض ارتباط السياق بالـLookup، حتى لو الهدف غير مباشر */
+              add("Lookup مرتبط بالسياق", prefix + " — lookupListIndex " + r.lookupListIndex);
+            }
+          });
+        }
+      });
+    });
+
+    /* Extension substitution */
+    if (st.extension) scanSubtable(st.extension, lookupIndex, subIndex, "Extension → " + type);
+  };
+
+  gsub.lookups.forEach((lookup, li) => {
+    if (!lookup) return;
+    (lookup.subtables || []).forEach((st, si) => scanSubtable(st, li, si));
+  });
+  return hits;
+}
+
+function __mhScanCompositeUsage(fontObj, targetGid) {
+  const hits = [];
+  /* opentype.js يحوّل بعض composite outlines إلى Path، لذلك لا نعتبر
+     غياب معلومات components دليلًا على أن الرسم غير مستخدم. لو كانت
+     معلومات components موجودة في الكائن نفسه، نفحصها. */
+  try {
+    const g = fontObj.glyphs.get(targetGid);
+    const candidates = [g && g.components, g && g.path && g.path.components];
+    candidates.forEach((arr) => {
+      if (!Array.isArray(arr)) return;
+      arr.forEach((c, i) => {
+        const id = c && (c.glyphIndex ?? c.glyphID ?? c.index ?? c.gid);
+        if (Number(id) === targetGid) hits.push({type:"Composite Component", detail:"مكوّن داخلي رقم " + i + " → GID " + targetGid});
+      });
+    });
+  } catch (e) {}
+  return hits;
+}
+
+function analyzeGlyphUsage(index) {
+  if (!font || index == null) return;
+  let g = null;
+  try { g = font.glyphs.get(index); } catch (e) {}
+  if (!g) return;
+
+  const cps = glyphAllCps(g, index);
+  const chars = cps.map(cpDisplayChar).filter(Boolean).join(" ");
+  const word = font.wordByGid && font.wordByGid[index];
+  const label = font.labelByGid && font.labelByGid[index];
+  const gsubHits = __mhScanGsubForGlyph(font, index);
+  const compHits = __mhScanCompositeUsage(font, index);
+  const hits = gsubHits.concat(compHits);
+
+  const uniq = [];
+  const seen = new Set();
+  hits.forEach(h => {
+    const k = h.type + "|" + h.detail;
+    if (!seen.has(k)) { seen.add(k); uniq.push(h); }
+  });
+
+  const status = (!cps.length && !word && !label && !uniq.length)
+    ? '<div class="hint warn">⚠ الرسم موجود كـGlyph لكن لم أجد له Unicode أو كلمة أو اسم مرجعي أو استخدام GSUB قابل للاكتشاف.</div>'
+    : '<div class="hint" style="color:var(--ok,#8fd18f)">✓ تم فحص مصادر التعريف والاستخدام المتاحة داخل المحرر.</div>';
+
+  const rows = [];
+  if (cps.length) rows.push('<tr><td>Unicode / cmap</td><td>' + esc(cps.map(cp => "U+" + cp.toString(16).toUpperCase().padStart(4,"0") + "  " + cpDisplayChar(cp)).join("  ·  ")) + '</td></tr>');
+  else rows.push('<tr><td>Unicode / cmap</td><td style="color:var(--warn)">لا يوجد</td></tr>');
+  rows.push('<tr><td>GID</td><td class="mono">' + index + '</td></tr>');
+  rows.push('<tr><td>الاسم التقني</td><td class="mono">' + esc(g.name || "—") + '</td></tr>');
+  rows.push('<tr><td>كلمة مدمجة</td><td>' + esc(word || "لا يوجد") + '</td></tr>');
+  rows.push('<tr><td>اسم مرجعي</td><td>' + esc(label || "لا يوجد") + '</td></tr>');
+
+  const hitHtml = uniq.length
+    ? '<div class="cmdTableWrap"><table class="cmdTable"><thead><tr><th>نوع الاستخدام</th><th>التفصيل</th></tr></thead><tbody>' +
+      uniq.map(h => '<tr><td style="white-space:nowrap;font-weight:700">' + esc(h.type) + '</td><td dir="ltr" style="text-align:left;font-family:var(--mono);font-size:11px">' + esc(h.detail) + '</td></tr>').join('') +
+      '</tbody></table></div>'
+    : '<div class="hint">لم يتم العثور على مرجع GSUB مباشر لهذا الـGID.</div>';
+
+  openModal("اكتشاف استخدام الرسم — G" + index, `
+    ${status}
+    <div class="roGrid" style="margin-top:10px">${rows.join("")}</div>
+    <div style="margin-top:14px;font-weight:800;color:var(--accent)">مراجع الاستخدام المكتشفة (${uniq.length})</div>
+    ${hitHtml}
+    <div class="hint" style="margin-top:12px">ملاحظة: وجود Glyph بدون Unicode طبيعي؛ الـGID هو هويته الداخلية. الفحص هنا يبحث في cmap وGSUB والبيانات المرجعية المحفوظة في المحرر، ولا يحوّل الرسم غير المرمّز إلى Unicode تلقائيًا.</div>
+    <div class="mbtns"><button class="btn" data-act="close-modal">إغلاق</button></div>
+  `);
+}
+
+const ACTIONS = {
+  /* ملفات وتبويبات */
+  "open-files": () => fileInput.click(),
+  "svg-converter": () => openSvgConverter(),
+  "unicode-range-add": () => window.__mihabarUnicodeRangeStudio && window.__mihabarUnicodeRangeStudio.open(),
+  "ur-preview": () => window.__mihabarUnicodeRangeStudio && window.__mihabarUnicodeRangeStudio.preview(),
+  "ur-add": () => window.__mihabarUnicodeRangeStudio && window.__mihabarUnicodeRangeStudio.add(),
+
+  "file-info": () => openFileInfo(),
+  "export-ttf": () => doExport(false),
+  "export-woff2": () => doExport(true),
+  "toggle-pure-export": () => toggleUiPureExport(),
+  "close-tab": () => closeSlot(activeSlot),
+  "undo": () => undo(),
+  "toggle-grouped": () => toggleGroupedView(),
+  "close-modal": () => closeModal(),
+
+  /* العمود الجانبي */
+  "sb-open": () => document.body.classList.add("sb-open"),
+  "sb-close": () => document.body.classList.remove("sb-open"),
+
+  /* أدوات */
+  "test-drive": () => openTestDrive(),
+  "space-studio": () => openSpaceStudio(),
+  "spw-apply": () => { if (window.__spwApply) window.__spwApply(); },
+  "spw-unify": () => { if (window.__spwUnify) window.__spwUnify(); },
+  "spw-restore": () => { if (window.__spwRestore) window.__spwRestore(); },
+  "font-pages": () => openFontPages(),
+  "pg-prev": () => pageNav(-1),
+  "pg-next": () => pageNav(1),
+  "pg-export-png": () => exportPagePNG(),
+  "export-glyph-png": () => exportGlyphPNG(),
+  "glyph-add": () => openAdd(),
+  "glyph-import": () => openImport(),
+  "compare-open": () => openCompare(),
+  "cmp-slot": (btn) => startCompare(+btn.dataset.slot),
+  "select-mode": () => setSelMode(!selMode),
+
+  /* القاموس */
+  "open-dict": () => openDict(),
+  "open-pairs": () => openPairs(),
+  "pairs-add": () => pairsAdd(),
+  "pairs-del": (btn) => pairsDel(btn.dataset.pair),
+  "dict-add": () => dictAdd(),
+  "dict-del": (btn) => dictDel(btn.dataset.word),
+  "dict-mode": (btn) => dictToggleMode(btn.dataset.word),
+  "dict-alt-add": (btn) => openGlyphPicker("dictAlt:" + btn.dataset.word),
+  "dict-alt-del": (btn) => dictAltDel(btn.dataset.word, btn.dataset.alt),
+  "dict-alts-scan": (btn) => dictAltsScan(btn.dataset.word),
+  "dict-export": () => dictExport(),
+  "dict-import": () => {
+    const fi = document.getElementById("dictFileInput");
+    if (fi) fi.click();
+  },
+  "pick-open": (btn) => openGlyphPicker(btn && btn.dataset ? btn.dataset.target : null),
+  "pick-prev": () => { if (window.__pickNav) window.__pickNav(-1); },
+  "pick-next": () => { if (window.__pickNav) window.__pickNav(1); },
+  "pick-select": (btn) => pickSelect(btn),
+  "words-list": () => openWordsList(),
+  "emb-save": () => embSave(),
+  "emb-edit": (btn) => embEdit(btn.dataset.word),
+  "emb-del": (btn) => embDel(btn.dataset.word),
+  "emb-del-sel": () => embDelSel(),
+  "emb-restore": (btn) => embRestore(btn.dataset.word),
+  "emb-restore-all": () => embRestoreAll(),
+  "emb-toggle": (btn) => embToggleSel(btn.dataset.word),
+  "emb-sel-all": () => embSelAll(),
+  "emb-sel-none": () => embSelNone(),
+  "emb-cancel": () => embResetForm(),
+  "goto-glyph": (btn) => gotoGlyph(+btn.dataset.gid),
+  "backup-all": () => backupAllDicts(),
+  "restore-backup": () => restoreBackup(),
+
+  /* بطاقة معاينة + دفتر الحروف + ملف المشروع */
+  "card-open": () => openPreviewCard(),
+  "card-save": () => exportCardPNG(),
+  "book-open": () => openLetterBook(),
+  "book-print": (btn) => {
+    const scopeEl = qs("#bookScope");
+    bookPrint(scopeEl ? scopeEl.value : "arabic");
+  },
+  "project-save": () => projectSave(),
+  "project-open": () => {
+    const fi = document.getElementById("projFileInput");
+    if (fi) fi.click();
+  },
+  "sw-img": () => swapFromImage(curIndex),
+  "n-pick-img": () => { /* الزر مربوط مباشرة في openAdd — عشان التعارض مع الموزّع */ },
+
+  /* نسخ */
+  "svgconv-text": () => svgConvText(),
+  "svgconv-copy": () => svgConvCopy(),
+  "svgconv-download": () => svgConvDownload(),
+  "svgconv-image-retry": () => svgConvImageRetry(),
+
+  "cp-char": async () => {
+    const g = font.glyphs.get(curIndex);
+    const cps = glyphAllCps(g, curIndex);
+    if (!cps.length) return;
+    const ok = await copyText(String.fromCodePoint(cps[0]));
+    toast(ok ? "تم نسخ الحرف" : "فشل النسخ");
+  },
+  "cp-code": async () => {
+    const g = font.glyphs.get(curIndex);
+    const cps = glyphAllCps(g, curIndex);
+    if (!cps.length) return;
+    const code = cps.map((c) => "U+" + c.toString(16).toUpperCase().padStart(4, "0")).join(", ");
+    const ok = await copyText(cps.length > 1
+      ? code : cps[0].toString(16).toUpperCase().padStart(4, "0"));
+    toast(ok ? "تم نسخ: " + code : "فشل النسخ");
+  },
+  "cp-all-chars": async () => {
+    const g = font.glyphs.get(curIndex);
+    const cps = glyphAllCps(g, curIndex);
+    if (!cps.length) return;
+    const chars = cps.map(cpDisplayChar).filter(Boolean).join("");
+    const ok = await copyText(chars);
+    toast(ok ? "تم نسخ كل الرموز المرتبطة بالرسمة (" + cps.length + ")" : "فشل النسخ");
+  },
+  "cp-svg": async () => {
+    const g = font.glyphs.get(curIndex);
+    if (!g || !g.path || !g.path.commands.length) {
+      toast("لا رسمة", true);
+      return;
+    }
+    const fullSvg = glyphToFullSvgDocument(g);
+    if (!fullSvg) { toast("لا مسار صالح", true); return; }
+    const ok = await copyText(fullSvg);
+    toast(ok ? "تم نسخ مستند SVG كامل (" + (fullSvg.match(/viewBox=\"([^\"]+)\"/) || [,""])[1] + ")" : "فشل النسخ");
+  },
+
+  /* عمليات الحروف */
+  "g-remap": () => openRemap(curIndex),
+  "g-save": () => saveGlyphInfo(),
+  "g-move": () => openMove(curIndex),
+  "g-dup": () => openDuplicate(curIndex),
+  "g-del": () => doDelete(curIndex),
+
+  "g-swap": () => openSwap(curIndex),
+  "g-restore-original": () => restoreOriginalGlyph(curIndex),
+  "g-color-delete": () => deleteColorDrawing(curIndex),
+  "g-cmds": () => openPathCommands(curIndex),
+  "g-analyze-usage": () => analyzeGlyphUsage(curIndex),
+  "g-cmds-copy": async () => {
+    const g = font.glyphs.get(curIndex);
+    if (!g || !g.path) return;
+    const typeName = { M: "بداية", L: "خط", C: "منحنى مكعب", Q: "منحنى تربيعي", Z: "إغلاق" };
+    const lines = g.path.commands.map((c, i) => {
+      let coords = "";
+      if (c.type === "M" || c.type === "L") coords = "x=" + Math.round(c.x) + " y=" + Math.round(c.y);
+      else if (c.type === "Q") coords = "x1=" + Math.round(c.x1) + " y1=" + Math.round(c.y1) + " x=" + Math.round(c.x) + " y=" + Math.round(c.y);
+      else if (c.type === "C") coords = "x1=" + Math.round(c.x1) + " y1=" + Math.round(c.y1) + " x2=" + Math.round(c.x2) + " y2=" + Math.round(c.y2) + " x=" + Math.round(c.x) + " y=" + Math.round(c.y);
+      return (i + 1) + ". " + (typeName[c.type] || c.type) + (coords ? " — " + coords : "");
+    }).join("\n");
+    const ok = await copyText(lines);
+    toast(ok ? "تم نسخ " + g.path.commands.length + " أمر" : "فشل النسخ");
+  },
+  "g-actions-back": () => openActions(curIndex),
+  "sw-font": () => openSwapFromFont(curIndex),
+  "sw-font-save": () => saveSwapFont(),
+  "sw-other": () => openSwapOther(),
+  "sw-svg": () => openSwapFromSvg(curIndex),
+  "sw-svg-save": () => saveSwapSvg(),
+  "sw-self": () => saveSwapSelf(),
+  "swap-cancel": () => {
+    swapTargetIndex = null;
+    openSwap(curIndex);
+  },
+
+  "m-save": () => saveMove(),
+  "r-save": () => saveRemap(),
+  "d-save": () => saveDuplicate(),
+  "n-save": () => saveAdd(),
+  "n-add-all": () => saveAddAllForms(),
+  "fi-save": () => saveFileInfo(),
+
+  /* التحديد */
+  "sel-all": () => selectAllVisible(),
+  "sel-del": () => deleteSelected(),
+  "sel-clear-code": () => clearSelectedCodes(),
+  "sel-cancel": () => setSelMode(false),
+
+  /* التجربة */
+  "td-diag": async () => {
+    const input = qs("#tdText");
+    if (!input || !font) return;
+    const upm = font.unitsPerEm || 1000;
+    const shaped = shapeArabic(input.value);
+    const lines = ["gid | نص | معلن(adv) | حبر(ink) | فرق/upm | ملحوظة"];
+    shaped.forEach((s) => {
+      if (s.gid === undefined || s.gid === null) {
+        lines.push("— | (فراغ/ناقص) | — | — | — | —");
+        return;
+      }
+      let g = null;
+      try { g = font.glyphs.get(s.gid); } catch (e) {}
+      if (!g) return;
+      const adv = g.advanceWidth || 0;
+      let inkW = 0;
+      try {
+        const bb = g.path.getBoundingBox();
+        if (isFinite(bb.x1) && isFinite(bb.x2)) inkW = Math.max(0, bb.x2 - bb.x1);
+      } catch (e) {}
+      const diff = inkW - adv;
+      const frac = upm ? (diff / upm) : 0;
+      const label = s.cpText || (s.dictWord !== undefined ? s.dictWord : (s.cp ? String.fromCodePoint(s.cp) : ""));
+      const cpHex = (s.cp !== undefined && s.cp !== null) ? "U+" + s.cp.toString(16).toUpperCase() : "—";
+      const dw = (s.dictWord !== undefined) ? ("قاموس:" + s.dictWord) : "—";
+      const note = frac > 0.5 ? "⚠ فادح" : (frac > 0.15 ? "متسع" : (frac > 0 ? "طبيعي" : "—"));
+      lines.push(s.gid + " | " + label + " (" + cpHex + ", " + dw + ") | " + adv + " | " + Math.round(inkW) + " | " + frac.toFixed(2) + " | " + note);
+    });
+    let report = "upm=" + upm + "\n" + lines.join("\n");
+    /* ملخص المسافة في رأس التقرير — عشان «الفراغ يختلف بين خط و خط» يبان بالرقم */
+    try {
+      const gls = (typeof spaceGlyphsOf === "function") ? spaceGlyphsOf(font) : [];
+      const em = (typeof __mhSpaceEm === "function") ? __mhSpaceEm() : 0.26;
+      const sv = (typeof loadSavedSpaceFor === "function" && activeSlot >= 0 && slots[activeSlot])
+        ? loadSavedSpaceFor(slots[activeSlot].name) : null;
+      const effU = (typeof __mhActiveSpaceUnits === "function") ? __mhActiveSpaceUnits(upm) : null;
+      const shownU = (effU !== null) ? effU : Math.round(gls[0].advanceWidth || 0);
+      const spLine = gls.length
+        ? ("المسافة U+0020: " + shownU + " وحدة = " +
+           ((shownU / upm) * 100).toFixed(1) + "% من em" +
+           (sv ? " (موحّدة على " + (sv.em * 100).toFixed(1) + "%)" : "") +
+           " — غيّرها من أداة «توحيد عرض المسافة»")
+        : ("المسافة U+0020 مش موجودة في الخط — الفواصل بتاخد " + (em * 100).toFixed(1) + "% (إعداد استوديو المسافة)");
+      report = "upm=" + upm + " | " + spLine + "\n" + lines.join("\n");
+    } catch (eSp) { /* التقرير الأساسي يفضل شغال */ }
+    const ok = await copyText(report);
+    uiAlert(report.replace(/\n/g, "<br>"), "تشخيص الفراغات" + (ok ? " (اتنسخ كمان)" : ""));
+  },
+  "td-copy": async () => {
+    const input = qs("#tdText");
+    if (!input) return;
+    const shaped = shapeArabic(input.value);
+    const out = shaped.filter((s) => !s.missing)
+      .map((s) => s.cpText || (s.cp ? String.fromCodePoint(s.cp) : ""))
+      .join("");
+    if (!out) { toast("لا شيء للنسخ", true); return; }
+    const ok = await copyText(out);
+    toast(ok ? "تم النسخ" : "فشل النسخ");
+  },
+  "td-clear": () => {
+    const input = qs("#tdText");
+    if (input) {
+      input.value = "";
+      input.dispatchEvent(new Event("input"));
+    }
+  },
+
+  /* الاستيراد */
+  "imp-open": () => impFileInput.click(),
+  "imp-back": () => {
+    if (swapTargetIndex !== null) {
+      const t = swapTargetIndex;
+      swapTargetIndex = null;
+      openSwap(t);
+    } else {
+      openImport();
+    }
+  },
+  "imp-slot": (btn) => {
+    importSlotIndex = +btn.dataset.slot;
+    renderImportList();
+  },
+  "imp-select-all": () => toggleAllImportVisible(),
+  "imp-clear-select": () => clearImportSelection(),
+  "imp-add-selected": () => addSelectedImports(),
+
+  "ia-add": null,
+  "ia-replace": null,
+  "ia-swap": null
+};
+
+/* ================================================================
+   § 34 — توزيع الأحداث
+   ================================================================ */
+document.addEventListener("click", (e) => {
+  /* زرار "؟" الصغير جنب كل أداة في القائمة الجانبية — بيوقف هنا
+     ومايكملش لـ data-act بتاع الزرار الأساسي عشان الأداة ما تفتحش */
+  const helpBtn = e.target.closest(".sb-help");
+  if (helpBtn) {
+    e.stopPropagation();
+    showFeatureHelp(helpBtn.dataset.helpAct);
+    return;
+  }
+
+  const actBtn = e.target.closest("[data-act]");
+  if (actBtn) {
+    runActionByName(actBtn.dataset.act, actBtn);
+    /* على الهواتف: أي عملية تنطلق من الدرج تقفل الدرج تلقائيًا */
+    if (actBtn.closest("#sidebar") && actBtn.dataset.act !== "sb-close" && actBtn.dataset.act !== "sb-open") {
+      document.body.classList.remove("sb-open");
+    }
+  }
+});
+
+fileInput.addEventListener("change", () => {
+  loadFontFiles(fileInput.files);
+  fileInput.value = "";
+});
+
+impFileInput.addEventListener("change", () => {
+  loadImportFiles(impFileInput.files);
+  impFileInput.value = "";
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (!dialogEl.hidden) {
+      if (dialogFinish) dialogFinish();
+    } else if (!modalEl.hidden) {
+      closeModal();
+    } else if (document.body.classList.contains("sb-open")) {
+      document.body.classList.remove("sb-open");
+    } else if (selMode) {
+      setSelMode(false);
+    }
+    return;
+  }
+
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+    const t = e.target;
+    const inField = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA");
+    if (!inField && undoStack.length) {
+      e.preventDefault();
+      undo();
+    }
+  }
+});
+
+function setUIReady(ready) {
+  searchEl.disabled = !ready;
+  const pageSizeSel = document.getElementById("pageSizeSel");
+  if (pageSizeSel) {
+    pageSizeSel.disabled = !ready;
+    if (ready) pageSizeSel.value = String(__mihabarPageSize());
+  }
+  [
+    "test-drive", "space-studio", "font-pages", "open-dict", "open-pairs", "words-list", "glyph-add",
+    "glyph-import", "compare-open", "select-mode", "export-glyph-png",
+    "file-info", "export-ttf", "export-woff2", "backup-all",
+    "restore-backup", "close-tab", "card-open", "book-open",
+    "project-save", "project-open", "toggle-grouped", "toggle-pure-export", "unicode-range-add"
+  ].forEach((act) => {
+    const el = document.querySelector('[data-act="' + act + '"]');
+    if (el) el.disabled = !ready;
+  });
+
+  if (!ready) {
+    undoStack.length = 0;
+  }
+  updateUndoBtn();
+  updateGroupBtn();
+}
+
+/* تحديث زر التقسيم: لون استوديو لو مفعّل، عادي لو لأ */
+function updateGroupBtn() {
+  const btn = document.getElementById("groupBtn");
+  if (!btn) return;
+  if ((window.__mihabarGroupedViewEnabled ? window.__mihabarGroupedViewEnabled() : groupedViewEnabled())) {
+    btn.style.color = "var(--accent)";
+    btn.style.background = "var(--soft2)";
+  } else {
+    btn.style.color = "";
+    btn.style.background = "";
+  }
+}
+
+/* تبديل وضع التقسيم وإعادة الرسم */
+function toggleGroupedView() {
+  const newVal = !(window.__mihabarGroupedViewEnabled ? window.__mihabarGroupedViewEnabled() : groupedViewEnabled());
+  setGroupedView(newVal);
+  updateGroupBtn();
+  if (font) renderAll();
+  toast(newVal ? "تم تفعيل تقسيم الشبكة لأقسام" : "تم إيقاف التقسيم — عرض مسطح");
+}
+
+/* ================================================================
+   § 35 — التهيئة
+   ================================================================ */
+updateEmptyState();
+setUIReady(false);
+updatePureExportLabel();
+window.__MH_BOOT__ = true; /* حرس الأخطاء: كل السكريبتات اشتغلت للآخر */
